@@ -1,0 +1,85 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/background</item>
+        <item name="colorPrimaryVariant">@color/background</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/background</item>
+        <item name="colorSecondaryVariant">@color/background</item>
+        <item name="colorOnSecondary">@color/background</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Dropdown Top and Bottom Color. -->
+        <item name="colorSurface">@color/background</item>
+        <!-- OncreateOptionsMenu Style -->
+        <item name="android:itemTextAppearance">@style/OptionsMenuStyle</item>
+        <item name="android:itemBackground">@color/background</item>
+
+    </style>
+
+    <!-- FAB Custom Style. -->
+    <style name="LabelStyle">
+        <item name="android:background">@drawable/fab_text_style</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Navigation Drawer Text Custom Style -->
+    <style name="NavDrawerTextStyle" parent="Base.TextAppearance.AppCompat">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold|italic</item>
+    </style>
+
+    <!-- Navigation Drawer Divider Custom Style -->
+    <style name="NavigationView" parent="Base.Theme.AppCompat">
+        <item name="android:listDivider">@color/background</item>
+        <item name="android:textColorPrimary">@color/background</item>
+        <item name="android:textColorSecondary">@color/background</item>
+        <item name="textAppearanceSubtitle2">@style/NavDrawerTextStyle</item>
+    </style>
+
+    <!-- Edit Text Custom Style -->
+    <style name="ThemeOverlay.AppTheme.TextInputEditText.Outlined" parent="">
+        <item name="colorControlActivated">@color/background</item>
+    </style>
+
+    <!-- Toast Custom Style -->
+    <style name="CustomToast">
+        <item name="stColorBackground">@color/background</item>
+        <item name="stTextColor">@color/white</item>
+        <item name="stLength">LONG</item>
+        <item name="stRadius">10dp</item>
+        <item name="stTextBold">true</item>
+    </style>
+
+    <!-- Error Toast Custom Style -->
+    <style name="CustomErrorToast">
+        <item name="stColorBackground">@color/red</item>
+        <item name="stTextColor">@color/white</item>
+        <item name="stLength">LONG</item>
+        <item name="stRadius">10dp</item>
+        <item name="stTextBold">true</item>
+    </style>
+
+    <!-- Date Picker Style -->
+    <style name="DateDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/background</item>
+    </style>
+
+    <!-- Delete Dialog Style -->
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/background</item>
+        <item name="android:textColorPrimary">@color/background</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <!-- OncreateOptionsMenu Style -->
+    <style name="OptionsMenuStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+</resources>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".General.AdminActivity">
+
+        <TextView
+            android:id="@+id/adminHeading1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="@string/admin_activity"
+            android:textColor="@color/background"
+            android:textSize="30sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/adminHeading2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="@string/add_list_values"
+            android:textColor="@color/background"
+            android:textSize="23sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/adminHeading1" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/listValueLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="32dp"
+            android:hint="@string/enter_list_value"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/adminHeading2"
+            app:startIconDrawable="@drawable/ic_remarks"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/listValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="textCapWords"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/listNameLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/select_list"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/listValueLayout"
+            app:layout_constraintStart_toStartOf="@+id/listValueLayout"
+            app:layout_constraintTop_toBottomOf="@+id/listValueLayout"
+            app:startIconDrawable="@drawable/ic_category"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/listName"
+                android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:inputType="none"
+                android:textColor="@color/background"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/listSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/button_background"
+            android:text="  Submit  "
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listNameLayout"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/adminHeading3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="@string/add_personal_details"
+            android:textColor="@color/background"
+            android:textSize="23sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listSubmit" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/personalNameLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:hint="@string/enter_name"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/listNameLayout"
+            app:layout_constraintStart_toStartOf="@+id/listNameLayout"
+            app:layout_constraintTop_toBottomOf="@+id/adminHeading3"
+            app:startIconDrawable="@drawable/ic_type"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/personalName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/personalValueLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/enter_value"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/personalNameLayout"
+            app:layout_constraintStart_toStartOf="@+id/personalNameLayout"
+            app:layout_constraintTop_toBottomOf="@+id/personalNameLayout"
+            app:startIconDrawable="@drawable/ic_category"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/personalValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionSend"
+                android:inputType="textCapWords"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/personalSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/button_background"
+            android:text="  Submit  "
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/personalValueLayout"
+            tools:ignore="HardcodedText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

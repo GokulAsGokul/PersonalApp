@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".AddBalances.AddBalanceDetailsActivity">
+
+        <TextView
+            android:id="@+id/balDecHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="@string/add_balance_details"
+            android:textColor="@color/background"
+            android:textSize="30sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/balSourceNameLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginEnd="32dp"
+            android:hint="@string/select_source_name"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/balDecHeading"
+            app:startIconDrawable="@drawable/ic_view_balance"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/balSourceName"
+                android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:inputType="none"
+                android:textColor="@color/background"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/balAmountLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/amount"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/balSourceNameLayout"
+            app:layout_constraintStart_toStartOf="@+id/balSourceNameLayout"
+            app:layout_constraintTop_toBottomOf="@+id/balSourceNameLayout"
+            app:startIconDrawable="@drawable/ic_rupee"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/balAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/balCategoryLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/select_category"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/balAmountLayout"
+            app:layout_constraintStart_toStartOf="@+id/balAmountLayout"
+            app:layout_constraintTop_toBottomOf="@+id/balAmountLayout"
+            app:startIconDrawable="@drawable/ic_category"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/balCategory"
+                android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:inputType="none"
+                android:textColor="@color/background"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/balTranDateLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/transaction_date"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:errorTextColor="@color/red"
+            app:layout_constraintEnd_toEndOf="@+id/balCategoryLayout"
+            app:layout_constraintStart_toStartOf="@+id/balCategoryLayout"
+            app:layout_constraintTop_toBottomOf="@+id/balCategoryLayout"
+            app:startIconDrawable="@drawable/ic_date"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/balTranDate"
+                android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:inputType="none"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/balDecRemarksLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/remarks"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="20"
+            app:counterTextColor="@color/background"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/balTranDateLayout"
+            app:layout_constraintStart_toStartOf="@+id/balTranDateLayout"
+            app:layout_constraintTop_toBottomOf="@+id/balTranDateLayout"
+            app:startIconDrawable="@drawable/ic_remarks"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/balDecRemarks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="textCapWords"
+                android:text="@string/mention_if_any"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/balSwitchIncome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/income"
+            android:textColor="@color/background"
+            android:textSize="20sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toStartOf="@+id/balSwitch"
+            app:layout_constraintTop_toBottomOf="@+id/balDecRemarksLayout" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/balSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textOff="@string/off"
+            android:textOn="@string/on"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/balDecRemarksLayout"
+            app:thumbTint="@color/background"
+            app:trackTint="@color/background" />
+
+        <TextView
+            android:id="@+id/balSwitchOutcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/expense"
+            android:textColor="@color/background"
+            android:textSize="20sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintStart_toEndOf="@+id/balSwitch"
+            app:layout_constraintTop_toBottomOf="@+id/balDecRemarksLayout" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/balDecSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/button_background"
+            android:text="  Submit  "
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/balSwitch"
+            tools:ignore="HardcodedText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

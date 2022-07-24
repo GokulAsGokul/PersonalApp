@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "222874769199",
+    "project_id": "personalapp-63e8b",
+    "storage_bucket": "personalapp-63e8b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222874769199:android:53a3431e38f935ffae73da",
+        "android_client_info": {
+          "package_name": "com.gokul.personal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "222874769199-m2l1spe77ae71d9j3i4lj3rka0mpm3oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-ZDpRuVx5mRndhsB0Mt7z1iO_Luw05Dk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "222874769199-m2l1spe77ae71d9j3i4lj3rka0mpm3oq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
