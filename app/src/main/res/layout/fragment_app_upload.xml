@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".AdminActivity.AppUploadFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".AppUpload.UploadAppActivity">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/appUploadHeading"
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="150dp"
+            android:layout_marginTop="80dp"
             android:layout_marginEnd="32dp"
             android:hint="@string/app_version_no"
             android:textColorHint="@color/background"
@@ -69,9 +69,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
-            android:layout_marginEnd="32dp"
             android:hint="@string/select_updated_version"
             android:textColorHint="@color/background"
             android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
@@ -84,8 +82,8 @@
             app:boxStrokeWidthFocused="2dp"
             app:errorTextColor="@color/red"
             app:hintTextColor="@color/background"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/appUpVersionLayout"
+            app:layout_constraintStart_toStartOf="@+id/appUpVersionLayout"
             app:layout_constraintTop_toBottomOf="@+id/appUpVersionLayout"
             app:startIconDrawable="@drawable/ic_app_dec"
             app:startIconTint="@color/background">
@@ -106,9 +104,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
-            android:layout_marginEnd="32dp"
             android:hint="@string/new_version_note"
             android:textColorHint="@color/background"
             android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
@@ -123,8 +119,8 @@
             app:endIconTint="@color/background"
             app:errorTextColor="@color/red"
             app:hintTextColor="@color/background"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/appUpFileLayout"
+            app:layout_constraintStart_toStartOf="@+id/appUpFileLayout"
             app:layout_constraintTop_toBottomOf="@+id/appUpFileLayout"
             app:startIconDrawable="@drawable/ic_remarks"
             app:startIconTint="@color/background">
@@ -156,4 +152,5 @@
             tools:ignore="HardcodedText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+
+</FrameLayout>

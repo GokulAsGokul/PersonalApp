@@ -1,4 +1,4 @@
-package com.gokul.personal.General;
+package com.gokul.personal.Miscellaneous;
 
 import android.app.Activity;
 import android.content.Context;

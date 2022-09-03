@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.gokul.personal.General.ConnectionCheck;
-import com.gokul.personal.General.GeneralData;
+import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.GeneralData;
 import com.gokul.personal.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

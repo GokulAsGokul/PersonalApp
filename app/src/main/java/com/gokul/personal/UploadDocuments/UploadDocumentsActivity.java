@@ -20,20 +20,26 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.gokul.personal.General.ConnectionCheck;
-import com.gokul.personal.General.GeneralData;
+import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.GeneralData;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -42,12 +48,13 @@ public class UploadDocumentsActivity extends AppCompatActivity {
 
     private TextInputLayout docUploadNameLayout, docUpCategoryLayout, docUploadFileLayout;
     private AutoCompleteTextView docUploadName, docUpCategory, docUploadFile;
-    private Dialog dialog;
     private Vibrator vibrator;
-    final String[] categoryList = {"Bank", "Certificate", "College", "Family", "Personal", "Work", "Others"};
     private String categoryDropDown = "";
     private Uri fileUri;
     private String fileName, fileCategory, fileUrl, fileExtension;
+    private Dialog dialog1, dialog2;
+    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private final ArrayList<String> categoryList = new ArrayList<>();
 
     ActivityResultLauncher<String> fileContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
@@ -80,12 +87,23 @@ public class UploadDocumentsActivity extends AppCompatActivity {
 
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
 
-        dialog = new Dialog(UploadDocumentsActivity.this);
-        dialog.setContentView(R.layout.uploading_dialog);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        dialog1 = new Dialog(UploadDocumentsActivity.this);
+        dialog1.setContentView(R.layout.uploading_dialog);
+        dialog1.setCancelable(true);
+        dialog1.setCanceledOnTouchOutside(false);
+        if (dialog1.getWindow() != null) {
+            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+
+        dialog2 = new Dialog(UploadDocumentsActivity.this);
+        dialog2.setContentView(R.layout.loading_dialog);
+        dialog2.setCancelable(true);
+        dialog2.setCanceledOnTouchOutside(false);
+        if (dialog2.getWindow() != null) {
+            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+        if (ConnectionCheck.getConnectionType(getApplicationContext()) != 0) {
+            dialog2.show();
         }
 
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
@@ -94,11 +112,28 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         docUpCategory.setClickable(true);
         docUpCategory.setFocusable(false);
         docUpCategoryLayout.setClickable(true);
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this, R.layout.dropdown_list, categoryList);
-        docUpCategory.setAdapter(categoryAdapter);
-        docUpCategory.setOnItemClickListener((parent, view, position, id) -> {
-            UIUtil.hideKeyboard(UploadDocumentsActivity.this);
-            categoryDropDown = parent.getItemAtPosition(position).toString();
+        databaseReference.child("DropDown Values").child("UploadDocCategory").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                    dialog2.show();
+                    categoryList.add(temp);
+                }
+                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(UploadDocumentsActivity.this, R.layout.dropdown_list, categoryList);
+                sourceAdapter.sort(Comparator.naturalOrder());
+                docUpCategory.setAdapter(sourceAdapter);
+                dialog2.dismiss();
+                docUpCategory.setOnItemClickListener((parent, view, position, id) -> {
+                    UIUtil.hideKeyboard(UploadDocumentsActivity.this);
+                    categoryDropDown = parent.getItemAtPosition(position).toString();
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(UploadDocumentsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
         });
 
         docUploadFileLayout.setClickable(true);
@@ -156,7 +191,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                 docUploadFileLayout.setErrorEnabled(false);
                 docUploadFileLayout.setError(null);
                 UIUtil.hideKeyboard(UploadDocumentsActivity.this);
-                dialog.show();
+                dialog1.show();
                 docUpload();
             }
         }
@@ -167,7 +202,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         if (fileUri != null) {
             FirebaseStorage.getInstance().getReference().child("Documents/" + fileCategory + "/" + fileName)
                     .getDownloadUrl().addOnSuccessListener(uri -> {
-                dialog.dismiss();
+                dialog1.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(UploadDocumentsActivity.this, "Document already available", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }).addOnFailureListener(e -> {
@@ -190,7 +225,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                                 Objects.requireNonNull(docUploadName.getText()).clear();
                                 Objects.requireNonNull(docUpCategory.getText()).clear();
                                 Objects.requireNonNull(docUploadFile.getText()).clear();
-                                dialog.dismiss();
+                                dialog1.dismiss();
                                 StyleableToast.makeText(UploadDocumentsActivity.this, "Uploaded Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                             }).addOnFailureListener(e1 -> {
                         docUploadFile.setText(R.string.firebaseUpdateError);
@@ -199,17 +234,17 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                     });
 
                 }).addOnFailureListener(e12 -> {
-                    dialog.dismiss();
+                    dialog1.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(UploadDocumentsActivity.this, "Failed to capture document URL: " + e12.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     docUploadFile.setText(R.string.uploadError);
                 })).addOnFailureListener(e1 -> {
-                    dialog.dismiss();
+                    dialog1.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(UploadDocumentsActivity.this, "Document Upload Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }).addOnProgressListener(snapshot -> {
-                    ProgressBar downloadDialogBar = dialog.findViewById(R.id.uploadDialogBar);
-                    TextView uploadDialog2 = dialog.findViewById(R.id.uploadDialog2);
+                    ProgressBar downloadDialogBar = dialog1.findViewById(R.id.uploadDialogBar);
+                    TextView uploadDialog2 = dialog1.findViewById(R.id.uploadDialog2);
                     final int progress = (int) ((snapshot.getBytesTransferred() * 100L) / snapshot.getTotalByteCount());
                     downloadDialogBar.setProgress(progress);
                     uploadDialog2.setText((snapshot.getBytesTransferred()) / (1024L) + " KB of " + (snapshot.getTotalByteCount()) / (1024L) + " KB");
@@ -232,4 +267,5 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         super.onRestart();
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
     }
+
 }

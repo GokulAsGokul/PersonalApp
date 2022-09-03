@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".AdminActivity.BankDetailsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/bankDetailsHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="@string/add_bank_details"
+            android:textColor="@color/background"
+            android:textSize="25sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bnkNameLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="32dp"
+            android:hint="@string/enter_bank_name"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bankDetailsHeading"
+            app:startIconDrawable="@drawable/ic_account_balance"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bnkName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bnkCIFLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/enter_customer_id"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/bnkNameLayout"
+            app:layout_constraintStart_toStartOf="@+id/bnkNameLayout"
+            app:layout_constraintTop_toBottomOf="@+id/bnkNameLayout"
+            app:startIconDrawable="@drawable/ic_name"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bnkCIF"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bnkAcntNumberLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/enter_account_number"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/bnkCIFLayout"
+            app:layout_constraintStart_toStartOf="@+id/bnkCIFLayout"
+            app:layout_constraintTop_toBottomOf="@+id/bnkCIFLayout"
+            app:startIconDrawable="@drawable/ic_view_lent"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bnkAcntNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bnkIFSCLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/enter_ifsc_code"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/bnkAcntNumberLayout"
+            app:layout_constraintStart_toStartOf="@+id/bnkAcntNumberLayout"
+            app:layout_constraintTop_toBottomOf="@+id/bnkAcntNumberLayout"
+            app:startIconDrawable="@drawable/ic_view_documents"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bnkIFSC"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bnkMICRLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/enter_micr_code"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/bnkIFSCLayout"
+            app:layout_constraintStart_toStartOf="@+id/bnkIFSCLayout"
+            app:layout_constraintTop_toBottomOf="@+id/bnkIFSCLayout"
+            app:startIconDrawable="@drawable/ic_type"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bnkMICR"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bnkBranchLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/enter_branch_name"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/bnkMICRLayout"
+            app:layout_constraintStart_toStartOf="@+id/bnkMICRLayout"
+            app:layout_constraintTop_toBottomOf="@+id/bnkMICRLayout"
+            app:startIconDrawable="@drawable/ic_remarks"
+            app:startIconTint="@color/background">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bnkBranch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionSend"
+                android:inputType="textCapWords"
+                android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/bnkSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/button_background"
+            android:text="  Submit  "
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bnkBranchLayout"
+            tools:ignore="HardcodedText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

@@ -2,7 +2,7 @@ package com.gokul.personal.AddBalances;
 
 public class BalanceDetailsData {
 
-    private String Source, Amount, Category, Date, Remarks, Type;
+    private String Source, Amount, Category, BalType, Date, Remarks, Type;
 
     public String getSource() {
         return Source;
@@ -26,6 +26,14 @@ public class BalanceDetailsData {
 
     public void setCategory(String category) {
         Category = category;
+    }
+
+    public String getBalType() {
+        return BalType;
+    }
+
+    public void setBalType(String balType) {
+        BalType = balType;
     }
 
     public String getDate() {

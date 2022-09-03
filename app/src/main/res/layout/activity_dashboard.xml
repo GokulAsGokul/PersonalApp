@@ -6,67 +6,412 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".General.DashboardActivity">
+    tools:context=".Dashboard.DashboardActivity">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@color/white">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
             android:background="@color/white">
 
-            <com.getbase.floatingactionbutton.FloatingActionsMenu
-                android:id="@+id/fabBtn"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/recyclerViewLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="20dp"
-                app:fab_addButtonColorNormal="@color/background"
-                app:fab_expandDirection="up"
-                app:fab_labelStyle="@style/LabelStyle"
-                app:fab_labelsPosition="left"
+                android:layout_marginTop="40dp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/dashDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/dashAnimation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="50dp"
+                    android:foregroundGravity="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:lottie_autoPlay="true"
+                    app:lottie_fileName="empty.json"
+                    app:lottie_loop="true" />
+
+                <ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
+                    android:id="@+id/dashDetailIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/dashDetail"
+                    app:spi_dotSelectedColor="@color/background" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="30dp"
+                android:background="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/recyclerViewLayout">
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/addAppBtn"
-                    android:layout_width="wrap_content"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/balanceCard"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:fab_colorNormal="@color/background"
-                    app:fab_icon="@drawable/ic_app_dec"
-                    app:fab_title="@string/upload_latest_app" />
+                    android:layout_margin="20dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardMaxElevation="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/addDocBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:fab_colorNormal="@color/background"
-                    app:fab_icon="@drawable/ic_document"
-                    app:fab_title="@string/upload_documents" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/balanceLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white">
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/addBalBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:fab_colorNormal="@color/background"
-                    app:fab_icon="@drawable/ic_account_balance"
-                    app:fab_title="@string/add_balance_details" />
+                        <TextView
+                            android:id="@+id/balanceLayoutText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/background"
+                            android:padding="10dp"
+                            android:text="Balance Details"
+                            android:textColor="@color/white"
+                            android:textSize="20sp"
+                            android:textStyle="bold|italic"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/addLendBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:fab_colorNormal="@color/background"
-                    app:fab_icon="@drawable/ic_lend_dec"
-                    app:fab_title="@string/add_lending_details" />
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/balanceCard1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="40dp"
+                            android:layout_marginEnd="20dp"
+                            android:onClick="expand1"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="5dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceLayoutText">
 
-            </com.getbase.floatingactionbutton.FloatingActionsMenu>
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/balanceCardLayout1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:animateLayoutChanges="true"
+                                android:background="@color/white">
+
+                                <TextView
+                                    android:id="@+id/cardText1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/background"
+                                    android:padding="10dp"
+                                    android:text="India"
+                                    android:textColor="@color/white"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold|italic"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/availableAmountText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="20dp"
+                                    android:layout_marginTop="20dp"
+                                    android:text="Available Amount    : Rs "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/cardText1"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/availableAmount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/availableAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/cardText1" />
+
+                                <TextView
+                                    android:id="@+id/lentAmountText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:text="Lent Amount            : Rs "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toStartOf="@+id/availableAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/availableAmountText"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/lentAmount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/lentAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/availableAmount" />
+
+                                <TextView
+                                    android:id="@+id/investmentAmountText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:text="Invested Amount     : Rs "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toStartOf="@+id/lentAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/lentAmountText"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/investmentAmount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/investmentAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/lentAmount" />
+
+                                <TextView
+                                    android:id="@+id/totalAmountText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginBottom="20dp"
+                                    android:text="Total Amount           : Rs "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="@+id/investmentAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/investmentAmountText"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/totalAmount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/totalAmountText"
+                                    app:layout_constraintTop_toBottomOf="@+id/investmentAmount" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/balanceCard2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="40dp"
+                            android:onClick="expand2"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="5dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceCard1">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/balanceCardLayout2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:animateLayoutChanges="true"
+                                android:background="@color/white">
+
+                                <TextView
+                                    android:id="@+id/cardText2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/background"
+                                    android:padding="10dp"
+                                    android:text="Oman"
+                                    android:textColor="@color/white"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold|italic"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/availableAmountText1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="20dp"
+                                    android:layout_marginTop="20dp"
+                                    android:text="Available Amount    : RO "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/cardText2"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/availableAmount1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/availableAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/cardText2" />
+
+                                <TextView
+                                    android:id="@+id/lentAmountText1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:text="Lent Amount            : RO "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toStartOf="@+id/availableAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/availableAmountText1"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/lentAmount1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/lentAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/availableAmount1" />
+
+                                <TextView
+                                    android:id="@+id/investmentAmountText1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:text="Invested Amount     : RO "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toStartOf="@+id/lentAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/lentAmountText1"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/investmentAmount1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/investmentAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/lentAmount1" />
+
+                                <TextView
+                                    android:id="@+id/totalAmountText1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginBottom="20dp"
+                                    android:text="Total Amount           : RO "
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="@+id/investmentAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/investmentAmountText1"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:id="@+id/totalAmount1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:textColor="@color/background"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold|italic"
+                                    android:visibility="gone"
+                                    app:layout_constraintStart_toEndOf="@+id/totalAmountText1"
+                                    app:layout_constraintTop_toBottomOf="@+id/investmentAmountText1" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </ScrollView>
 
     <com.google.android.material.navigation.NavigationView

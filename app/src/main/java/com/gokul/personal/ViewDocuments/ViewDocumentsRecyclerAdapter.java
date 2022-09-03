@@ -12,7 +12,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,8 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.gokul.personal.General.ConnectionCheck;
-import com.gokul.personal.General.GeneralData;
+import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.GeneralData;
 import com.gokul.personal.R;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -41,7 +40,6 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
     private TextView downloadDialogText1, downloadDialogText2, downloadDialogText3;
     private ProgressBar downloadDialogBar;
     private final Activity activity;
-    private Menu myMenu;
 
     public ViewDocumentsRecyclerAdapter(Context context, ArrayList<GeneralData> list, Activity activity) {
         this.context = context;
@@ -56,10 +54,11 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
         return new ViewDocumentsRecyclerAdapter.MyViewHolder(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewDocumentsRecyclerAdapter.MyViewHolder holder, int position) {
         GeneralData data = list.get(position);
-        holder.serialNo.setText(String.valueOf(position + 1));
+        holder.serialNo.setText((position + 1) +".");
         holder.viewDocsText.setText(data.getFileName());
 
         holder.viewDocsDownload.setOnClickListener(view -> {
@@ -98,9 +97,6 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
                             list.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
                             if (list.isEmpty()) {
-                                myMenu.findItem(R.id.search).setVisible(false);
-                                myMenu.findItem(R.id.sortByAZ).setVisible(false);
-                                myMenu.findItem(R.id.sortByZA).setVisible(false);
                                 LottieAnimationView animationView = activity.findViewById(R.id.docsAnimation);
                                 animationView.setVisibility(View.VISIBLE);
                                 animationView.playAnimation();
@@ -110,11 +106,11 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
                         }).
                         addOnFailureListener(e ->
                                 StyleableToast.makeText(activity, "Document Data Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show())).addOnFailureListener(e -> StyleableToast.makeText(activity, "Document Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show()));
-                builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+                builder.setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss());
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
-                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(0, 74, 153));
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(0, 74, 153));
+                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundColor(Color.rgb(0, 74, 153));
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.rgb(0, 74, 153));
 
             }
 
@@ -153,7 +149,7 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
         DownloadManager.Request request = new DownloadManager.Request(uri).setTitle("Document Download")
                 .setDescription(fileName + " is downloading").setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalPublicDir(destination, "Personal/Documents/" + (fileName + "." + extension));
+                .setDestinationInExternalPublicDir(destination, "PersonalApp/Documents/" + (fileName + "." + extension));
         downloadID = downloadManager.enqueue(request);
 
         new Thread(() -> {

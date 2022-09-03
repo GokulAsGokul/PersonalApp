@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/bankName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/detailsLayout"
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:foregroundGravity="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bankName">
+
+            <TextView
+                android:id="@+id/cifNoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:text="Customer ID  : "
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/cifNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toEndOf="@+id/cifNoText"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/accountNoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:text="Account.No   : "
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toStartOf="@+id/cifNoText"
+                app:layout_constraintTop_toBottomOf="@+id/cifNoText"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/accountNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toEndOf="@+id/accountNoText"
+                app:layout_constraintTop_toBottomOf="@+id/cifNoText" />
+
+            <TextView
+                android:id="@+id/ifscCodeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:text="IFSC Code     : "
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toStartOf="@+id/accountNoText"
+                app:layout_constraintTop_toBottomOf="@+id/accountNoText"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/ifscCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toEndOf="@+id/ifscCodeText"
+                app:layout_constraintTop_toBottomOf="@+id/accountNo" />
+
+            <TextView
+                android:id="@+id/micrCodeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:text="MICR Code    : "
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toStartOf="@+id/ifscCodeText"
+                app:layout_constraintTop_toBottomOf="@+id/ifscCodeText"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/micrCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toEndOf="@+id/micrCodeText"
+                app:layout_constraintTop_toBottomOf="@+id/ifscCode" />
+
+            <TextView
+                android:id="@+id/branchNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical"
+                android:text="Branch           : "
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/micrCodeText"
+                app:layout_constraintTop_toBottomOf="@+id/micrCodeText"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/branchName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/background"
+                android:textSize="17sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintStart_toEndOf="@+id/branchNameText"
+                app:layout_constraintTop_toBottomOf="@+id/micrCode" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/dashShareBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:contentDescription="@string/lentdetailseditbtn"
+                android:src="@drawable/ic_share"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

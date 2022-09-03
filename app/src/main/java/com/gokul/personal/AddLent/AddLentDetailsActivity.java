@@ -1,8 +1,8 @@
 package com.gokul.personal.AddLent;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -14,21 +14,27 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.gokul.personal.General.ConnectionCheck;
-import com.gokul.personal.General.DashboardActivity;
+import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -40,12 +46,13 @@ public class AddLentDetailsActivity extends AppCompatActivity {
     private TextInputLayout lendDecNameLayout, lendDecAmountLayout, lendDecFromLayout, lendDecToLayout, lendDecTranDateLayout, lendDecRemarksLayout;
     private TextInputEditText lendDecName, lendDecAmount, lendDecRemarks;
     private AutoCompleteTextView lendDecFrom, lendDecTo, lendDecTranDate;
-    final String[] fromList = {"Cash", "DBS Bank", "HDFC Bank", "GPay", "LVB Bank", "PhonePe", "SBI Bank", "Others"};
-    final String[] toList = {"Bank", "Cash", "GPay", "PhonePe", "Others"};
     private String fromDropDown, toDropDown = "";
     private Vibrator vibrator;
     private String name, amount, from, to, date, remarks;
-    private Dialog dialog1;
+    private Dialog dialog1, dialog2;
+    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private final ArrayList<String> fromList = new ArrayList<>();
+    private final ArrayList<String> toList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,28 +87,73 @@ public class AddLentDetailsActivity extends AppCompatActivity {
             dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         }
 
+        dialog2 = new Dialog(AddLentDetailsActivity.this);
+        dialog2.setContentView(R.layout.loading_dialog);
+        dialog2.setCancelable(true);
+        dialog2.setCanceledOnTouchOutside(false);
+        if (dialog2.getWindow() != null) {
+            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+        if (ConnectionCheck.getConnectionType(getApplicationContext()) != 0) {
+            dialog2.show();
+        }
+
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
 
         lendDecFrom.setInputType(InputType.TYPE_NULL);
         lendDecFrom.setClickable(true);
         lendDecFrom.setFocusable(false);
         lendDecFromLayout.setClickable(true);
-        ArrayAdapter<String> fromAdapter = new ArrayAdapter<>(this, R.layout.dropdown_list, fromList);
-        lendDecFrom.setAdapter(fromAdapter);
-        lendDecFrom.setOnItemClickListener((parent, view, position, id) -> {
-            UIUtil.hideKeyboard(AddLentDetailsActivity.this);
-            fromDropDown = parent.getItemAtPosition(position).toString();
+        databaseReference.child("DropDown Values").child("Sources").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                    dialog2.show();
+                    fromList.add(temp);
+                }
+                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentDetailsActivity.this, R.layout.dropdown_list, fromList);
+                sourceAdapter.sort(Comparator.naturalOrder());
+                lendDecFrom.setAdapter(sourceAdapter);
+                dialog2.dismiss();
+                lendDecFrom.setOnItemClickListener((parent, view, position, id) -> {
+                    UIUtil.hideKeyboard(AddLentDetailsActivity.this);
+                    fromDropDown = parent.getItemAtPosition(position).toString();
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(AddLentDetailsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
         });
 
         lendDecTo.setInputType(InputType.TYPE_NULL);
         lendDecTo.setClickable(true);
         lendDecTo.setFocusable(false);
         lendDecToLayout.setClickable(true);
-        ArrayAdapter<String> toAdapter = new ArrayAdapter<>(this, R.layout.dropdown_list, toList);
-        lendDecTo.setAdapter(toAdapter);
-        lendDecTo.setOnItemClickListener((parent, view, position, id) -> {
-            UIUtil.hideKeyboard(AddLentDetailsActivity.this);
-            toDropDown = parent.getItemAtPosition(position).toString();
+        databaseReference.child("DropDown Values").child("AddLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                    dialog2.show();
+                    toList.add(temp);
+                }
+                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentDetailsActivity.this, R.layout.dropdown_list, toList);
+                sourceAdapter.sort(Comparator.naturalOrder());
+                lendDecTo.setAdapter(sourceAdapter);
+                dialog2.dismiss();
+                lendDecTo.setOnItemClickListener((parent, view, position, id) -> {
+                    UIUtil.hideKeyboard(AddLentDetailsActivity.this);
+                    toDropDown = parent.getItemAtPosition(position).toString();
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(AddLentDetailsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
         });
 
         lendDecTranDate.setInputType(InputType.TYPE_NULL);
@@ -146,6 +198,8 @@ public class AddLentDetailsActivity extends AppCompatActivity {
         }, year, month, day);
         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         datePickerDialog.show();
+        datePickerDialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setBackgroundColor(ContextCompat.getColor(this, R.color.white));
+        datePickerDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setBackgroundColor(ContextCompat.getColor(this, R.color.white));
         datePickerDialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.background));
         datePickerDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.background));
     }
@@ -311,6 +365,7 @@ public class AddLentDetailsActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private void lentSubmit() {
 
         lendDecNameLayout.setError(null);
@@ -331,24 +386,23 @@ public class AddLentDetailsActivity extends AppCompatActivity {
         } else {
             dialog1.show();
 
-            LentData data = new LentData();
+            String date1 = new SimpleDateFormat("_dd_MM_yyyy_HH_mm", Locale.getDefault()).format(new Date());
 
+            LentData data = new LentData();
             data.setName(name);
             data.setAmount(amount);
             data.setFrom(from);
             data.setTo(to);
             data.setDate(date);
             data.setRemarks(remarks);
+            data.setUpdateFinder(name + date1);
 
-            FirebaseDatabase.getInstance().getReference("Lent Details").child(name).setValue(data).addOnCompleteListener(task -> {
+            databaseReference.child("Lent Details").child(name + date1).setValue(data).addOnCompleteListener(task -> {
                 dialog1.dismiss();
-                StyleableToast.makeText(AddLentDetailsActivity.this, "Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                Intent intent = new Intent(AddLentDetailsActivity.this, DashboardActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                StyleableToast.makeText(AddLentDetailsActivity.this, "Lent Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
             }).addOnFailureListener(e -> {
                 dialog1.dismiss();
-                StyleableToast.makeText(AddLentDetailsActivity.this, "Add Lent Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                StyleableToast.makeText(AddLentDetailsActivity.this, "Lend Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
         }
     }
@@ -358,4 +412,5 @@ public class AddLentDetailsActivity extends AppCompatActivity {
         super.onRestart();
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
     }
+
 }

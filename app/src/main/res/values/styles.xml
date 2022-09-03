@@ -20,13 +20,6 @@
 
     </style>
 
-    <!-- FAB Custom Style. -->
-    <style name="LabelStyle">
-        <item name="android:background">@drawable/fab_text_style</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
     <!-- Navigation Drawer Text Custom Style -->
     <style name="NavDrawerTextStyle" parent="Base.TextAppearance.AppCompat">
         <item name="android:textSize">18sp</item>

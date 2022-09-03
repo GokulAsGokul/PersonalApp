@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.gokul.personal">
 
@@ -13,24 +14,30 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        app:lottie_enableMergePathsForKitKatAndAbove="true">
+        <activity android:name=".ViewInvestmentDetails.ViewInvestmentDetailsActivity" />
+        <activity android:name=".AddInvestmentDetails.AddInvestmentDetailsActivity" />
+        <activity android:name=".ViewLentDetails.ViewLentDetailsActivity" />
         <activity android:name=".ViewPersonalDetails.ViewPersonalDetailsActivity" />
-        <activity android:name=".General.AdminActivity" />
-        <activity android:name=".General.ViewBalanceDetailsActivity" />
+        <activity android:name=".AdminActivity.AdminActivity" />
+        <activity android:name=".ViewBalance.ViewBalanceDetailsActivity" />
         <activity android:name=".ViewDocuments.ViewDocumentsActivity" />
-        <activity android:name=".AppUpload.UploadAppActivity" />
         <activity android:name=".UploadDocuments.UploadDocumentsActivity" />
         <activity android:name=".AddBalances.AddBalanceDetailsActivity" />
         <activity android:name=".AddLent.AddLentDetailsActivity" />
         <activity
-            android:name=".General.DashboardActivity"
+            android:name=".Dashboard.DashboardActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,6 +45,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.gokul.personal.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_share" />
+        </provider>
     </application>
 
 </manifest>

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item android:title="@string/adding_details">
         <menu>
             <group android:checkableBehavior="single">
-                <item
-                    android:id="@+id/navAddApp"
-                    android:icon="@drawable/ic_app_dec"
-                    android:title="@string/upload_latest_app" />
                 <item
                     android:id="@+id/navAddDoc"
                     android:icon="@drawable/ic_document"
@@ -15,6 +12,10 @@
                     android:id="@+id/navAddBal"
                     android:icon="@drawable/ic_account_balance"
                     android:title="@string/add_balance_details" />
+                <item
+                    android:id="@+id/navAddInvest"
+                    android:icon="@drawable/ic_add_investment"
+                    android:title="@string/add_investment_details" />
                 <item
                     android:id="@+id/navAddLend"
                     android:icon="@drawable/ic_lend_dec"
@@ -39,6 +40,10 @@
                     android:icon="@drawable/ic_view_lent"
                     android:title="@string/lent_details" />
                 <item
+                    android:id="@+id/navViewInvest"
+                    android:icon="@drawable/ic_investment"
+                    android:title="@string/investments" />
+                <item
                     android:id="@+id/navViewDash"
                     android:icon="@drawable/ic_dashboard"
                     android:title="@string/dashboard" />
@@ -51,7 +56,6 @@
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/navAppVer"
-                    android:enabled="false"
                     android:icon="@drawable/ic_nav_app_ver"
                     android:title="" />
             </group>
