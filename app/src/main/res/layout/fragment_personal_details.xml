@@ -94,12 +94,48 @@
                 android:id="@+id/personalValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="actionSend"
+                android:imeOptions="actionDone"
                 android:inputType="textCapWords"
                 android:textColor="@color/background"
                 android:textCursorDrawable="@drawable/color_cursor"
                 android:textSize="20sp"
                 android:textStyle="bold|italic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/personalTypeLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/select_type"
+            android:textColorHint="@color/background"
+            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/grey"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintEnd_toEndOf="@+id/personalValueLayout"
+            app:layout_constraintStart_toStartOf="@+id/personalValueLayout"
+            app:layout_constraintTop_toBottomOf="@+id/personalValueLayout"
+            app:startIconDrawable="@drawable/ic_type"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/personalType"
+                android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:inputType="none"
+                android:textColor="@color/background"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -113,7 +149,7 @@
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/personalValueLayout"
+            app:layout_constraintTop_toBottomOf="@+id/personalTypeLayout"
             tools:ignore="HardcodedText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

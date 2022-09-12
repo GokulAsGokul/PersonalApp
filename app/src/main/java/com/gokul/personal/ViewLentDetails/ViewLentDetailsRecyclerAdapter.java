@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,13 +48,15 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
     private DialogPlus dialog;
     private TextInputEditText lentUpdateAmount;
     private TextInputLayout lentUpdateAmountLayout;
-    private LottieAnimationView animationView;
+    private final LottieAnimationView animationView;
+    private final Vibrator vibrator;
 
-    public ViewLentDetailsRecyclerAdapter(Context context, ArrayList<LentData> list, Activity activity, LottieAnimationView animationView) {
+    public ViewLentDetailsRecyclerAdapter(Context context, ArrayList<LentData> list, Activity activity, LottieAnimationView animationView,Vibrator vibrator) {
         this.context = context;
         this.list = list;
         this.activity = activity;
         this.animationView = animationView;
+        this.vibrator = vibrator;
     }
 
     @NonNull
@@ -86,7 +90,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 builder.setTitle("Delete Details");
                 builder.setMessage("Are you sure want to delete this ?");
 
-                builder.setPositiveButton("Delete", (dialog, which) -> FirebaseDatabase.getInstance().getReference("Lent Details").child(data.getUpdateFinder()).removeValue().
+                builder.setPositiveButton("Delete", (dialog, which) -> FirebaseDatabase.getInstance().getReference("Lent Details India").child(data.getUpdateFinder()).removeValue().
                         addOnSuccessListener(unused -> {
                             list.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
@@ -94,6 +98,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                                 animationView.setVisibility(View.VISIBLE);
                                 animationView.playAnimation();
                                 dialog.dismiss();
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                             } else {
                                 StyleableToast.makeText(activity, "Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                             }
@@ -152,7 +157,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
             lentUpdateAmountLayout.setError(null);
             lentUpdateAmountLayout.setErrorEnabled(false);
 
-            FirebaseDatabase.getInstance().getReference("Lent Details").child(updater).child("amount").setValue(amount).
+            FirebaseDatabase.getInstance().getReference("Lent Details India").child(updater).child("amount").setValue(amount).
                     addOnCompleteListener(task -> {
                         dialog.dismiss();
                         StyleableToast.makeText(context, "Updated Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();

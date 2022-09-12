@@ -11,6 +11,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,11 +42,13 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
     private TextView downloadDialogText1, downloadDialogText2, downloadDialogText3;
     private ProgressBar downloadDialogBar;
     private final Activity activity;
+    private final Vibrator vibrator;
 
-    public ViewDocumentsRecyclerAdapter(Context context, ArrayList<GeneralData> list, Activity activity) {
+    public ViewDocumentsRecyclerAdapter(Context context, ArrayList<GeneralData> list, Activity activity, Vibrator vibrator) {
         this.context = context;
         this.list = list;
         this.activity = activity;
+        this.vibrator = vibrator;
     }
 
     @NonNull
@@ -58,7 +62,8 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
     @Override
     public void onBindViewHolder(@NonNull ViewDocumentsRecyclerAdapter.MyViewHolder holder, int position) {
         GeneralData data = list.get(position);
-        holder.serialNo.setText((position + 1) +".");
+        holder.viewDocsCategory.setText(data.getFileCategory().toUpperCase());
+        holder.serialNo.setText((position + 1) + ".");
         holder.viewDocsText.setText(data.getFileName());
 
         holder.viewDocsDownload.setOnClickListener(view -> {
@@ -101,6 +106,7 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
                                 animationView.setVisibility(View.VISIBLE);
                                 animationView.playAnimation();
                                 dialog.dismiss();
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                             }
                             StyleableToast.makeText(activity, "Document Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                         }).
@@ -124,16 +130,16 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView viewDocsText, serialNo;
+        TextView viewDocsCategory, viewDocsText, serialNo;
         ImageView viewDocsDownload, viewDocsDelete;
 
         public MyViewHolder(View itemView) {
             super(itemView);
+            viewDocsCategory = itemView.findViewById(R.id.viewDocsCategory);
             serialNo = itemView.findViewById(R.id.serialNo);
             viewDocsText = itemView.findViewById(R.id.viewDocsText);
             viewDocsDownload = itemView.findViewById(R.id.viewDocsDownload);
             viewDocsDelete = itemView.findViewById(R.id.viewDocsDelete);
-
         }
     }
 

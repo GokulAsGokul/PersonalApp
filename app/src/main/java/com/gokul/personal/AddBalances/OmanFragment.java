@@ -1,5 +1,6 @@
 package com.gokul.personal.AddBalances;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
@@ -243,7 +244,7 @@ public class OmanFragment extends Fragment {
                 balSourceNameLayout.setErrorEnabled(true);
                 balSourceNameLayout.setError("Source Name is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.isEmpty()) {
+            } else if (amount == null) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
@@ -383,10 +384,10 @@ public class OmanFragment extends Fragment {
             data.setDate(date);
             data.setRemarks(remarks);
 
-            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm", Locale.getDefault()).format(new Date());
+            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
             String date2 = new SimpleDateFormat("MM_yyyy", Locale.getDefault()).format(new Date());
 
-            databaseReference.child("Oman Balance Details").child(source).child(date2).child(date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmitCall(view)).addOnFailureListener(e -> {
+            databaseReference.child("Balance Details Oman").child(source).child(date2).child(date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmitCall(view)).addOnFailureListener(e -> {
                 dialog1.dismiss();
                 StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
@@ -395,21 +396,21 @@ public class OmanFragment extends Fragment {
 
     private void availableBalanceSubmitCall(View view) {
 
-        databaseReference.child("Oman Available Balance Details").child(source).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("Available Balance Details Oman").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
                 if (balSwitch.isChecked()) {
                     if (temp == null) {
-                        availableBalanceSubmit(Integer.parseInt(amount), view);
+                        availableBalanceSubmit(amount, view);
                     } else {
-                        availableBalanceSubmit((Integer.parseInt(temp) - Integer.parseInt(amount)), view);
+                        availableBalanceSubmit(String.valueOf(Double.parseDouble(temp) - Double.parseDouble(amount)), view);
                     }
                 } else {
                     if (temp == null) {
-                        availableBalanceSubmit(Integer.parseInt(amount), view);
+                        availableBalanceSubmit(amount, view);
                     } else {
-                        availableBalanceSubmit((Integer.parseInt(temp) + Integer.parseInt(amount)), view);
+                        availableBalanceSubmit(String.valueOf(Double.parseDouble(temp) + Double.parseDouble(amount)), view);
                     }
                 }
             }
@@ -421,8 +422,10 @@ public class OmanFragment extends Fragment {
         });
     }
 
-    private void availableBalanceSubmit(int sourceAmount, View view) {
-        databaseReference.child("Oman Available Balance Details").child(source).setValue(String.valueOf(sourceAmount)).addOnCompleteListener(task -> {
+    private void availableBalanceSubmit(String sourceAmount, View view) {
+
+        @SuppressLint("DefaultLocale") String amount = String.format("%.3f", Float.parseFloat(sourceAmount));
+        databaseReference.child("Available Balance Details Oman").child(source).child("amount").setValue(amount).addOnCompleteListener(task -> {
             dialog1.dismiss();
             balSourceName.getText().clear();
             Objects.requireNonNull(balAmount.getText()).clear();

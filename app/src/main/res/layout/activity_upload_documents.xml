@@ -42,6 +42,9 @@
             app:boxStrokeColor="@color/grey"
             app:boxStrokeWidth="2dp"
             app:boxStrokeWidthFocused="2dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="25"
+            app:counterTextColor="@color/background"
             app:endIconMode="clear_text"
             app:endIconTint="@color/background"
             app:errorTextColor="@color/red"
@@ -56,8 +59,9 @@
                 android:id="@+id/docUploadName"
                 android:layout_width="match_parent"
                 android:layout_height="60sp"
-                android:inputType="textCapWords"
                 android:imeOptions="actionDone"
+                android:inputType="textCapWords"
+                android:maxLength="25"
                 android:textColor="@color/background"
                 android:textSize="20sp"
                 android:textStyle="bold|italic"
@@ -123,7 +127,7 @@
             app:startIconDrawable="@drawable/ic_document"
             app:startIconTint="@color/background">
 
-           <AutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/docUploadFile"
                 android:layout_width="match_parent"
                 android:layout_height="60sp"
@@ -131,7 +135,7 @@
                 android:textColor="@color/background"
                 android:textSize="20sp"
                 android:textStyle="bold|italic"
-               tools:ignore="LabelFor" />
+                tools:ignore="LabelFor" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatButton

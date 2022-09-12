@@ -18,4 +18,14 @@
         android:title="@string/sort_by_z_a"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/sortByCategoryAZ"
+        android:title="@string/sort_by_category_a_z"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sortByCategoryZA"
+        android:title="@string/sort_by_category_z_a"
+        app:showAsAction="never" />
+
 </menu>

@@ -43,10 +43,6 @@
                     android:id="@+id/navViewInvest"
                     android:icon="@drawable/ic_investment"
                     android:title="@string/investments" />
-                <item
-                    android:id="@+id/navViewDash"
-                    android:icon="@drawable/ic_dashboard"
-                    android:title="@string/dashboard" />
             </group>
         </menu>
     </item>

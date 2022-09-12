@@ -85,10 +85,13 @@ public class DashboardActivity extends AppCompatActivity {
     private ProgressBar downloadDialogBar;
     private Dialog dialog;
     private Vibrator vibrator;
-    private TextView availableAmount, availableAmountText, lentAmount, lentAmountText, investmentAmount, investmentAmountText, totalAmount, totalAmountText, cardText,
-            availableAmount1, availableAmountText1, lentAmount1, lentAmountText1, investmentAmount1, investmentAmountText1, totalAmount1, totalAmountText1, cardText1;
-    private int totalLentAmount, totalAvailableAmount, totalInvestmentAmount, sumAmount;
-    private ConstraintLayout balanceCardLayout, balanceCardLayout1;
+    private TextView availableAmount, availableAmountText, lentAmount, lentAmountText, investmentAmount, investmentAmountText, totalAmount, totalAmountText,
+            availableAmountOM, availableAmountTextOM, lentAmountOM, lentAmountTextOM, totalAmountOM, totalAmountTextOM;
+    private int totalLentAmount, totalAvailableAmount, totalInvestmentAmount;
+    private double totalAvailableAmountOM, totalLentAmountOM;
+    private ConstraintLayout balanceCardLayout, balanceCardLayoutOM;
+    private LottieAnimationView animationView;
+    private RecyclerView recyclerView;
 
     private final BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
         @Override
@@ -121,6 +124,8 @@ public class DashboardActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
+
         View headerView = navigationView.getHeaderView(0);
         headerView.findViewById(R.id.navDraProfile).setOnClickListener(view -> startActivity(new Intent(DashboardActivity.this, AdminActivity.class)));
         headerView.findViewById(R.id.headerLayout2).setOnClickListener(view -> startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class)));
@@ -148,8 +153,6 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(DashboardActivity.this, AddLentDetailsActivity.class));
             } else if (item.getItemId() == R.id.navAddInvest) {
                 startActivity(new Intent(DashboardActivity.this, AddInvestmentDetailsActivity.class));
-            } else if (item.getItemId() == R.id.navViewDash) {
-                drawerLayout.closeDrawer(GravityCompat.START);
             } else if (item.getItemId() == R.id.navViewDoc) {
                 startActivity(new Intent(DashboardActivity.this, ViewDocumentsActivity.class));
             } else if (item.getItemId() == R.id.navViewBal) {
@@ -166,7 +169,6 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         balanceCardLayout = findViewById(R.id.balanceCardLayout1);
-        cardText = findViewById(R.id.cardText1);
         availableAmount = findViewById(R.id.availableAmount);
         availableAmountText = findViewById(R.id.availableAmountText);
         lentAmount = findViewById(R.id.lentAmount);
@@ -175,20 +177,17 @@ public class DashboardActivity extends AppCompatActivity {
         investmentAmountText = findViewById(R.id.investmentAmountText);
         totalAmount = findViewById(R.id.totalAmount);
         totalAmountText = findViewById(R.id.totalAmountText);
-        balanceCardLayout1 = findViewById(R.id.balanceCardLayout2);
-        cardText1 = findViewById(R.id.cardText2);
-        availableAmount1 = findViewById(R.id.availableAmountText1);
-        availableAmountText1 = findViewById(R.id.availableAmountText1);
-        lentAmount1 = findViewById(R.id.lentAmountText1);
-        lentAmountText1 = findViewById(R.id.lentAmountText1);
-        investmentAmount1 = findViewById(R.id.investmentAmountText1);
-        investmentAmountText1 = findViewById(R.id.investmentAmountText1);
-        totalAmount1 = findViewById(R.id.totalAmountText1);
-        totalAmountText1 = findViewById(R.id.totalAmountText1);
+        balanceCardLayoutOM = findViewById(R.id.balanceCardLayoutOM);
+        availableAmountOM = findViewById(R.id.availableAmountOM);
+        availableAmountTextOM = findViewById(R.id.availableAmountTextOM);
+        lentAmountOM = findViewById(R.id.lentAmountOM);
+        lentAmountTextOM = findViewById(R.id.lentAmountTextOM);
+        totalAmountOM = findViewById(R.id.totalAmountOM);
+        totalAmountTextOM = findViewById(R.id.totalAmountTextOM);
 
         balanceCardLayout.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
 
-        LottieAnimationView animationView = findViewById(R.id.dashAnimation);
+        animationView = findViewById(R.id.dashAnimation);
         animationView.setVisibility(View.GONE);
 
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
@@ -205,12 +204,56 @@ public class DashboardActivity extends AppCompatActivity {
             dialog.show();
         }
 
-        RecyclerView recyclerView = findViewById(R.id.dashDetail);
+        recyclerView = findViewById(R.id.dashDetail);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         PagerSnapHelper snapHelper = new PagerSnapHelper();
         snapHelper.attachToRecyclerView(recyclerView);
+        bankDetails();
 
+        indiaAvailableAmountCall();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onDownloadComplete);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
+        bankDetails();
+        indiaAvailableAmountCall();
+    }
+
+    public void expand1(View view) {
+        int v = (availableAmount.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE;
+        TransitionManager.beginDelayedTransition(balanceCardLayout, new AutoTransition());
+        availableAmount.setVisibility(v);
+        availableAmountText.setVisibility(v);
+        lentAmount.setVisibility(v);
+        lentAmountText.setVisibility(v);
+        investmentAmount.setVisibility(v);
+        investmentAmountText.setVisibility(v);
+        totalAmount.setVisibility(v);
+        totalAmountText.setVisibility(v);
+    }
+
+    public void expand2(View view) {
+        int v = (availableAmountOM.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE;
+        TransitionManager.beginDelayedTransition(balanceCardLayoutOM, new AutoTransition());
+        availableAmountOM.setVisibility(v);
+        availableAmountTextOM.setVisibility(v);
+        lentAmountOM.setVisibility(v);
+        lentAmountTextOM.setVisibility(v);
+        totalAmountOM.setVisibility(v);
+        totalAmountTextOM.setVisibility(v);
+    }
+
+    private void bankDetails() {
         ArrayList<AdminData> list = new ArrayList<>();
         DashboardRecyclerAdapter adapter = new DashboardRecyclerAdapter(this, list);
 
@@ -240,9 +283,6 @@ public class DashboardActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         ScrollingPagerIndicator pagerIndicator = findViewById(R.id.dashDetailIndicator);
         pagerIndicator.attachToRecyclerView(recyclerView);
-
-        lentAmountCall();
-
     }
 
     @Override
@@ -389,21 +429,31 @@ public class DashboardActivity extends AppCompatActivity {
         return FileProvider.getUriForFile(context, "com.gokul.personal.provider", file);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(onDownloadComplete);
+    private void indiaAvailableAmountCall() {
+
+        databaseReference.child("Available Balance Details India").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String amount = childDataSnapshot.child("amount").getValue(String.class);
+                    assert amount != null;
+                    totalAvailableAmount = totalAvailableAmount + Integer.parseInt(amount);
+                }
+                availableAmount.setText(String.valueOf(totalAvailableAmount));
+                indiaLentAmountCall();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(DashboardActivity.this, "India Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
+
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
-    }
+    private void indiaLentAmountCall() {
 
-    private void lentAmountCall() {
-
-        databaseReference.child("Lent Details").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("Lent Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
@@ -412,18 +462,18 @@ public class DashboardActivity extends AppCompatActivity {
                     totalLentAmount = totalLentAmount + Integer.parseInt(amount);
                 }
                 lentAmount.setText(String.valueOf(totalLentAmount));
-                investmentCall();
+                indiaInvestmentCall();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(DashboardActivity.this, "Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                StyleableToast.makeText(DashboardActivity.this, "India Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
 
     }
 
-    private void investmentCall() {
+    private void indiaInvestmentCall() {
 
         databaseReference.child("Investment Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -434,7 +484,8 @@ public class DashboardActivity extends AppCompatActivity {
                     totalInvestmentAmount = totalInvestmentAmount + Integer.parseInt(amount);
                 }
                 investmentAmount.setText(String.valueOf(totalInvestmentAmount));
-                dialog.dismiss();
+                totalAmount.setText(String.valueOf(totalAvailableAmount + totalLentAmount + totalInvestmentAmount));
+                omanAvailableAmountCall();
             }
 
             @Override
@@ -445,29 +496,50 @@ public class DashboardActivity extends AppCompatActivity {
 
     }
 
-    public void expand1(View view) {
-        int v = (availableAmount.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE;
-        TransitionManager.beginDelayedTransition(balanceCardLayout, new AutoTransition());
-        availableAmount.setVisibility(v);
-        availableAmountText.setVisibility(v);
-        lentAmount.setVisibility(v);
-        lentAmountText.setVisibility(v);
-        investmentAmount.setVisibility(v);
-        investmentAmountText.setVisibility(v);
-        totalAmount.setVisibility(v);
-        totalAmountText.setVisibility(v);
+    private void omanAvailableAmountCall() {
+
+        databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String amount = childDataSnapshot.child("amount").getValue(String.class);
+                    assert amount != null;
+                    totalAvailableAmountOM = totalAvailableAmountOM + Double.parseDouble(amount);
+                }
+                @SuppressLint("DefaultLocale") String amount = String.format("%.3f", totalAvailableAmountOM);
+                availableAmountOM.setText(amount);
+                omanLentAmountCall();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(DashboardActivity.this, "Oman Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
+
     }
 
-    public void expand2(View view) {
-        int v = (availableAmount1.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE;
-        TransitionManager.beginDelayedTransition(balanceCardLayout1, new AutoTransition());
-        availableAmount1.setVisibility(v);
-        availableAmountText1.setVisibility(v);
-        lentAmount1.setVisibility(v);
-        lentAmountText1.setVisibility(v);
-        investmentAmount1.setVisibility(v);
-        investmentAmountText1.setVisibility(v);
-        totalAmount1.setVisibility(v);
-        totalAmountText1.setVisibility(v);
+    private void omanLentAmountCall() {
+
+        databaseReference.child("Lent Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String amount = childDataSnapshot.child("amount").getValue(String.class);
+                    assert amount != null;
+                    totalLentAmountOM = totalLentAmountOM + Double.parseDouble(amount);
+                }
+                @SuppressLint("DefaultLocale") String amount = String.format("%.3f", totalLentAmountOM);
+                @SuppressLint("DefaultLocale") String amount1 = String.format("%.3f", (totalAvailableAmountOM + totalLentAmountOM));
+                lentAmountOM.setText(amount);
+                totalAmountOM.setText(amount1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(DashboardActivity.this, "Oman Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
     }
+
 }

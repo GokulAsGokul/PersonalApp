@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
@@ -50,6 +51,11 @@ public class ViewDocumentsActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.background)));
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
+
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Documents");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recyclerView = findViewById(R.id.docsList);
         LottieAnimationView animationView = findViewById(R.id.docsAnimation);
@@ -101,7 +107,7 @@ public class ViewDocumentsActivity extends AppCompatActivity {
             }
         });
 
-        adapter = new ViewDocumentsRecyclerAdapter(this, list, ViewDocumentsActivity.this);
+        adapter = new ViewDocumentsRecyclerAdapter(this, list, ViewDocumentsActivity.this, vibrator);
         recyclerView.setAdapter(adapter);
     }
 
@@ -158,6 +164,14 @@ public class ViewDocumentsActivity extends AppCompatActivity {
                 return true;
             case R.id.sortByZA:
                 list.sort(GeneralData.docComparatorZA);
+                adapter.notifyDataSetChanged();
+                return true;
+            case R.id.sortByCategoryAZ:
+                list.sort(GeneralData.docCategoryComparatorAZ);
+                adapter.notifyDataSetChanged();
+                return true;
+            case R.id.sortByCategoryZA:
+                list.sort(GeneralData.docCategoryComparatorZA);
                 adapter.notifyDataSetChanged();
                 return true;
         }

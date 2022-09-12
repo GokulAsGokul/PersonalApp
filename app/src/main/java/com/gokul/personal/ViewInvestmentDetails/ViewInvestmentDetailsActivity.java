@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
@@ -50,6 +51,11 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.background)));
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
+
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Investments");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recyclerView = findViewById(R.id.investDetail);
         LottieAnimationView animationView = findViewById(R.id.investAnimation);
@@ -101,7 +107,7 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
             }
         });
 
-        adapter = new ViewInvestmentDetailsRecyclerAdapter(this, list, ViewInvestmentDetailsActivity.this,animationView);
+        adapter = new ViewInvestmentDetailsRecyclerAdapter(this, list, ViewInvestmentDetailsActivity.this,animationView,vibrator);
         recyclerView.setAdapter(adapter);
     }
 

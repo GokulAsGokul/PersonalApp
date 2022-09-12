@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class GeneralData {
 
-    private String Name, Status, AppVersionNo, AppName, AppUrl, AppExtension, AppVersionNote, FileName, FileCategory, FileType, FileUrl, FileExtension;
+    private String Name, Status, AppVersionNo, AppName, AppUrl, AppExtension, AppVersionNote, FileName, FileCategory, FileUrl, FileExtension;
 
     public String getName() {
         return Name;
@@ -78,14 +78,6 @@ public class GeneralData {
         FileCategory = fileCategory;
     }
 
-    public String getFileType() {
-        return FileType;
-    }
-
-    public void setFileType(String fileType) {
-        FileType = fileType;
-    }
-
     public String getFileUrl() {
         return FileUrl;
     }
@@ -105,5 +97,9 @@ public class GeneralData {
     public static Comparator<GeneralData> docComparatorAZ = (g1, g2) -> g1.getFileName().compareTo(g2.getFileName());
 
     public static Comparator<GeneralData> docComparatorZA = (g1, g2) -> g2.getFileName().compareTo(g1.getFileName());
+
+    public static Comparator<GeneralData> docCategoryComparatorAZ = (g1, g2) -> g1.getFileCategory().compareTo(g2.getFileCategory());
+
+    public static Comparator<GeneralData> docCategoryComparatorZA = (g1, g2) -> g2.getFileCategory().compareTo(g1.getFileCategory());
 
 }

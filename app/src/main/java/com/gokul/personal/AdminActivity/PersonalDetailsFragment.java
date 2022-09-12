@@ -5,10 +5,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -25,6 +27,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -33,11 +39,15 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public class PersonalDetailsFragment extends Fragment {
 
-    private TextInputLayout personalNameLayout, personalValueLayout;
+    private TextInputLayout personalNameLayout, personalValueLayout, personalTypeLayout;
     private TextInputEditText personalName, personalValue;
+    private AutoCompleteTextView personalType;
     private Vibrator vibrator;
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private final ArrayList<String> typeList = new ArrayList<>();
+    private String typeDropDown;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,8 +56,10 @@ public class PersonalDetailsFragment extends Fragment {
 
         personalNameLayout = view.findViewById(R.id.personalNameLayout);
         personalValueLayout = view.findViewById(R.id.personalValueLayout);
+        personalTypeLayout = view.findViewById(R.id.personalTypeLayout);
         personalName = view.findViewById(R.id.personalName);
         personalValue = view.findViewById(R.id.personalValue);
+        personalType = view.findViewById(R.id.personalType);
         Button personalSubmit = view.findViewById(R.id.personalSubmit);
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
@@ -59,12 +71,32 @@ public class PersonalDetailsFragment extends Fragment {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         }
 
-        personalValue.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                addPersonalDetails(view);
-                return true;
+        personalType.setInputType(InputType.TYPE_NULL);
+        personalType.setClickable(true);
+        personalTypeLayout.setClickable(true);
+        personalType.setFocusable(false);
+        databaseReference.child("DropDown Values").child("PersonalTypes").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                    dialog.show();
+                    typeList.add(temp);
+                }
+                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(view.getContext(), R.layout.dropdown_list, typeList);
+                sourceAdapter.sort(Comparator.naturalOrder());
+                personalType.setAdapter(sourceAdapter);
+                dialog.dismiss();
+                personalType.setOnItemClickListener((parent, view, position, id) -> {
+                    UIUtil.hideKeyboard(requireActivity());
+                    typeDropDown = parent.getItemAtPosition(position).toString();
+                });
             }
-            return false;
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(view.getContext(), "Type Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
         });
 
         personalSubmit.setOnClickListener((View view1) -> addPersonalDetails(view));
@@ -76,6 +108,7 @@ public class PersonalDetailsFragment extends Fragment {
 
         String namePersonal = Objects.requireNonNull(personalName.getText()).toString().trim();
         String valuePersonal = Objects.requireNonNull(personalValue.getText()).toString().trim();
+        String typePersonal = Objects.requireNonNull(personalType.getText()).toString().trim();
 
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
@@ -90,15 +123,26 @@ public class PersonalDetailsFragment extends Fragment {
                 personalValueLayout.setErrorEnabled(true);
                 personalValueLayout.setError("Value is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (typePersonal.isEmpty()) {
+                personalNameLayout.setErrorEnabled(false);
+                personalNameLayout.setError(null);
+                personalValueLayout.setErrorEnabled(false);
+                personalValueLayout.setError(null);
+                personalTypeLayout.setErrorEnabled(true);
+                personalTypeLayout.setError("Type is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 personalNameLayout.setErrorEnabled(false);
                 personalNameLayout.setError(null);
                 personalValueLayout.setErrorEnabled(false);
                 personalValueLayout.setError(null);
+                personalTypeLayout.setErrorEnabled(false);
+                personalTypeLayout.setError(null);
 
                 AdminData adminData = new AdminData();
                 adminData.setPersonalName(namePersonal);
                 adminData.setPersonalValue(valuePersonal);
+                adminData.setPersonalType(typePersonal);
 
                 dialog.show();
 

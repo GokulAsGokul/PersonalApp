@@ -228,7 +228,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="15dp"
-                                    android:layout_marginBottom="20dp"
+                                    android:paddingBottom="20dp"
                                     android:text="Total Amount           : Rs "
                                     android:textColor="@color/background"
                                     android:textSize="15sp"
@@ -272,14 +272,14 @@
                             app:layout_constraintTop_toBottomOf="@+id/balanceCard1">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
-                                android:id="@+id/balanceCardLayout2"
+                                android:id="@+id/balanceCardLayoutOM"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:animateLayoutChanges="true"
                                 android:background="@color/white">
 
                                 <TextView
-                                    android:id="@+id/cardText2"
+                                    android:id="@+id/cardTextOM"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:background="@color/background"
@@ -294,22 +294,22 @@
                                     tools:ignore="HardcodedText" />
 
                                 <TextView
-                                    android:id="@+id/availableAmountText1"
+                                    android:id="@+id/availableAmountTextOM"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="20dp"
                                     android:layout_marginTop="20dp"
-                                    android:text="Available Amount    : RO "
+                                    android:text="Available Amount    : Ro "
                                     android:textColor="@color/background"
                                     android:textSize="15sp"
                                     android:textStyle="bold|italic"
                                     android:visibility="gone"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/cardText2"
+                                    app:layout_constraintTop_toBottomOf="@+id/cardTextOM"
                                     tools:ignore="HardcodedText" />
 
                                 <TextView
-                                    android:id="@+id/availableAmount1"
+                                    android:id="@+id/availableAmountOM"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="20dp"
@@ -317,25 +317,25 @@
                                     android:textSize="15sp"
                                     android:textStyle="bold|italic"
                                     android:visibility="gone"
-                                    app:layout_constraintStart_toEndOf="@+id/availableAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/cardText2" />
+                                    app:layout_constraintStart_toEndOf="@+id/availableAmountTextOM"
+                                    app:layout_constraintTop_toBottomOf="@+id/cardTextOM" />
 
                                 <TextView
-                                    android:id="@+id/lentAmountText1"
+                                    android:id="@+id/lentAmountTextOM"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="15dp"
-                                    android:text="Lent Amount            : RO "
+                                    android:text="Lent Amount            : Ro "
                                     android:textColor="@color/background"
                                     android:textSize="15sp"
                                     android:textStyle="bold|italic"
                                     android:visibility="gone"
-                                    app:layout_constraintStart_toStartOf="@+id/availableAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/availableAmountText1"
+                                    app:layout_constraintStart_toStartOf="@+id/availableAmountTextOM"
+                                    app:layout_constraintTop_toBottomOf="@+id/availableAmountTextOM"
                                     tools:ignore="HardcodedText" />
 
                                 <TextView
-                                    android:id="@+id/lentAmount1"
+                                    android:id="@+id/lentAmountOM"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="15dp"
@@ -343,53 +343,27 @@
                                     android:textSize="15sp"
                                     android:textStyle="bold|italic"
                                     android:visibility="gone"
-                                    app:layout_constraintStart_toEndOf="@+id/lentAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/availableAmount1" />
+                                    app:layout_constraintStart_toEndOf="@+id/lentAmountTextOM"
+                                    app:layout_constraintTop_toBottomOf="@+id/availableAmountTextOM" />
 
                                 <TextView
-                                    android:id="@+id/investmentAmountText1"
+                                    android:id="@+id/totalAmountTextOM"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="15dp"
-                                    android:text="Invested Amount     : RO "
-                                    android:textColor="@color/background"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold|italic"
-                                    android:visibility="gone"
-                                    app:layout_constraintStart_toStartOf="@+id/lentAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/lentAmountText1"
-                                    tools:ignore="HardcodedText" />
-
-                                <TextView
-                                    android:id="@+id/investmentAmount1"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="15dp"
-                                    android:textColor="@color/background"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold|italic"
-                                    android:visibility="gone"
-                                    app:layout_constraintStart_toEndOf="@+id/investmentAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/lentAmount1" />
-
-                                <TextView
-                                    android:id="@+id/totalAmountText1"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="15dp"
-                                    android:layout_marginBottom="20dp"
-                                    android:text="Total Amount           : RO "
+                                    android:paddingBottom="20dp"
+                                    android:text="Total Amount           : Ro "
                                     android:textColor="@color/background"
                                     android:textSize="15sp"
                                     android:textStyle="bold|italic"
                                     android:visibility="gone"
                                     app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintStart_toStartOf="@+id/investmentAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/investmentAmountText1"
+                                    app:layout_constraintStart_toStartOf="@+id/lentAmountTextOM"
+                                    app:layout_constraintTop_toBottomOf="@+id/lentAmountTextOM"
                                     tools:ignore="HardcodedText" />
 
                                 <TextView
-                                    android:id="@+id/totalAmount1"
+                                    android:id="@+id/totalAmountOM"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="15dp"
@@ -397,8 +371,8 @@
                                     android:textSize="15sp"
                                     android:textStyle="bold|italic"
                                     android:visibility="gone"
-                                    app:layout_constraintStart_toEndOf="@+id/totalAmountText1"
-                                    app:layout_constraintTop_toBottomOf="@+id/investmentAmountText1" />
+                                    app:layout_constraintStart_toEndOf="@+id/totalAmountTextOM"
+                                    app:layout_constraintTop_toBottomOf="@+id/lentAmountTextOM" />
 
                             </androidx.constraintlayout.widget.ConstraintLayout>
 

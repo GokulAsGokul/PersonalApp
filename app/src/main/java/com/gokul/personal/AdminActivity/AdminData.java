@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class AdminData {
 
-    private String listValue, personalName, personalValue, bankName, bankCIF, bankAccount, bankIFSC, bankMICR, bankBranch;
+    private String listValue, personalName, personalValue,personalType, bankName, bankCIF, bankAccount, bankIFSC, bankMICR, bankBranch;
 
     public String getListValue() {
         return listValue;
@@ -28,6 +28,14 @@ public class AdminData {
 
     public void setPersonalValue(String personalValue) {
         this.personalValue = personalValue;
+    }
+
+    public String getPersonalType() {
+        return personalType;
+    }
+
+    public void setPersonalType(String personalType) {
+        this.personalType = personalType;
     }
 
     public String getBankName() {

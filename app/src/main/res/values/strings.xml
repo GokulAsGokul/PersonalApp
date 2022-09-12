@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Personal</string>
-    <string name="add_lending_details">Add Lending Details</string>
+    <string name="add_lending_details">Add Lent Details</string>
     <string name="add_balance_details">Add Balance Details</string>
     <string name="upload_documents">Upload Documents</string>
     <string name="upload_latest_app">Upload Latest App</string>
@@ -106,4 +106,8 @@
     <string name="enter_bank_name">Enter Bank Name</string>
     <string name="enter_customer_id">Enter Customer ID</string>
     <string name="select_type">Select Type</string>
+    <string name="sort_by_category_a_z">Sort By Category A-Z</string>
+    <string name="sort_by_category_z_a">Sort By Category Z-A</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
 </resources>

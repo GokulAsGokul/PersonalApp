@@ -43,7 +43,7 @@ public class ListValuesFragment extends Fragment {
     private AutoCompleteTextView listName;
     private Vibrator vibrator;
     private Dialog dialog;
-    final String[] listsName = {"AddBalanceCategory", "AddLentTo", "InvestmentFrequency", "OmanCategory", "OmanSource", "Sources", "UploadDocCategory"};
+    final String[] listsName = {"AddBalanceCategory", "AddLentTo", "InvestmentFrequency", "OmanCategory", "OmanLentTo", "OmanSource", "PersonalTypes", "Sources", "UploadDocCategory"};
     private String valueList, nameList, listsDropDown;
     private SwitchCompat valSwitch;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();

@@ -21,6 +21,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -76,6 +77,11 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.background)));
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
+
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Upload Documents");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         docUploadNameLayout = findViewById(R.id.docUploadNameLayout);
         docUpCategoryLayout = findViewById(R.id.docUpCategoryLayout);
@@ -216,7 +222,6 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                     GeneralData data = new GeneralData();
                     data.setFileName(fileName);
                     data.setFileCategory(fileCategory);
-                    data.setFileType(fileCategory);
                     data.setFileUrl(fileUrl);
                     data.setFileExtension(fileExtension);
 

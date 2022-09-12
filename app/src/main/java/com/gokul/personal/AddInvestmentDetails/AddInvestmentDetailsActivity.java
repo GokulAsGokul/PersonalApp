@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -62,6 +63,11 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.background)));
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
+
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Add Investments");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         investDecNameLayout = findViewById(R.id.investDecNameLayout);
         investDecAmountLayout = findViewById(R.id.investDecAmountLayout);
@@ -410,14 +416,47 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
             data.setRemarks(remarks);
             data.setUpdateFinder(name + date1);
 
-            databaseReference.child("Investment Details").child(name + date1).setValue(data).addOnCompleteListener(task -> {
-                dialog1.dismiss();
-                StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-            }).addOnFailureListener(e -> {
+            databaseReference.child("Investment Details").child(name + date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmit()).addOnFailureListener(e -> {
                 dialog1.dismiss();
                 StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
         }
+    }
+
+    private void availableBalanceSubmit() {
+
+        databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String temp = snapshot.getValue(String.class);
+                String sourceAmount;
+                if (temp == null) {
+                    sourceAmount = String.valueOf(Integer.parseInt(amount));
+                } else {
+                    sourceAmount = String.valueOf(Integer.parseInt(temp) - Integer.parseInt(amount));
+                }
+
+                databaseReference.child("Available Balance Details India").child(source).child("amount").setValue(sourceAmount).addOnCompleteListener(task -> {
+                    Objects.requireNonNull(investDecName.getText()).clear();
+                    Objects.requireNonNull(investDecAmount.getText()).clear();
+                    investDecFreq.getText().clear();
+                    Objects.requireNonNull(investDecTerm.getText()).clear();
+                    investDecSource.getText().clear();
+                    investDecTranDate.getText().clear();
+                    dialog1.dismiss();
+                    StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+                }).addOnFailureListener(e1 -> {
+                    dialog1.dismiss();
+                    StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                });
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
     }
 
     @Override

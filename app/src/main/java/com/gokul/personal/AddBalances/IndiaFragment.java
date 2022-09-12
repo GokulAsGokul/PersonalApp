@@ -346,10 +346,10 @@ public class IndiaFragment extends Fragment {
             data.setDate(date);
             data.setRemarks(remarks);
 
-            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm", Locale.getDefault()).format(new Date());
+            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
             String date2 = new SimpleDateFormat("MM_yyyy", Locale.getDefault()).format(new Date());
 
-            databaseReference.child("India Balance Details").child(source).child(date2).child(date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmitCall(view)).addOnFailureListener(e -> {
+            databaseReference.child("Balance Details India").child(source).child(date2).child(date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmitCall(view)).addOnFailureListener(e -> {
                 dialog1.dismiss();
                 StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
@@ -358,7 +358,7 @@ public class IndiaFragment extends Fragment {
 
     private void availableBalanceSubmitCall(View view) {
 
-        databaseReference.child("India Available Balance Details").child(source).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
@@ -385,7 +385,7 @@ public class IndiaFragment extends Fragment {
     }
 
     private void availableBalanceSubmit(int sourceAmount, View view) {
-        databaseReference.child("India Available Balance Details").child(source).setValue(String.valueOf(sourceAmount)).addOnCompleteListener(task -> {
+        databaseReference.child("Available Balance Details India").child(source).child("amount").setValue(String.valueOf(sourceAmount)).addOnCompleteListener(task -> {
             dialog1.dismiss();
             balSourceName.getText().clear();
             Objects.requireNonNull(balAmount.getText()).clear();

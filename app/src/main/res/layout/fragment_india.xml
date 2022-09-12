@@ -206,6 +206,7 @@
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
                 android:inputType="textCapWords"
+                android:maxLength="20"
                 android:text="@string/mention_if_any"
                 android:textColor="@color/background"
                 android:textCursorDrawable="@drawable/color_cursor"

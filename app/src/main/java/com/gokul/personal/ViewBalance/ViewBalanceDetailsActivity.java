@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -45,6 +46,11 @@ public class ViewBalanceDetailsActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.background)));
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
+
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Balances");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         balancePieChart = findViewById(R.id.balancePieChart);
 

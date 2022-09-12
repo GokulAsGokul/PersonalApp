@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
@@ -51,6 +52,11 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
 
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Lents");
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         RecyclerView recyclerView = findViewById(R.id.lentDetail);
         LottieAnimationView animationView = findViewById(R.id.lentAnimation);
         animationView.setVisibility(View.GONE);
@@ -75,7 +81,7 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        FirebaseDatabase.getInstance().getReference("Lent Details").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("Lent Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -101,7 +107,7 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
             }
         });
 
-        adapter = new ViewLentDetailsRecyclerAdapter(this, list, ViewLentDetailsActivity.this, animationView);
+        adapter = new ViewLentDetailsRecyclerAdapter(this, list, ViewLentDetailsActivity.this, animationView, vibrator);
         recyclerView.setAdapter(adapter);
 
     }
@@ -170,4 +176,5 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
         super.onRestart();
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
     }
+
 }
