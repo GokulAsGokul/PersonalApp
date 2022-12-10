@@ -92,13 +92,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"
-                    android:text="Frequency :"
+                    android:text="Folio Num  :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
 
                 <TextView
-                    android:id="@+id/invDetFrequency"
+                    android:id="@+id/invDetFolio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -231,7 +231,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:contentDescription="@string/investmentdetailseditbtn"
+                android:contentDescription="@string/investment_details_edit_btn"
                 android:src="@drawable/ic_edit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -241,7 +241,7 @@
                 android:id="@+id/investDetDeleteBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/investmentdetailsdeletebtn"
+                android:contentDescription="@string/investment_details_delete_btn"
                 android:src="@drawable/ic_delete"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
@@ -33,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +56,7 @@ public class AddLentOmanFragment extends Fragment {
     private String fromDropDown, toDropDown = "";
     private Vibrator vibrator;
     private String name, amount, from, to, date, remarks;
-    private Dialog dialog1, dialog2;
+    private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> fromList = new ArrayList<>();
     private final ArrayList<String> toList = new ArrayList<>();
@@ -80,23 +82,17 @@ public class AddLentOmanFragment extends Fragment {
 
         ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
 
-        dialog1 = new Dialog(view.getContext());
-        dialog1.setContentView(R.layout.submit_dialog);
-        dialog1.setCancelable(true);
-        dialog1.setCanceledOnTouchOutside(false);
-        if (dialog1.getWindow() != null) {
-            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        }
-
-        dialog2 = new Dialog(view.getContext());
-        dialog2.setContentView(R.layout.loading_dialog);
-        dialog2.setCancelable(true);
-        dialog2.setCanceledOnTouchOutside(false);
-        if (dialog2.getWindow() != null) {
-            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        dialog = new Dialog(view.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        dialog.setContentView(R.layout.loading_dialog);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
         }
         if (ConnectionCheck.getConnectionType(view.getContext()) != 0) {
-            dialog2.show();
+            dialog.show();
         }
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
@@ -110,13 +106,13 @@ public class AddLentOmanFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog2.show();
+                    dialog.show();
                     fromList.add(temp);
                 }
                 ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(view.getContext(), R.layout.dropdown_list, fromList);
                 sourceAdapter.sort(Comparator.naturalOrder());
                 lendDecFrom.setAdapter(sourceAdapter);
-                dialog2.dismiss();
+                dialog.dismiss();
                 lendDecFrom.setOnItemClickListener((parent, view, position, id) -> {
                     UIUtil.hideKeyboard(requireActivity());
                     fromDropDown = parent.getItemAtPosition(position).toString();
@@ -125,6 +121,7 @@ public class AddLentOmanFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -138,13 +135,13 @@ public class AddLentOmanFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog2.show();
+                    dialog.show();
                     toList.add(temp);
                 }
                 ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(view.getContext(), R.layout.dropdown_list, toList);
                 sourceAdapter.sort(Comparator.naturalOrder());
                 lendDecTo.setAdapter(sourceAdapter);
-                dialog2.dismiss();
+                dialog.dismiss();
                 lendDecTo.setOnItemClickListener((parent, view, position, id) -> {
                     UIUtil.hideKeyboard(requireActivity());
                     toDropDown = parent.getItemAtPosition(position).toString();
@@ -153,7 +150,8 @@ public class AddLentOmanFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(view.getContext(), "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                dialog.dismiss();
+                StyleableToast.makeText(view.getContext(), "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
 
@@ -230,7 +228,8 @@ public class AddLentOmanFragment extends Fragment {
             }
 
             name = Objects.requireNonNull(lendDecName.getText()).toString();
-            amount = Objects.requireNonNull(lendDecAmount.getText()).toString();
+            DecimalFormat decimalFormat = new DecimalFormat("0.000");
+            amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lendDecAmount.getText()).toString().trim()));
             from = lendDecFrom.getText().toString().trim();
             to = lendDecTo.getText().toString().trim();
             date = lendDecTranDate.getText().toString().trim();
@@ -243,6 +242,12 @@ public class AddLentOmanFragment extends Fragment {
                 lendDecNameLayout.setError("Borrower Name is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (amount.isEmpty()) {
+                lendDecNameLayout.setError(null);
+                lendDecNameLayout.setErrorEnabled(false);
+                lendDecAmountLayout.setErrorEnabled(true);
+                lendDecAmountLayout.setError("Amount is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (amount.equals("0.000")) {
                 lendDecNameLayout.setError(null);
                 lendDecNameLayout.setErrorEnabled(false);
                 lendDecAmountLayout.setErrorEnabled(true);
@@ -322,7 +327,7 @@ public class AddLentOmanFragment extends Fragment {
                     lendDecRemarksLayout.setError("Mention the From Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    lentSubmit(view);
+                    availableBalanceSubmitCall(view);
                 }
             } else if (to.equals("Bank")) {
                 if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
@@ -340,7 +345,7 @@ public class AddLentOmanFragment extends Fragment {
                     lendDecRemarksLayout.setError("Mention the Bank Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    lentSubmit(view);
+                    availableBalanceSubmitCall(view);
                 }
             } else if (to.equals("Others")) {
                 if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
@@ -358,13 +363,60 @@ public class AddLentOmanFragment extends Fragment {
                     lendDecRemarksLayout.setError("Mention the To Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    lentSubmit(view);
+                    availableBalanceSubmitCall(view);
                 }
             } else {
-                lentSubmit(view);
+                availableBalanceSubmitCall(view);
             }
 
         }
+    }
+
+    private void availableBalanceSubmitCall(View view) {
+
+        dialog.setCancelable(false);
+        dialog.show();
+        databaseReference.child("Available Balance Details Oman").child(from).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String temp = snapshot.getValue(String.class);
+                if (temp == null) {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                } else {
+                    if (Double.parseDouble(amount) <= Double.parseDouble(temp)) {
+                        availableBalanceSubmit(String.valueOf(Double.parseDouble(temp) - Double.parseDouble(amount)), view);
+                    } else {
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
+    }
+
+    private void availableBalanceSubmit(String sourceAmount, View view) {
+
+        @SuppressLint("DefaultLocale") String amount = String.format("%.3f", Float.parseFloat(sourceAmount));
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(from);
+        data.setAmount(amount);
+
+        databaseReference.child("Available Balance Details Oman").child(from).setValue(data).addOnCompleteListener(task -> lentSubmit(view)).addOnFailureListener(e1 -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
+
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -386,59 +438,58 @@ public class AddLentOmanFragment extends Fragment {
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
-            dialog1.show();
 
-            String date1 = new SimpleDateFormat("_dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
+            String finder = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
             LentData data = new LentData();
             data.setName(name);
-            data.setAmount(amount);
+            if (amount.contains(".")) {
+                data.setAmount(amount);
+            } else {
+                data.setAmount(amount + ".000");
+            }
             data.setFrom(from);
             data.setTo(to);
             data.setDate(date);
             data.setRemarks(remarks);
-            data.setUpdateFinder(name + date1);
+            data.setUpdateFinder(finder);
 
-            databaseReference.child("Lent Details Oman").child(name + date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmit(view)).addOnFailureListener(e -> {
-                dialog1.dismiss();
+            BalanceDetailsData balanceDetailsData = new BalanceDetailsData();
+            balanceDetailsData.setAmount(amount);
+            balanceDetailsData.setTransAmount(amount);
+            balanceDetailsData.setCategory("Lent");
+            balanceDetailsData.setDate(date);
+            balanceDetailsData.setFilter(date.substring(3, 10).replaceAll("-", "_"));
+            balanceDetailsData.setRemarks("To " + name);
+            balanceDetailsData.setSource(from);
+            balanceDetailsData.setType("Expense");
+            balanceDetailsData.setUpdateFinder(finder);
+
+            databaseReference.child("Lent Details Oman").child(finder).setValue(data).addOnCompleteListener(task -> balanceDetailsSubmit(view, balanceDetailsData, finder)).addOnFailureListener(e -> {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Lend Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
         }
     }
 
-    private void availableBalanceSubmit(View view) {
+    private void balanceDetailsSubmit(View view, BalanceDetailsData balanceDetailsData, String date) {
 
-        databaseReference.child("Available Balance Details Oman").child(from).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String temp = snapshot.getValue(String.class);
-                String sourceAmount;
-                if (temp == null) {
-                    sourceAmount = String.valueOf(Integer.parseInt(amount));
-                } else {
-                    sourceAmount = String.valueOf(Integer.parseInt(temp) - Integer.parseInt(amount));
-                }
-                @SuppressLint("DefaultLocale") String amount = String.format("%.3f", Float.parseFloat(sourceAmount));
-                databaseReference.child("Available Balance Details Oman").child(from).child("amount").setValue(amount).addOnCompleteListener(task -> {
-                    Objects.requireNonNull(lendDecName.getText()).clear();
-                    Objects.requireNonNull(lendDecAmount.getText()).clear();
-                    lendDecFrom.getText().clear();
-                    lendDecTo.getText().clear();
-                    lendDecTranDate.getText().clear();
-                    dialog1.dismiss();
-                    StyleableToast.makeText(view.getContext(), "Lent Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                }).addOnFailureListener(e1 -> {
-                    dialog1.dismiss();
-                    StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                });
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
+        databaseReference.child("Balance Details Oman").child(from).child(date).setValue(balanceDetailsData).addOnCompleteListener(task -> {
+            Objects.requireNonNull(lendDecName.getText()).clear();
+            Objects.requireNonNull(lendDecAmount.getText()).clear();
+            lendDecFrom.getText().clear();
+            lendDecTo.getText().clear();
+            lendDecTranDate.getText().clear();
+            lendDecRemarks.setText(R.string.mention_if_any);
+            dialog.dismiss();
+            StyleableToast.makeText(view.getContext(), "Lent Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+        }).addOnFailureListener(e -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
+
     }
 
 }

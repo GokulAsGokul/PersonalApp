@@ -29,7 +29,7 @@
     </style>
 
     <!-- Edit Text Custom Style -->
-    <style name="ThemeOverlay.AppTheme.TextInputEditText.Outlined" parent="">
+    <style name="ThemeOverlay.AppTheme.TextInputEditText.Outlined" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
         <item name="colorControlActivated">@color/background</item>
     </style>
 
@@ -68,6 +68,11 @@
         <item name="android:textColor">@color/background</item>
         <item name="android:textStyle">italic|bold</item>
         <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">#fff</item>
+        <item name="boxStrokeWidth">2dp</item>
     </style>
 
 </resources>

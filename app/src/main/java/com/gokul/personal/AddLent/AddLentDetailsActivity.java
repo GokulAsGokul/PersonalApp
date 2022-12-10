@@ -39,7 +39,6 @@ public class AddLentDetailsActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
-        actionBar.setTitle("Add Lents");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         TabLayout tabLayoutOM = findViewById(R.id.tabLayoutOM);

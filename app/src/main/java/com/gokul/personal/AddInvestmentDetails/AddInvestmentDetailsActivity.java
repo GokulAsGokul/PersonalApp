@@ -19,6 +19,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
@@ -44,16 +45,15 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
-    private TextInputLayout investDecNameLayout, investDecAmountLayout, investDecFreqLayout, investDecTermLayout, investDecSourceLayout, investDecTranDateLayout, investDecRemarksLayout;
-    private TextInputEditText investDecName, investDecAmount, investDecTerm, investDecRemarks;
-    private AutoCompleteTextView investDecFreq, investDecSource, investDecTranDate;
+    private TextInputLayout investDecNameLayout, investDecAmountLayout, investDecFolioLayout, investDecTermLayout, investDecSourceLayout, investDecTranDateLayout, investDecRemarksLayout;
+    private TextInputEditText investDecName, investDecAmount, investDecFolio, investDecTerm, investDecRemarks;
+    private AutoCompleteTextView investDecSource, investDecTranDate;
     private String freqDropDown, sourceDropDown;
     private Vibrator vibrator;
-    private String name, amount, frequency, term, source, date, remarks;
-    private Dialog dialog1, dialog2;
+    private String name, amount, folioNumber, term, source, date, remarks;
+    private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> sourceList = new ArrayList<>();
-    private final ArrayList<String> freqList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +66,11 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
-        actionBar.setTitle("Add Investments");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         investDecNameLayout = findViewById(R.id.investDecNameLayout);
         investDecAmountLayout = findViewById(R.id.investDecAmountLayout);
-        investDecFreqLayout = findViewById(R.id.investDecFreqLayout);
+        investDecFolioLayout = findViewById(R.id.investDecFolioLayout);
         investDecTermLayout = findViewById(R.id.investDecTermLayout);
         investDecSourceLayout = findViewById(R.id.investDecSourceLayout);
         investDecTranDateLayout = findViewById(R.id.investDecTranDateLayout);
@@ -80,78 +79,44 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         investDecAmount = findViewById(R.id.investDecAmount);
         investDecTerm = findViewById(R.id.investDecTerm);
         investDecRemarks = findViewById(R.id.investDecRemarks);
-        investDecFreq = findViewById(R.id.investDecFreq);
+        investDecFolio = findViewById(R.id.investDecFolio);
         investDecSource = findViewById(R.id.investDecSource);
         investDecTranDate = findViewById(R.id.investDecTranDate);
         Button investDecSubmit = findViewById(R.id.investDecSubmit);
 
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
 
-        dialog1 = new Dialog(AddInvestmentDetailsActivity.this);
-        dialog1.setContentView(R.layout.submit_dialog);
-        dialog1.setCancelable(true);
-        dialog1.setCanceledOnTouchOutside(false);
-        if (dialog1.getWindow() != null) {
-            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        }
-
-        dialog2 = new Dialog(AddInvestmentDetailsActivity.this);
-        dialog2.setContentView(R.layout.loading_dialog);
-        dialog2.setCancelable(true);
-        dialog2.setCanceledOnTouchOutside(false);
-        if (dialog2.getWindow() != null) {
-            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        dialog = new Dialog(AddInvestmentDetailsActivity.this, android.R.style.Theme_DeviceDefault_NoActionBar);
+        dialog.setContentView(R.layout.loading_dialog);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
         }
         if (ConnectionCheck.getConnectionType(getApplicationContext()) != 0) {
-            dialog2.show();
+            dialog.show();
         }
 
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
-
-        investDecFreq.setInputType(InputType.TYPE_NULL);
-        investDecFreq.setClickable(true);
-        investDecFreq.setClickable(true);
-        investDecFreq.setFocusable(false);
-        databaseReference.child("DropDown Values").child("InvestmentFrequency").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog2.show();
-                    freqList.add(temp);
-                }
-                ArrayAdapter<String> freqAdapter = new ArrayAdapter<>(AddInvestmentDetailsActivity.this, R.layout.dropdown_list, freqList);
-                freqAdapter.sort(Comparator.naturalOrder());
-                investDecFreq.setAdapter(freqAdapter);
-                dialog2.dismiss();
-                investDecFreq.setOnItemClickListener((parent, view, position, id) -> {
-                    UIUtil.hideKeyboard(AddInvestmentDetailsActivity.this);
-                    freqDropDown = parent.getItemAtPosition(position).toString();
-                });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Frequency Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
 
         investDecSource.setInputType(InputType.TYPE_NULL);
         investDecSource.setClickable(true);
         investDecSourceLayout.setClickable(true);
         investDecSource.setFocusable(false);
-        databaseReference.child("DropDown Values").child("Sources").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog2.show();
+                    dialog.show();
                     sourceList.add(temp);
                 }
                 ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddInvestmentDetailsActivity.this, R.layout.dropdown_list, sourceList);
                 sourceAdapter.sort(Comparator.naturalOrder());
                 investDecSource.setAdapter(sourceAdapter);
-                dialog2.dismiss();
+                dialog.dismiss();
                 investDecSource.setOnItemClickListener((parent, view, position, id) -> {
                     UIUtil.hideKeyboard(AddInvestmentDetailsActivity.this);
                     sourceDropDown = parent.getItemAtPosition(position).toString();
@@ -160,6 +125,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
                 StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -219,8 +185,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
             investDecNameLayout.setErrorEnabled(false);
             investDecAmountLayout.setError(null);
             investDecAmountLayout.setErrorEnabled(false);
-            investDecFreqLayout.setError(null);
-            investDecFreqLayout.setErrorEnabled(false);
+            investDecFolioLayout.setError(null);
+            investDecFolio.setError(null);
             investDecTermLayout.setError(null);
             investDecTermLayout.setErrorEnabled(false);
             investDecSourceLayout.setError(null);
@@ -239,7 +205,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
             name = Objects.requireNonNull(investDecName.getText()).toString();
             amount = Objects.requireNonNull(investDecAmount.getText()).toString();
-            frequency = investDecFreq.getText().toString().trim();
+            folioNumber = Objects.requireNonNull(investDecFolio.getText()).toString().trim();
             term = Objects.requireNonNull(investDecTerm.getText()).toString().trim();
             source = investDecSource.getText().toString().trim();
             date = investDecTranDate.getText().toString().trim();
@@ -257,21 +223,27 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecAmountLayout.setErrorEnabled(true);
                 investDecAmountLayout.setError("Amount is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (frequency.isEmpty()) {
+            } else if (amount.equals("0")) {
+                investDecNameLayout.setError(null);
+                investDecNameLayout.setErrorEnabled(false);
+                investDecAmountLayout.setErrorEnabled(true);
+                investDecAmountLayout.setError("Amount is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (folioNumber.isEmpty()) {
                 investDecNameLayout.setError(null);
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
-                investDecFreqLayout.setErrorEnabled(true);
-                investDecFreqLayout.setError("Frequency is Required");
+                investDecFolioLayout.setErrorEnabled(true);
+                investDecFolioLayout.setError("Frequency is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (term.isEmpty()) {
                 investDecNameLayout.setError(null);
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
-                investDecFreqLayout.setError(null);
-                investDecFreqLayout.setErrorEnabled(false);
+                investDecFolioLayout.setError(null);
+                investDecFolioLayout.setErrorEnabled(false);
                 investDecTermLayout.setErrorEnabled(true);
                 investDecTermLayout.setError("Term is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -280,8 +252,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
-                investDecFreqLayout.setError(null);
-                investDecFreqLayout.setErrorEnabled(false);
+                investDecFolioLayout.setError(null);
+                investDecFolioLayout.setErrorEnabled(false);
                 investDecTermLayout.setError(null);
                 investDecTermLayout.setErrorEnabled(false);
                 investDecSourceLayout.setErrorEnabled(true);
@@ -292,8 +264,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
-                investDecFreqLayout.setError(null);
-                investDecFreqLayout.setErrorEnabled(false);
+                investDecFolioLayout.setError(null);
+                investDecFolioLayout.setErrorEnabled(false);
                 investDecTermLayout.setError(null);
                 investDecTermLayout.setErrorEnabled(false);
                 investDecSourceLayout.setError(null);
@@ -306,8 +278,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
-                investDecFreqLayout.setError(null);
-                investDecFreqLayout.setErrorEnabled(false);
+                investDecFolioLayout.setError(null);
+                investDecFolioLayout.setErrorEnabled(false);
                 investDecTermLayout.setError(null);
                 investDecTermLayout.setErrorEnabled(false);
                 investDecSourceLayout.setError(null);
@@ -322,8 +294,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
-                investDecFreqLayout.setError(null);
-                investDecFreqLayout.setErrorEnabled(false);
+                investDecFolioLayout.setError(null);
+                investDecFolioLayout.setErrorEnabled(false);
                 investDecTermLayout.setError(null);
                 investDecTermLayout.setErrorEnabled(false);
                 investDecSourceLayout.setError(null);
@@ -339,8 +311,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                     investDecNameLayout.setErrorEnabled(false);
                     investDecAmountLayout.setError(null);
                     investDecAmountLayout.setErrorEnabled(false);
-                    investDecFreqLayout.setError(null);
-                    investDecFreqLayout.setErrorEnabled(false);
+                    investDecFolioLayout.setError(null);
+                    investDecFolioLayout.setErrorEnabled(false);
                     investDecTermLayout.setError(null);
                     investDecTermLayout.setErrorEnabled(false);
                     investDecSourceLayout.setError(null);
@@ -351,7 +323,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                     investDecRemarksLayout.setError("Mention the Source Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    investSubmit();
+                    availableBalanceSubmitCall();
                 }
             } else if (source.equals("Bank")) {
                 if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
@@ -359,8 +331,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                     investDecNameLayout.setErrorEnabled(false);
                     investDecAmountLayout.setError(null);
                     investDecAmountLayout.setErrorEnabled(false);
-                    investDecFreqLayout.setError(null);
-                    investDecFreqLayout.setErrorEnabled(false);
+                    investDecFolioLayout.setError(null);
+                    investDecFolioLayout.setErrorEnabled(false);
                     investDecTermLayout.setError(null);
                     investDecTermLayout.setErrorEnabled(false);
                     investDecSourceLayout.setError(null);
@@ -371,13 +343,56 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                     investDecRemarksLayout.setError("Mention the Bank Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    investSubmit();
+                    availableBalanceSubmitCall();
                 }
             } else {
-                investSubmit();
+                availableBalanceSubmitCall();
             }
 
         }
+    }
+
+    private void availableBalanceSubmitCall() {
+        dialog.setCancelable(false);
+        dialog.show();
+        databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String temp = snapshot.getValue(String.class);
+                if (temp == null) {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                } else {
+                    if (Integer.parseInt(amount) <= Integer.parseInt(temp)) {
+                        availableBalanceSubmit(String.valueOf((Integer.parseInt(temp) - Integer.parseInt(amount))));
+                    } else {
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
+    }
+
+    private void availableBalanceSubmit(String sourceAmount) {
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(sourceAmount);
+
+        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> investSubmit()).addOnFailureListener(e1 -> {
+            dialog.dismiss();
+            StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
+
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -387,8 +402,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         investDecNameLayout.setErrorEnabled(false);
         investDecAmountLayout.setError(null);
         investDecAmountLayout.setErrorEnabled(false);
-        investDecFreqLayout.setError(null);
-        investDecFreqLayout.setErrorEnabled(false);
+        investDecFolioLayout.setError(null);
+        investDecFolioLayout.setErrorEnabled(false);
         investDecTermLayout.setError(null);
         investDecTermLayout.setErrorEnabled(false);
         investDecSourceLayout.setError(null);
@@ -402,61 +417,57 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         if (ConnectionCheck.getConnectionType(getApplicationContext()) == 0) {
             ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
         } else {
-            dialog1.show();
 
-            String date1 = new SimpleDateFormat("_dd_MM_yyyy_HH_mm", Locale.getDefault()).format(new Date());
+            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
             InvestmentData data = new InvestmentData();
             data.setName(name);
             data.setAmount(amount);
-            data.setFrequency(frequency);
+            data.setFolioNumber(folioNumber);
             data.setTerm(term);
             data.setSource(source);
             data.setDate(date);
             data.setRemarks(remarks);
-            data.setUpdateFinder(name + date1);
+            data.setUpdateFinder(date1);
 
-            databaseReference.child("Investment Details").child(name + date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmit()).addOnFailureListener(e -> {
-                dialog1.dismiss();
+            databaseReference.child("Investment Details").child(date1).setValue(data).addOnCompleteListener(task -> balanceSubmit(date1)).addOnFailureListener(e -> {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
         }
     }
 
-    private void availableBalanceSubmit() {
+    private void balanceSubmit(String date1) {
 
-        databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String temp = snapshot.getValue(String.class);
-                String sourceAmount;
-                if (temp == null) {
-                    sourceAmount = String.valueOf(Integer.parseInt(amount));
-                } else {
-                    sourceAmount = String.valueOf(Integer.parseInt(temp) - Integer.parseInt(amount));
-                }
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(amount);
+        data.setTransAmount(amount);
+        data.setCategory("Investment");
+        data.setType("Expense");
+        data.setDate(date);
+        data.setRemarks(remarks);
+        data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
+        data.setUpdateFinder(date1);
 
-                databaseReference.child("Available Balance Details India").child(source).child("amount").setValue(sourceAmount).addOnCompleteListener(task -> {
-                    Objects.requireNonNull(investDecName.getText()).clear();
-                    Objects.requireNonNull(investDecAmount.getText()).clear();
-                    investDecFreq.getText().clear();
-                    Objects.requireNonNull(investDecTerm.getText()).clear();
-                    investDecSource.getText().clear();
-                    investDecTranDate.getText().clear();
-                    dialog1.dismiss();
-                    StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                }).addOnFailureListener(e1 -> {
-                    dialog1.dismiss();
-                    StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                });
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
+        databaseReference.child("Balance Details India").child(source).child(date1).setValue(data).addOnCompleteListener(task -> {
+            dialog.dismiss();
+            Objects.requireNonNull(investDecName.getText()).clear();
+            Objects.requireNonNull(investDecAmount.getText()).clear();
+            Objects.requireNonNull(investDecFolio.getText()).clear();
+            Objects.requireNonNull(investDecTerm.getText()).clear();
+            investDecSource.getText().clear();
+            investDecTranDate.getText().clear();
+            investDecRemarks.setText(R.string.mention_if_any);
+            dialog.dismiss();
+            StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+        }).addOnFailureListener(e -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
+
     }
 
     @Override

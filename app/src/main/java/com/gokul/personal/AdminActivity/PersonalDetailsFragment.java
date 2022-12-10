@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
@@ -64,11 +65,14 @@ public class PersonalDetailsFragment extends Fragment {
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
 
-        dialog = new Dialog(view.getContext());
-        dialog.setContentView(R.layout.submit_dialog);
+        dialog = new Dialog(view.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        dialog.setContentView(R.layout.loading_dialog);
+        dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(false);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
         }
 
         personalType.setInputType(InputType.TYPE_NULL);
@@ -95,6 +99,8 @@ public class PersonalDetailsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Type Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -139,12 +145,13 @@ public class PersonalDetailsFragment extends Fragment {
                 personalTypeLayout.setErrorEnabled(false);
                 personalTypeLayout.setError(null);
 
+                dialog.show();
+                dialog.setCancelable(true);
+
                 AdminData adminData = new AdminData();
                 adminData.setPersonalName(namePersonal);
                 adminData.setPersonalValue(valuePersonal);
                 adminData.setPersonalType(typePersonal);
-
-                dialog.show();
 
                 databaseReference.child("Personal Details").orderByChild("personalName").equalTo(namePersonal).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -176,6 +183,7 @@ public class PersonalDetailsFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "Personal details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     }
                 });

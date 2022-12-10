@@ -2,37 +2,38 @@ package com.gokul.personal.ViewInvestmentDetails;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.AddInvestmentDetails.InvestmentData;
+import com.gokul.personal.AddInvestmentDetails.UpdateInvestmentDetailsActivity;
+import com.gokul.personal.AddLent.UpdateLentDetailsActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ViewHolder;
-
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import io.github.muddz.styleabletoast.StyleableToast;
 
@@ -40,11 +41,10 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
     private final Context context;
     private ArrayList<InvestmentData> list;
     private final Activity activity;
-    private DialogPlus dialog;
-    private TextInputEditText investUpdateAmount;
-    private TextInputLayout investUpdateAmountLayout;
     private final LottieAnimationView animationView;
     private final Vibrator vibrator;
+    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private Dialog loadingDialog;
 
     public ViewInvestmentDetailsRecyclerAdapter(Context context, ArrayList<InvestmentData> list, Activity activity, LottieAnimationView animationView, Vibrator vibrator) {
         this.context = context;
@@ -66,11 +66,21 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
         InvestmentData data = list.get(position);
         holder.invDetCompany.setText(data.getName());
         holder.invDetAmount.setText(data.getAmount());
-        holder.invDetFrequency.setText(data.getFrequency());
+        holder.invDetFolio.setText(data.getFolioNumber());
         holder.invDetTerm.setText(data.getTerm());
         holder.invDetSource.setText(data.getSource());
         holder.invDetDate.setText(data.getDate());
         holder.invDetRemarks.setText(data.getRemarks());
+
+        loadingDialog = new Dialog(holder.itemView.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        loadingDialog.setContentView(R.layout.loading_dialog);
+        loadingDialog.setCancelable(true);
+        loadingDialog.setCanceledOnTouchOutside(false);
+        if (loadingDialog.getWindow() != null) {
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            loadingDialog.getWindow().setStatusBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
+            loadingDialog.getWindow().setNavigationBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
+        }
 
         holder.investDetDeleteBtn.setOnClickListener(view -> {
             if (ConnectionCheck.getConnectionType(context) == 0) {
@@ -81,18 +91,12 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
                 builder.setTitle("Delete Details");
                 builder.setMessage("Are you sure want to delete this ?");
 
-                builder.setPositiveButton("Delete", (dialog, which) -> FirebaseDatabase.getInstance().getReference("Investment Details").child(data.getUpdateFinder()).removeValue().
+                builder.setPositiveButton("Delete", (dialog, which) -> databaseReference.child("Investment Details").child(data.getUpdateFinder()).removeValue().
                         addOnSuccessListener(unused -> {
+                            loadingDialog.show();
                             list.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
-                            if (list.isEmpty()) {
-                                animationView.setVisibility(View.VISIBLE);
-                                animationView.playAnimation();
-                                dialog.dismiss();
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                            } else {
-                                StyleableToast.makeText(activity, "Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                            }
+                            availableBalanceUpdateCall(data.getSource(), data.getAmount(), loadingDialog);
                         }).
                         addOnFailureListener(e ->
                                 StyleableToast.makeText(activity, "Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show()));
@@ -106,58 +110,69 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
         });
 
         holder.investDetEditBtn.setOnClickListener(view -> {
-            dialog = DialogPlus.newDialog(context).setGravity(Gravity.CENTER)
-                    .setMargin(50, 0, 50, 0)
-                    .setContentHolder(new ViewHolder(R.layout.investment_details_updater))
-                    .setExpanded(false).setCancelable(true).create();
-
-            View view1 = dialog.getHolderView();
-
-            investUpdateAmountLayout = view1.findViewById(R.id.investUpdateAmountLayout);
-            investUpdateAmount = view1.findViewById(R.id.investUpdateAmount);
-            AppCompatButton investUpdateBtn = view1.findViewById(R.id.investUpdateBtn);
-
-            investUpdateAmount.setText(data.getAmount());
-
-            investUpdateBtn.setOnClickListener(view2 -> updateLentDetails(data.getUpdateFinder()));
-
-            investUpdateAmount.setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    updateLentDetails(data.getUpdateFinder());
-                    return true;
-                }
-                return false;
-            });
-
-            dialog.show();
-
+            if (ConnectionCheck.getConnectionType(context) == 0) {
+                ConnectionCheck.connectionDialogShow(context, activity);
+            } else {
+                Intent intent = new Intent(context, UpdateInvestmentDetailsActivity.class);
+                intent.putExtra("name", data.getName());
+                intent.putExtra("amount", data.getAmount());
+                intent.putExtra("folio", data.getFolioNumber());
+                intent.putExtra("term", data.getTerm());
+                intent.putExtra("date", data.getDate());
+                intent.putExtra("remarks", data.getRemarks());
+                intent.putExtra("updateFinder", data.getUpdateFinder());
+                context.startActivity(intent);
+            }
         });
 
     }
 
-    private void updateLentDetails(String updater) {
+    private void availableBalanceUpdateCall(String source, String amount, Dialog dialogCall) {
 
-        UIUtil.hideKeyboard(activity);
+        databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String temp = snapshot.getValue(String.class);
+                if (temp == null) {
+                    availableBalanceSubmit(source, String.valueOf(Integer.parseInt(amount)), dialogCall);
+                } else {
+                    availableBalanceSubmit(source, String.valueOf(Integer.parseInt(temp) + Integer.parseInt(amount)), dialogCall);
+                }
+            }
 
-        String amount = Objects.requireNonNull(investUpdateAmount.getText()).toString().trim();
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                dialogCall.dismiss();
+                if (list.isEmpty()) {
+                    animationView.setVisibility(View.VISIBLE);
+                    animationView.playAnimation();
+                }
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                StyleableToast.makeText(activity, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+            }
+        });
 
-        if (amount.isEmpty()) {
-            investUpdateAmountLayout.setErrorEnabled(true);
-            investUpdateAmountLayout.setError("Amount is required");
-        } else {
-            investUpdateAmountLayout.setError(null);
-            investUpdateAmountLayout.setErrorEnabled(false);
+    }
 
-            FirebaseDatabase.getInstance().getReference("Investment Details").child(updater).child("amount").setValue(amount).
-                    addOnCompleteListener(task -> {
-                        dialog.dismiss();
-                        StyleableToast.makeText(context, "Updated Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                    }).addOnFailureListener(e -> {
-                dialog.dismiss();
-                StyleableToast.makeText(context, "Updated Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            });
-        }
+    private void availableBalanceSubmit(String source, String sourceAmount, Dialog dialogCall) {
 
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(sourceAmount);
+
+        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> {
+            if (list.isEmpty()) {
+                animationView.setVisibility(View.VISIBLE);
+                animationView.playAnimation();
+                dialogCall.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+            StyleableToast.makeText(activity, "Investment Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+        }).addOnFailureListener(e1 -> {
+            dialogCall.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(context, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
     }
 
     @Override
@@ -167,14 +182,14 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView invDetCompany, invDetAmount, invDetFrequency, invDetTerm, invDetSource, invDetDate, invDetRemarks;
+        TextView invDetCompany, invDetAmount, invDetFolio, invDetTerm, invDetSource, invDetDate, invDetRemarks;
         ImageView investDetEditBtn, investDetDeleteBtn;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             invDetCompany = itemView.findViewById(R.id.invDetCompany);
             invDetAmount = itemView.findViewById(R.id.invDetAmount);
-            invDetFrequency = itemView.findViewById(R.id.invDetFrequency);
+            invDetFolio = itemView.findViewById(R.id.invDetFolio);
             invDetTerm = itemView.findViewById(R.id.invDetTerm);
             invDetSource = itemView.findViewById(R.id.invDetSource);
             invDetDate = itemView.findViewById(R.id.invDetDate);

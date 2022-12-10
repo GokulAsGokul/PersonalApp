@@ -30,6 +30,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -67,12 +69,14 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
 
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
 
-        dialog = new Dialog(ViewInvestmentDetailsActivity.this);
+        dialog = new Dialog(ViewInvestmentDetailsActivity.this, android.R.style.Theme_DeviceDefault_NoActionBar);
         dialog.setContentView(R.layout.loading_dialog);
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(false);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
         }
         if (ConnectionCheck.getConnectionType(getApplicationContext()) != 0) {
             dialog.show();
@@ -98,16 +102,29 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
                     animationView.playAnimation();
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    list.sort((i1, i2) -> {
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                        try {
+                            return String.valueOf(Objects.requireNonNull(dateFormat.parse(i2.getDate())).getTime()).compareTo(
+                                    String.valueOf(Objects.requireNonNull(dateFormat.parse(i1.getDate())).getTime()));
+                        } catch (ParseException e) {
+                            StyleableToast.makeText(ViewInvestmentDetailsActivity.this, "List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                        }
+                        return 0;
+                    });
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(ViewInvestmentDetailsActivity.this, "Investment Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
 
-        adapter = new ViewInvestmentDetailsRecyclerAdapter(this, list, ViewInvestmentDetailsActivity.this,animationView,vibrator);
+        adapter = new ViewInvestmentDetailsRecyclerAdapter(this, list, ViewInvestmentDetailsActivity.this, animationView, vibrator);
         recyclerView.setAdapter(adapter);
     }
 

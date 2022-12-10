@@ -20,6 +20,10 @@
                     android:id="@+id/navAddLend"
                     android:icon="@drawable/ic_lend_dec"
                     android:title="@string/add_lending_details" />
+                <item
+                    android:id="@+id/navAddPers"
+                    android:icon="@drawable/ic_personal_board"
+                    android:title="@string/personal_board" />
             </group>
         </menu>
     </item>

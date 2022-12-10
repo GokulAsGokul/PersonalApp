@@ -5,7 +5,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +13,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -41,7 +40,7 @@ public class BankDetailsFragment extends Fragment {
     private TextInputEditText bnkName, bnkCIF, bnkAcntNumber, bnkIFSC, bnkMICR, bnkBranch;
     private String bankName, bankCIF, bankAccount, bankIFSC, bankMICR, bankBranch;
     private Vibrator vibrator;
-    private Dialog dialog1;
+    private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
     @Override
@@ -65,11 +64,14 @@ public class BankDetailsFragment extends Fragment {
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
 
-        dialog1 = new Dialog(view.getContext());
-        dialog1.setContentView(R.layout.submit_dialog);
-        dialog1.setCanceledOnTouchOutside(false);
-        if (dialog1.getWindow() != null) {
-            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        dialog = new Dialog(view.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        dialog.setContentView(R.layout.loading_dialog);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
         }
 
         bnkBranch.setOnEditorActionListener((v, actionId, event) -> {
@@ -173,6 +175,8 @@ public class BankDetailsFragment extends Fragment {
 
     private void bankSubmit(View view1) {
 
+        dialog.show();
+
         AdminData data = new AdminData();
         data.setBankName(bankName);
         data.setBankCIF(bankCIF);
@@ -181,15 +185,13 @@ public class BankDetailsFragment extends Fragment {
         data.setBankMICR(bankMICR);
         data.setBankBranch(bankBranch);
 
-        dialog1.show();
-
         databaseReference.child("Bank Details").orderByChild("bankName").equalTo(bankName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 if (snapshot.exists()) {
 
-                    dialog1.dismiss();
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view1.getContext(), "Bank details already available", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
 
@@ -201,15 +203,12 @@ public class BankDetailsFragment extends Fragment {
                         Objects.requireNonNull(bnkIFSC.getText()).clear();
                         Objects.requireNonNull(bnkMICR.getText()).clear();
                         Objects.requireNonNull(bnkBranch.getText()).clear();
-                        dialog1.dismiss();
+                        dialog.dismiss();
                         StyleableToast.makeText(view1.getContext(), "Bank details added successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            dialog1.dismiss();
-                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                            StyleableToast.makeText(view1.getContext(), "Bank details add error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                        }
+                    }).addOnFailureListener(e -> {
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        StyleableToast.makeText(view1.getContext(), "Bank details add error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     });
                 }
 

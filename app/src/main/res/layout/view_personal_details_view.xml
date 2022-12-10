@@ -14,11 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:padding="10dp">
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/viewPerDetText1"
-            android:layout_width="320dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:gravity="start"
             android:paddingStart="10dp"
@@ -31,8 +31,9 @@
 
         <TextView
             android:id="@+id/viewPerDetText2"
-            android:layout_width="320dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:gravity="start"
             android:paddingStart="10dp"
             android:textColor="@color/background"
@@ -40,31 +41,46 @@
             android:textStyle="bold|italic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewPerDetText1"
             tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/viewPersonalType"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/docs_category_background"
+            android:padding="2dp"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SmallSp" />
 
         <ImageView
             android:id="@+id/viewPerDetDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:contentDescription="@string/delete_icon"
-            android:paddingEnd="5dp"
             android:paddingTop="5dp"
             android:src="@drawable/ic_delete"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/viewPersonalType"
+            app:layout_constraintTop_toBottomOf="@+id/viewPersonalType"
             tools:ignore="RtlSymmetry" />
 
         <ImageView
             android:id="@+id/viewPerDetEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/delete_icon"
-            android:layout_marginTop="10dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:contentDescription="@string/edit_icon"
+            android:paddingTop="5dp"
             android:src="@drawable/ic_edit"
-            app:layout_constraintTop_toBottomOf="@id/viewPerDetDelete"
-            app:layout_constraintStart_toStartOf="@id/viewPerDetDelete"
+            app:layout_constraintStart_toStartOf="@+id/viewPersonalType"
+            app:layout_constraintTop_toBottomOf="@+id/viewPersonalType"
             tools:ignore="RtlSymmetry" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

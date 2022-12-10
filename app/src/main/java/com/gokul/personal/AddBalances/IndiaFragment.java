@@ -47,12 +47,11 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public class IndiaFragment extends Fragment {
 
-    private TextInputLayout balSourceNameLayout, balAmountLayout, balCategoryLayout, balTranDateLayout, balDecRemarksLayout;
-    private TextInputEditText balAmount, balDecRemarks;
+    private TextInputLayout balSourceNameLayout, balAmountLayout, balTransAmountLayout, balCategoryLayout, balTranDateLayout, balDecRemarksLayout;
+    private TextInputEditText balAmount, balTransAmount, balDecRemarks;
     private AutoCompleteTextView balSourceName, balCategory, balTranDate;
-    private Dialog dialog1, dialog2;
-    private String sourceDropDown, categoryDropDown = "";
-    private String source, amount, category, date, remarks;
+    private Dialog dialog;
+    private String source, amount, transAmount, category, date, remarks, sourceDropDown, categoryDropDown;
     private SwitchCompat balSwitch;
     private Vibrator vibrator;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -66,35 +65,32 @@ public class IndiaFragment extends Fragment {
 
         balSourceNameLayout = view.findViewById(R.id.balSourceNameLayout);
         balAmountLayout = view.findViewById(R.id.balAmountLayout);
+        balTransAmountLayout = view.findViewById(R.id.balTransAmountLayout);
         balCategoryLayout = view.findViewById(R.id.balCategoryLayout);
         balTranDateLayout = view.findViewById(R.id.balTranDateLayout);
         balSourceName = view.findViewById(R.id.balSourceName);
         balAmount = view.findViewById(R.id.balAmount);
+        balTransAmount = view.findViewById(R.id.balTransAmount);
         balCategory = view.findViewById(R.id.balCategory);
         balTranDate = view.findViewById(R.id.balTranDate);
         balDecRemarksLayout = view.findViewById(R.id.balDecRemarksLayout);
         balDecRemarks = view.findViewById(R.id.balDecRemarks);
         balSwitch = view.findViewById(R.id.balSwitch);
         Button balDecSubmit = view.findViewById(R.id.balDecSubmit);
+
         ConnectionCheck.connectionDialogShow(view.getContext(), getActivity());
 
-        dialog1 = new Dialog(view.getContext());
-        dialog1.setContentView(R.layout.submit_dialog);
-        dialog1.setCancelable(true);
-        dialog1.setCanceledOnTouchOutside(false);
-        if (dialog1.getWindow() != null) {
-            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        }
-
-        dialog2 = new Dialog(view.getContext());
-        dialog2.setContentView(R.layout.loading_dialog);
-        dialog2.setCancelable(true);
-        dialog2.setCanceledOnTouchOutside(false);
-        if (dialog2.getWindow() != null) {
-            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        dialog = new Dialog(view.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        dialog.setContentView(R.layout.loading_dialog);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
         }
         if (ConnectionCheck.getConnectionType(view.getContext()) != 0) {
-            dialog2.show();
+            dialog.show();
         }
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
@@ -103,18 +99,18 @@ public class IndiaFragment extends Fragment {
         balSourceName.setClickable(true);
         balSourceName.setFocusable(false);
         balSourceNameLayout.setClickable(true);
-        databaseReference.child("DropDown Values").child("Sources").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog2.show();
+                    dialog.show();
                     sourceList.add(temp);
                 }
                 ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_list, sourceList);
                 sourceAdapter.sort(Comparator.naturalOrder());
                 balSourceName.setAdapter(sourceAdapter);
-                dialog2.dismiss();
+                dialog.dismiss();
                 balSourceName.setOnItemClickListener((parent, view, position, id) -> {
                     UIUtil.hideKeyboard(requireActivity());
                     sourceDropDown = parent.getItemAtPosition(position).toString();
@@ -123,6 +119,7 @@ public class IndiaFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "Sources Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -131,18 +128,18 @@ public class IndiaFragment extends Fragment {
         balCategory.setClickable(true);
         balCategory.setFocusable(false);
         balCategoryLayout.setClickable(true);
-        databaseReference.child("DropDown Values").child("AddBalanceCategory").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("DropDown Values").child("IndiaBalanceCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog2.show();
+                    dialog.show();
                     categoryList.add(temp);
                 }
                 ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_list, categoryList);
                 categoryAdapter.sort(Comparator.naturalOrder());
                 balCategory.setAdapter(categoryAdapter);
-                dialog2.dismiss();
+                dialog.dismiss();
                 balCategory.setOnItemClickListener((parent, view, position, id) -> {
                     UIUtil.hideKeyboard(requireActivity());
                     categoryDropDown = parent.getItemAtPosition(position).toString();
@@ -151,6 +148,7 @@ public class IndiaFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "Category Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -203,6 +201,8 @@ public class IndiaFragment extends Fragment {
             balSourceNameLayout.setErrorEnabled(false);
             balAmountLayout.setError(null);
             balAmountLayout.setErrorEnabled(false);
+            balTransAmountLayout.setError(null);
+            balTransAmountLayout.setErrorEnabled(false);
             balCategoryLayout.setError(null);
             balCategoryLayout.setErrorEnabled(false);
             balTranDateLayout.setError(null);
@@ -219,6 +219,7 @@ public class IndiaFragment extends Fragment {
 
             source = balSourceName.getText().toString();
             amount = Objects.requireNonNull(balAmount.getText()).toString().trim();
+            transAmount = Objects.requireNonNull(balTransAmount.getText()).toString().trim();
             category = Objects.requireNonNull(balCategory.getText()).toString().trim();
             date = Objects.requireNonNull(balTranDate.getText()).toString().trim();
             remarks = balDecRemarks.getText().toString().trim();
@@ -235,11 +236,35 @@ public class IndiaFragment extends Fragment {
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (amount.equals("0")) {
+                balSourceNameLayout.setError(null);
+                balSourceNameLayout.setErrorEnabled(false);
+                balAmountLayout.setErrorEnabled(true);
+                balAmountLayout.setError("Amount is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (transAmount.isEmpty()) {
+                balSourceNameLayout.setError(null);
+                balSourceNameLayout.setErrorEnabled(false);
+                balAmountLayout.setError(null);
+                balAmountLayout.setErrorEnabled(false);
+                balTransAmountLayout.setErrorEnabled(true);
+                balTransAmountLayout.setError("Amount is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (transAmount.equals("0")) {
+                balSourceNameLayout.setError(null);
+                balSourceNameLayout.setErrorEnabled(false);
+                balAmountLayout.setError(null);
+                balAmountLayout.setErrorEnabled(false);
+                balTransAmountLayout.setErrorEnabled(true);
+                balTransAmountLayout.setError("Amount is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (category.isEmpty()) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
                 balAmountLayout.setErrorEnabled(false);
+                balTransAmountLayout.setError(null);
+                balTransAmountLayout.setErrorEnabled(false);
                 balCategoryLayout.setErrorEnabled(true);
                 balCategoryLayout.setError("Category is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -248,6 +273,8 @@ public class IndiaFragment extends Fragment {
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
                 balAmountLayout.setErrorEnabled(false);
+                balTransAmountLayout.setError(null);
+                balTransAmountLayout.setErrorEnabled(false);
                 balCategoryLayout.setError(null);
                 balCategoryLayout.setErrorEnabled(false);
                 balTranDateLayout.setErrorEnabled(true);
@@ -258,6 +285,8 @@ public class IndiaFragment extends Fragment {
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
                 balAmountLayout.setErrorEnabled(false);
+                balTransAmountLayout.setError(null);
+                balTransAmountLayout.setErrorEnabled(false);
                 balCategoryLayout.setError(null);
                 balCategoryLayout.setErrorEnabled(false);
                 balTranDateLayout.setError(null);
@@ -270,6 +299,8 @@ public class IndiaFragment extends Fragment {
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
                 balAmountLayout.setErrorEnabled(false);
+                balTransAmountLayout.setError(null);
+                balTransAmountLayout.setErrorEnabled(false);
                 balCategoryLayout.setError(null);
                 balCategoryLayout.setErrorEnabled(false);
                 balTranDateLayout.setError(null);
@@ -283,6 +314,8 @@ public class IndiaFragment extends Fragment {
                     balSourceNameLayout.setErrorEnabled(false);
                     balAmountLayout.setError(null);
                     balAmountLayout.setErrorEnabled(false);
+                    balTransAmountLayout.setError(null);
+                    balTransAmountLayout.setErrorEnabled(false);
                     balCategoryLayout.setError(null);
                     balCategoryLayout.setErrorEnabled(false);
                     balTranDateLayout.setError(null);
@@ -291,7 +324,7 @@ public class IndiaFragment extends Fragment {
                     balDecRemarksLayout.setError("Mention the Source of Amount");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    submitBalance(view);
+                    availableBalanceSubmitCall(view);
                 }
             } else if (category.equals("Others")) {
                 if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
@@ -299,6 +332,8 @@ public class IndiaFragment extends Fragment {
                     balSourceNameLayout.setErrorEnabled(false);
                     balAmountLayout.setError(null);
                     balAmountLayout.setErrorEnabled(false);
+                    balTransAmountLayout.setError(null);
+                    balTransAmountLayout.setErrorEnabled(false);
                     balCategoryLayout.setError(null);
                     balCategoryLayout.setErrorEnabled(false);
                     balTranDateLayout.setError(null);
@@ -307,21 +342,26 @@ public class IndiaFragment extends Fragment {
                     balDecRemarksLayout.setError("Mention the Category of Amount");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    submitBalance(view);
+                    availableBalanceSubmitCall(view);
                 }
             } else {
-                submitBalance(view);
+                availableBalanceSubmitCall(view);
             }
 
         }
     }
 
-    private void submitBalance(View view) {
+    private void availableBalanceSubmitCall(View view) {
+
+        dialog.setCancelable(false);
+        dialog.show();
 
         balSourceNameLayout.setError(null);
         balSourceNameLayout.setErrorEnabled(false);
         balAmountLayout.setError(null);
         balAmountLayout.setErrorEnabled(false);
+        balTransAmountLayout.setError(null);
+        balTransAmountLayout.setErrorEnabled(false);
         balCategoryLayout.setError(null);
         balCategoryLayout.setErrorEnabled(false);
         balTranDateLayout.setError(null);
@@ -332,11 +372,82 @@ public class IndiaFragment extends Fragment {
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
-            dialog1.show();
+
+            databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String temp = snapshot.getValue(String.class);
+                    if (balSwitch.isChecked()) {
+                        if (temp == null) {
+                            dialog.dismiss();
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                        } else {
+                            if (Integer.parseInt(transAmount) <= Integer.parseInt(temp)) {
+                                availableBalanceSubmit((Integer.parseInt(temp) - Integer.parseInt(transAmount)), view);
+                            } else {
+                                dialog.dismiss();
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                                StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                            }
+                        }
+                    } else {
+                        if (temp == null) {
+                            availableBalanceSubmit(Integer.parseInt(transAmount), view);
+                        } else {
+                            availableBalanceSubmit((Integer.parseInt(temp) + Integer.parseInt(transAmount)), view);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        }
+
+    }
+
+    private void availableBalanceSubmit(int sourceAmount, View view) {
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(String.valueOf(sourceAmount));
+
+        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(view)).addOnFailureListener(e1 -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
+    }
+
+    private void submitBalance(View view) {
+
+        balSourceNameLayout.setError(null);
+        balSourceNameLayout.setErrorEnabled(false);
+        balAmountLayout.setError(null);
+        balAmountLayout.setErrorEnabled(false);
+        balTransAmountLayout.setError(null);
+        balTransAmountLayout.setErrorEnabled(false);
+        balCategoryLayout.setError(null);
+        balCategoryLayout.setErrorEnabled(false);
+        balTranDateLayout.setError(null);
+        balTranDateLayout.setErrorEnabled(false);
+        balDecRemarksLayout.setError(null);
+        balDecRemarksLayout.setErrorEnabled(false);
+        UIUtil.hideKeyboard(requireActivity());
+        if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
+            ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
+        } else {
+
+            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
             BalanceDetailsData data = new BalanceDetailsData();
             data.setSource(source);
             data.setAmount(amount);
+            data.setTransAmount(transAmount);
             data.setCategory(category);
             if (balSwitch.isChecked()) {
                 data.setType("Expense");
@@ -345,58 +456,24 @@ public class IndiaFragment extends Fragment {
             }
             data.setDate(date);
             data.setRemarks(remarks);
+            data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
+            data.setUpdateFinder(date1);
 
-            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
-            String date2 = new SimpleDateFormat("MM_yyyy", Locale.getDefault()).format(new Date());
-
-            databaseReference.child("Balance Details India").child(source).child(date2).child(date1).setValue(data).addOnCompleteListener(task -> availableBalanceSubmitCall(view)).addOnFailureListener(e -> {
-                dialog1.dismiss();
+            databaseReference.child("Balance Details India").child(source).child(date1).setValue(data).addOnCompleteListener(task -> {
+                balSourceName.getText().clear();
+                Objects.requireNonNull(balAmount.getText()).clear();
+                Objects.requireNonNull(balTransAmount.getText()).clear();
+                balCategory.getText().clear();
+                balTranDate.getText().clear();
+                balDecRemarks.setText(R.string.mention_if_any);
+                dialog.dismiss();
+                StyleableToast.makeText(view.getContext(), "Balance Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+            }).addOnFailureListener(e -> {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             });
         }
-    }
-
-    private void availableBalanceSubmitCall(View view) {
-
-        databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String temp = snapshot.getValue(String.class);
-                if (balSwitch.isChecked()) {
-                    if (temp == null) {
-                        availableBalanceSubmit(Integer.parseInt(amount), view);
-                    } else {
-                        availableBalanceSubmit((Integer.parseInt(temp) - Integer.parseInt(amount)), view);
-                    }
-                } else {
-                    if (temp == null) {
-                        availableBalanceSubmit(Integer.parseInt(amount), view);
-                    } else {
-                        availableBalanceSubmit((Integer.parseInt(temp) + Integer.parseInt(amount)), view);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
-    }
-
-    private void availableBalanceSubmit(int sourceAmount, View view) {
-        databaseReference.child("Available Balance Details India").child(source).child("amount").setValue(String.valueOf(sourceAmount)).addOnCompleteListener(task -> {
-            dialog1.dismiss();
-            balSourceName.getText().clear();
-            Objects.requireNonNull(balAmount.getText()).clear();
-            balCategory.getText().clear();
-            balTranDate.getText().clear();
-            balDecRemarks.setText(R.string.mention_if_any);
-            StyleableToast.makeText(view.getContext(), "Balance Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-        }).addOnFailureListener(e1 -> {
-            dialog1.dismiss();
-            StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-        });
     }
 
 }

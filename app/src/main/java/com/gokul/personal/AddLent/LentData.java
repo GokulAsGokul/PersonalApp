@@ -1,10 +1,15 @@
 package com.gokul.personal.AddLent;
 
+import android.annotation.SuppressLint;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class LentData {
 
-    private String Name, Amount, From, To, Date, Remarks,UpdateFinder;
+    private String Name, Amount, From, To, Date, Remarks, UpdateFinder;
 
     public String getName() {
         return Name;
@@ -62,7 +67,26 @@ public class LentData {
         UpdateFinder = updateFinder;
     }
 
-    public static Comparator<LentData> docComparatorLatest = (l1, l2) -> l1.getDate().compareTo(l2.getDate());
+    public static Comparator<LentData> lentComparatorLatest = (l1, l2) -> {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            return String.valueOf(Objects.requireNonNull(dateFormat.parse(l2.getDate())).getTime()).compareToIgnoreCase(
+                    String.valueOf(Objects.requireNonNull(dateFormat.parse(l1.getDate())).getTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    };
 
-    public static Comparator<LentData> docComparatorOldest = (l1, l2) -> l2.getDate().compareTo(l1.getDate());
+    public static Comparator<LentData> lentComparatorOldest = (l1, l2) -> {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            return String.valueOf(Objects.requireNonNull(dateFormat.parse(l1.getDate())).getTime()).compareToIgnoreCase(
+                    String.valueOf(Objects.requireNonNull(dateFormat.parse(l2.getDate())).getTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    };
+
 }

@@ -8,24 +8,5 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/sortByAZ"
-        android:title="@string/sort_by_a_z"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/sortByZA"
-        android:title="@string/sort_by_z_a"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/sortByCategoryAZ"
-        android:title="@string/sort_by_category_a_z"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/sortByCategoryZA"
-        android:title="@string/sort_by_category_z_a"
-        app:showAsAction="never" />
-
+    
 </menu>

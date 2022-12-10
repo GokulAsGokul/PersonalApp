@@ -1,10 +1,13 @@
 package com.gokul.personal.AdminActivity;
 
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -21,6 +24,7 @@ import java.util.Objects;
 
 public class AdminActivity extends AppCompatActivity {
 
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +34,10 @@ public class AdminActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
 
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Admin Panel");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         TabLayout tabLayout1 = findViewById(R.id.tabLayout1);
         ViewPager viewPager1 = findViewById(R.id.viewPager1);
@@ -45,11 +53,13 @@ public class AdminActivity extends AppCompatActivity {
         MainAdapter adapter1 = new MainAdapter(getSupportFragmentManager());
         PersonalDetailsFragment personalDetailsFragment = new PersonalDetailsFragment();
         ListValuesFragment listValuesFragment = new ListValuesFragment();
+        DataFragment dataFragment = new DataFragment();
         BankDetailsFragment bankDetailsFragment = new BankDetailsFragment();
         AppUploadFragment appUploadFragment = new AppUploadFragment();
 
         adapter1.addFragment(personalDetailsFragment, "Personal");
         adapter1.addFragment(listValuesFragment, "List");
+        adapter1.addFragment(dataFragment, "Data");
         adapter1.addFragment(bankDetailsFragment, "Bank");
         adapter1.addFragment(appUploadFragment, "App");
         viewPager.setAdapter(adapter1);

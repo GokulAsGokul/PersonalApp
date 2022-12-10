@@ -1,12 +1,15 @@
 package com.gokul.personal.AddInvestmentDetails;
 
-import com.gokul.personal.AddLent.LentData;
+import android.annotation.SuppressLint;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class InvestmentData {
 
-    private String Name, Amount, Frequency, Term, Source, Date, Remarks, UpdateFinder;
+    private String Name, Amount, FolioNumber, Term, Source, Date, Remarks, UpdateFinder;
 
     public String getName() {
         return Name;
@@ -24,12 +27,12 @@ public class InvestmentData {
         Amount = amount;
     }
 
-    public String getFrequency() {
-        return Frequency;
+    public String getFolioNumber() {
+        return FolioNumber;
     }
 
-    public void setFrequency(String frequency) {
-        Frequency = frequency;
+    public void setFolioNumber(String folioNumber) {
+        FolioNumber = folioNumber;
     }
 
     public String getTerm() {
@@ -72,8 +75,26 @@ public class InvestmentData {
         UpdateFinder = updateFinder;
     }
 
-    public static Comparator<InvestmentData> docComparatorLatest = (l1, l2) -> l1.getDate().compareTo(l2.getDate());
+    public static Comparator<InvestmentData> docComparatorLatest = (i1, i2) -> {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            return String.valueOf(Objects.requireNonNull(dateFormat.parse(i2.getDate())).getTime()).compareToIgnoreCase(
+                    String.valueOf(Objects.requireNonNull(dateFormat.parse(i1.getDate())).getTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    };
 
-    public static Comparator<InvestmentData> docComparatorOldest = (l1, l2) -> l2.getDate().compareTo(l1.getDate());
+    public static Comparator<InvestmentData> docComparatorOldest = (i1, i2) -> {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            return String.valueOf(Objects.requireNonNull(dateFormat.parse(i1.getDate())).getTime()).compareToIgnoreCase(
+                    String.valueOf(Objects.requireNonNull(dateFormat.parse(i2.getDate())).getTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    };
 
 }

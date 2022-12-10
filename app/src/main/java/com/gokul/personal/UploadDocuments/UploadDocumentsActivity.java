@@ -80,7 +80,6 @@ public class UploadDocumentsActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
-        actionBar.setTitle("Upload Documents");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         docUploadNameLayout = findViewById(R.id.docUploadNameLayout);
@@ -95,18 +94,20 @@ public class UploadDocumentsActivity extends AppCompatActivity {
 
         dialog1 = new Dialog(UploadDocumentsActivity.this);
         dialog1.setContentView(R.layout.uploading_dialog);
-        dialog1.setCancelable(true);
+        dialog1.setCancelable(false);
         dialog1.setCanceledOnTouchOutside(false);
         if (dialog1.getWindow() != null) {
             dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         }
 
-        dialog2 = new Dialog(UploadDocumentsActivity.this);
+        dialog2 = new Dialog(UploadDocumentsActivity.this, android.R.style.Theme_DeviceDefault_NoActionBar);
         dialog2.setContentView(R.layout.loading_dialog);
         dialog2.setCancelable(true);
         dialog2.setCanceledOnTouchOutside(false);
         if (dialog2.getWindow() != null) {
             dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog2.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
+            dialog2.getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
         }
         if (ConnectionCheck.getConnectionType(getApplicationContext()) != 0) {
             dialog2.show();
@@ -118,7 +119,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         docUpCategory.setClickable(true);
         docUpCategory.setFocusable(false);
         docUpCategoryLayout.setClickable(true);
-        databaseReference.child("DropDown Values").child("UploadDocCategory").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("DropDown Values").child("DocumentCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
@@ -138,7 +139,9 @@ public class UploadDocumentsActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(UploadDocumentsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                dialog2.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                StyleableToast.makeText(UploadDocumentsActivity.this, "DocumentCategory Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
 
@@ -234,6 +237,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                                 StyleableToast.makeText(UploadDocumentsActivity.this, "Uploaded Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                             }).addOnFailureListener(e1 -> {
                         docUploadFile.setText(R.string.firebaseUpdateError);
+                        dialog2.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(UploadDocumentsActivity.this, "Document Upload in Firebase Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     });

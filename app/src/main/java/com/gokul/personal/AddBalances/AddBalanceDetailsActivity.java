@@ -39,7 +39,6 @@ public class AddBalanceDetailsActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
-        actionBar.setTitle("Add Balances");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);

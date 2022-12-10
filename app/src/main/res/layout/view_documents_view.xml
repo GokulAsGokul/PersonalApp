@@ -5,9 +5,7 @@
     android:id="@+id/docsCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="20dp"
-    android:layout_marginTop="10dp"
-    android:layout_marginEnd="20dp"
+    android:layout_margin="10dp"
     app:cardCornerRadius="10dp"
     app:cardElevation="5dp">
 
@@ -30,33 +28,16 @@
             tools:ignore="RtlSymmetry" />
 
         <TextView
-            android:id="@+id/viewDocsCategory"
-            android:layout_width="57dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="15dp"
-            android:background="@drawable/docs_category_background"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:textStyle="bold|italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="RtlSymmetry" />
-
-        <TextView
             android:id="@+id/viewDocsText"
-            android:layout_width="275dp"
+            android:layout_width="255dp"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
             android:textColor="@color/background"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold|italic"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/viewDocsDownload"
             app:layout_constraintStart_toEndOf="@+id/serialNo"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RtlSymmetry" />
@@ -65,26 +46,61 @@
             android:id="@+id/viewDocsDownload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:contentDescription="@string/download_icon"
-            android:paddingEnd="15dp"
+            android:paddingEnd="10dp"
             android:src="@drawable/ic_download"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/viewDocsDelete"
-            app:layout_constraintTop_toBottomOf="@+id/viewDocsCategory"
+            app:layout_constraintEnd_toStartOf="@+id/viewDocsCategory"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RtlSymmetry" />
 
         <ImageView
             android:id="@+id/viewDocsDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:contentDescription="@string/delete_icon"
+            android:paddingTop="5dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_delete"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/viewDocsType"
             app:layout_constraintTop_toBottomOf="@+id/viewDocsCategory"
             tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/viewDocsCategory"
+            android:layout_width="57dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/docs_category_background"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlSymmetry,SmallSp" />
+
+        <TextView
+            android:id="@+id/viewDocsType"
+            android:layout_width="57dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/docs_category_background"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold|italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/viewDocsCategory"
+            tools:ignore="RtlSymmetry,SmallSp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

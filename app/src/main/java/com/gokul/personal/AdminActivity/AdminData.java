@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class AdminData {
 
-    private String listValue, personalName, personalValue,personalType, bankName, bankCIF, bankAccount, bankIFSC, bankMICR, bankBranch;
+    private String listValue, personalName, personalValue, personalType, bankName, bankCIF, bankAccount, bankIFSC, bankMICR, bankBranch;
 
     public String getListValue() {
         return listValue;
@@ -86,8 +86,10 @@ public class AdminData {
         this.bankBranch = bankBranch;
     }
 
-    public static Comparator<AdminData> docComparatorAZ = (a1, a2) -> a1.getPersonalName().compareTo(a2.getPersonalName());
+    public static Comparator<AdminData> dataComparatorAZ = (a1, a2) -> a1.getPersonalName().compareToIgnoreCase(a2.getPersonalName());
 
-    public static Comparator<AdminData> docComparatorZA = (a1, a2) -> a2.getPersonalName().compareTo(a1.getPersonalName());
+    public static Comparator<AdminData> dataComparatorZA = (a1, a2) -> a2.getPersonalName().compareToIgnoreCase(a1.getPersonalName());
+
+    public static Comparator<AdminData> dataComparatorType = (a1, a2) -> a1.getPersonalType().compareToIgnoreCase(a2.getPersonalType());
 
 }

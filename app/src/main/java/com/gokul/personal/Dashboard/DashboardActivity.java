@@ -49,6 +49,7 @@ import com.gokul.personal.AddLent.AddLentDetailsActivity;
 import com.gokul.personal.AdminActivity.AdminActivity;
 import com.gokul.personal.AdminActivity.AdminData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.PersonalBoard.PersonalBoardActivity;
 import com.gokul.personal.R;
 import com.gokul.personal.UploadDocuments.UploadDocumentsActivity;
 import com.gokul.personal.ViewBalance.ViewBalanceDetailsActivity;
@@ -127,13 +128,77 @@ public class DashboardActivity extends AppCompatActivity {
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
 
         View headerView = navigationView.getHeaderView(0);
-        headerView.findViewById(R.id.navDraProfile).setOnClickListener(view -> startActivity(new Intent(DashboardActivity.this, AdminActivity.class)));
-        headerView.findViewById(R.id.headerLayout2).setOnClickListener(view -> startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class)));
+        headerView.findViewById(R.id.navDraProfile).setOnClickListener(view -> {
+
+//            Executor executor = ContextCompat.getMainExecutor(this);
+//
+//            BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+//                @Override
+//                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+//                    super.onAuthenticationError(errorCode, errString);
+//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+//                }
+//
+//                @Override
+//                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+//                    super.onAuthenticationSucceeded(result);
+//                    startActivity(new Intent(DashboardActivity.this, AdminActivity.class));
+//                }
+//
+//                @Override
+//                public void onAuthenticationFailed() {
+//                    super.onAuthenticationFailed();
+//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+//                }
+//            });
+//
+//            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Admin Activity Authentication")
+//                    .setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
+//
+//            prompt.authenticate(promptInfo);
+
+            startActivity(new Intent(DashboardActivity.this, AdminActivity.class));
+
+        });
+
+        headerView.findViewById(R.id.headerLayout2).setOnClickListener(view -> {
+
+//            Executor executor = ContextCompat.getMainExecutor(this);
+//
+//            BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+//                @Override
+//                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+//                    super.onAuthenticationError(errorCode, errString);
+//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+//                }
+//
+//                @Override
+//                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+//                    super.onAuthenticationSucceeded(result);
+//                    startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class));
+//                }
+//
+//                @Override
+//                public void onAuthenticationFailed() {
+//                    super.onAuthenticationFailed();
+//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+//                }
+//            });
+//
+//            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Personal Data View Authentication")
+//                    .setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
+//
+//            prompt.authenticate(promptInfo);
+
+            startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class));
+
+        });
 
         PackageInfo pInfo = null;
         try {
             pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(DashboardActivity.this, "App Version Read Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         }
         assert pInfo != null;
@@ -149,10 +214,12 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(DashboardActivity.this, UploadDocumentsActivity.class));
             } else if (item.getItemId() == R.id.navAddBal) {
                 startActivity(new Intent(DashboardActivity.this, AddBalanceDetailsActivity.class));
-            } else if (item.getItemId() == R.id.navAddLend) {
-                startActivity(new Intent(DashboardActivity.this, AddLentDetailsActivity.class));
             } else if (item.getItemId() == R.id.navAddInvest) {
                 startActivity(new Intent(DashboardActivity.this, AddInvestmentDetailsActivity.class));
+            } else if (item.getItemId() == R.id.navAddLend) {
+                startActivity(new Intent(DashboardActivity.this, AddLentDetailsActivity.class));
+            } else if (item.getItemId() == R.id.navAddPers) {
+                startActivity(new Intent(DashboardActivity.this, PersonalBoardActivity.class));
             } else if (item.getItemId() == R.id.navViewDoc) {
                 startActivity(new Intent(DashboardActivity.this, ViewDocumentsActivity.class));
             } else if (item.getItemId() == R.id.navViewBal) {
@@ -188,16 +255,18 @@ public class DashboardActivity extends AppCompatActivity {
         balanceCardLayout.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
 
         animationView = findViewById(R.id.dashAnimation);
-        animationView.setVisibility(View.GONE);
+        animationView.setVisibility(View.VISIBLE);
 
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
 
-        dialog = new Dialog(DashboardActivity.this);
+        dialog = new Dialog(DashboardActivity.this, android.R.style.Theme_DeviceDefault_NoActionBar);
         dialog.setContentView(R.layout.loading_dialog);
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(false);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.background));
         }
 
         if (ConnectionCheck.getConnectionType(getApplicationContext()) != 0) {
@@ -226,6 +295,11 @@ public class DashboardActivity extends AppCompatActivity {
         super.onRestart();
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
         bankDetails();
+        totalLentAmount = 0;
+        totalAvailableAmount = 0;
+        totalInvestmentAmount = 0;
+        totalAvailableAmountOM = 0;
+        totalLentAmountOM = 0;
         indiaAvailableAmountCall();
     }
 
@@ -255,7 +329,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void bankDetails() {
         ArrayList<AdminData> list = new ArrayList<>();
-        DashboardRecyclerAdapter adapter = new DashboardRecyclerAdapter(this, list);
+        DashboardRecyclerAdapter adapter = new DashboardRecyclerAdapter(this, list, DashboardActivity.this);
 
         databaseReference.child("Bank Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -271,11 +345,15 @@ public class DashboardActivity extends AppCompatActivity {
                     animationView.playAnimation();
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    animationView.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Bank detail read error: " + error.getMessage(), R.style.CustomErrorToast, Toast.LENGTH_LONG);
             }
         });
@@ -340,6 +418,8 @@ public class DashboardActivity extends AppCompatActivity {
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
+                                dialog.dismiss();
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                                 StyleableToast.makeText(DashboardActivity.this, "App Version Read Error: ", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                             }
                         });
@@ -348,6 +428,8 @@ public class DashboardActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(DashboardActivity.this, "App details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });
@@ -418,9 +500,13 @@ public class DashboardActivity extends AppCompatActivity {
                 getApplicationContext().startActivity(intent);
             } catch (ActivityNotFoundException e) {
                 e.printStackTrace();
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Error in apk install: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         } else {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(DashboardActivity.this, "New apk file not available", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         }
     }
@@ -445,6 +531,8 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "India Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -467,6 +555,8 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "India Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -490,6 +580,8 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -513,6 +605,8 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Oman Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
@@ -537,6 +631,8 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Oman Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });

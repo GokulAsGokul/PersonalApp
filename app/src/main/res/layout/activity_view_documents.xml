@@ -7,15 +7,97 @@
     android:background="@color/white"
     tools:context=".ViewDocuments.ViewDocumentsActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/viewDocRecycLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/viewDocFilterLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="30dp"
+            android:hint="@string/filter"
+            android:textColorHint="@color/background"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/background"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/viewDocFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textAlignment="center"
+                android:textColor="@color/background"
+                android:textSize="15sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor,RtlSymmetry" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/viewDocSortLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="40dp"
+            android:hint="@string/sort"
+            android:textColorHint="@color/background"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/background"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:endIconTint="@color/background"
+            app:errorTextColor="@color/red"
+            app:hintTextColor="@color/background"
+            app:layout_constraintStart_toEndOf="@+id/viewDocFilterLayout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconTint="@color/background">
+
+            <AutoCompleteTextView
+                android:id="@+id/viewDocSort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textAlignment="center"
+                android:textColor="@color/background"
+                android:textSize="15sp"
+                android:textStyle="bold|italic"
+                tools:ignore="LabelFor,RtlSymmetry" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/docsList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginBottom="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/viewDocRecycLayout" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/docsAnimation"

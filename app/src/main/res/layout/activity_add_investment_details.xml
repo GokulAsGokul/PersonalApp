@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="@string/add_investement_details"
+            android:text="@string/add_investment_details"
             android:textColor="@color/background"
             android:textSize="25sp"
             android:textStyle="bold|italic"
@@ -71,7 +71,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:hint="@string/amount"
+            android:hint="@string/enter_invested_amount"
             android:textColorHint="@color/background"
             android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
             app:boxCornerRadiusBottomEnd="10dp"
@@ -104,12 +104,12 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/investDecFreqLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/investDecFolioLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:hint="@string/select_frequency"
+            android:hint="@string/enter_folio_number"
             android:textColorHint="@color/background"
             android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
             app:boxCornerRadiusBottomEnd="10dp"
@@ -128,15 +128,16 @@
             app:startIconDrawable="@drawable/ic_view_balance"
             app:startIconTint="@color/background">
 
-            <AutoCompleteTextView
-                android:id="@+id/investDecFreq"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/investDecFolio"
                 android:layout_width="match_parent"
-                android:layout_height="60sp"
-                android:inputType="none"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="number"
                 android:textColor="@color/background"
+                android:textCursorDrawable="@drawable/color_cursor"
                 android:textSize="20sp"
-                android:textStyle="bold|italic"
-                tools:ignore="LabelFor" />
+                android:textStyle="bold|italic" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -159,9 +160,9 @@
             app:endIconTint="@color/background"
             app:errorTextColor="@color/red"
             app:hintTextColor="@color/background"
-            app:layout_constraintEnd_toEndOf="@+id/investDecFreqLayout"
-            app:layout_constraintStart_toStartOf="@+id/investDecFreqLayout"
-            app:layout_constraintTop_toBottomOf="@+id/investDecFreqLayout"
+            app:layout_constraintEnd_toEndOf="@+id/investDecFolioLayout"
+            app:layout_constraintStart_toStartOf="@+id/investDecFolioLayout"
+            app:layout_constraintTop_toBottomOf="@+id/investDecFolioLayout"
             app:startIconDrawable="@drawable/ic_type"
             app:startIconTint="@color/background">
 

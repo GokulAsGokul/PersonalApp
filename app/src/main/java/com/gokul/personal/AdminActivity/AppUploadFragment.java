@@ -83,6 +83,7 @@ public class AppUploadFragment extends Fragment {
 
         dialog1 = new Dialog(view.getContext());
         dialog1.setContentView(R.layout.uploading_dialog);
+        dialog1.setCancelable(false);
         dialog1.setCanceledOnTouchOutside(false);
         if (dialog1.getWindow() != null) {
             dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -160,6 +161,7 @@ public class AppUploadFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void uploadNewApp(View view) {
         if (appUri != null) {
+            dialog1.show();
             FirebaseStorage.getInstance().getReference().child("APK Files/" + appUpFile.getText() + ".apk")
                     .getDownloadUrl().addOnSuccessListener(uri -> {
                 dialog1.dismiss();
@@ -203,7 +205,6 @@ public class AppUploadFragment extends Fragment {
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Updated App Upload Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }).addOnProgressListener(snapshot -> {
-                    dialog1.show();
                     ProgressBar downloadDialogBar = dialog1.findViewById(R.id.uploadDialogBar);
                     TextView uploadDialog2 = dialog1.findViewById(R.id.uploadDialog2);
                     final int progress = (int) ((snapshot.getBytesTransferred() * 100L) / snapshot.getTotalByteCount());

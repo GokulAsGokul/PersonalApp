@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -63,6 +64,7 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
     public void onBindViewHolder(@NonNull ViewDocumentsRecyclerAdapter.MyViewHolder holder, int position) {
         GeneralData data = list.get(position);
         holder.viewDocsCategory.setText(data.getFileCategory().toUpperCase());
+        holder.viewDocsType.setText(data.getFileExtension().toUpperCase());
         holder.serialNo.setText((position + 1) + ".");
         holder.viewDocsText.setText(data.getFileName());
 
@@ -93,25 +95,40 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
                 ConnectionCheck.connectionDialogShow(context, activity);
             } else {
 
+                Dialog loadingDialog = new Dialog(view.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+                loadingDialog.setContentView(R.layout.loading_dialog);
+                loadingDialog.setCancelable(true);
+                loadingDialog.setCanceledOnTouchOutside(false);
+                if (loadingDialog.getWindow() != null) {
+                    loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                    loadingDialog.getWindow().setStatusBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+                    loadingDialog.getWindow().setNavigationBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
                 builder.setTitle("Delete Document");
                 builder.setMessage("Are you sure want to delete this ?");
 
-                builder.setPositiveButton("Delete", (dialog, which) -> FirebaseStorage.getInstance().getReferenceFromUrl(data.getFileUrl()).delete().addOnSuccessListener(unuse -> FirebaseDatabase.getInstance().getReference("Documents Data").child(data.getFileName()).removeValue().
-                        addOnSuccessListener(unused -> {
-                            list.remove(holder.getAdapterPosition());
-                            notifyItemRemoved(holder.getAdapterPosition());
-                            if (list.isEmpty()) {
-                                LottieAnimationView animationView = activity.findViewById(R.id.docsAnimation);
-                                animationView.setVisibility(View.VISIBLE);
-                                animationView.playAnimation();
-                                dialog.dismiss();
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                            }
-                            StyleableToast.makeText(activity, "Document Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-                        }).
-                        addOnFailureListener(e ->
-                                StyleableToast.makeText(activity, "Document Data Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show())).addOnFailureListener(e -> StyleableToast.makeText(activity, "Document Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show()));
+                builder.setPositiveButton("Delete", (dialog, which) -> {
+                    loadingDialog.show();
+                    FirebaseStorage.getInstance().getReferenceFromUrl(data.getFileUrl()).delete().addOnSuccessListener(unuse -> FirebaseDatabase.getInstance().getReference("Documents Data").child(data.getFileName()).removeValue().
+                            addOnSuccessListener(unused -> {
+                                list.remove(holder.getAdapterPosition());
+                                notifyItemRemoved(holder.getAdapterPosition());
+                                if (list.isEmpty()) {
+                                    LottieAnimationView animationView = activity.findViewById(R.id.docsAnimation);
+                                    animationView.setVisibility(View.VISIBLE);
+                                    animationView.playAnimation();
+                                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                                }
+                                loadingDialog.dismiss();
+                                StyleableToast.makeText(activity, "Document Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+                            }).
+                            addOnFailureListener(e -> {
+                                loadingDialog.dismiss();
+                                StyleableToast.makeText(activity, "Document Data Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                            })).addOnFailureListener(e -> StyleableToast.makeText(activity, "Document Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show());
+                });
                 builder.setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss());
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
@@ -130,12 +147,13 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView viewDocsCategory, viewDocsText, serialNo;
+        TextView viewDocsCategory, viewDocsText, serialNo, viewDocsType;
         ImageView viewDocsDownload, viewDocsDelete;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             viewDocsCategory = itemView.findViewById(R.id.viewDocsCategory);
+            viewDocsType = itemView.findViewById(R.id.viewDocsType);
             serialNo = itemView.findViewById(R.id.serialNo);
             viewDocsText = itemView.findViewById(R.id.viewDocsText);
             viewDocsDownload = itemView.findViewById(R.id.viewDocsDownload);

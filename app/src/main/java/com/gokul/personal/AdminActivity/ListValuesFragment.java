@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
@@ -43,7 +44,7 @@ public class ListValuesFragment extends Fragment {
     private AutoCompleteTextView listName;
     private Vibrator vibrator;
     private Dialog dialog;
-    final String[] listsName = {"AddBalanceCategory", "AddLentTo", "InvestmentFrequency", "OmanCategory", "OmanLentTo", "OmanSource", "PersonalTypes", "Sources", "UploadDocCategory"};
+    private final String[] listsName = {"IndiaBalanceCategory", "IndiaLentTo", "IndiaSource", "OmanBalanceCategory", "OmanLentTo", "OmanSource", "PersonalTypes", "DocumentCategory"};
     private String valueList, nameList, listsDropDown;
     private SwitchCompat valSwitch;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -63,11 +64,14 @@ public class ListValuesFragment extends Fragment {
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
 
-        dialog = new Dialog(view.getContext());
-        dialog.setContentView(R.layout.submit_dialog);
+        dialog = new Dialog(view.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        dialog.setContentView(R.layout.loading_dialog);
+        dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            dialog.getWindow().setStatusBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
+            dialog.getWindow().setNavigationBarColor(ContextCompat.getColor(view.getContext(), R.color.background));
         }
 
         listNameLayout.setClickable(true);
@@ -113,10 +117,10 @@ public class ListValuesFragment extends Fragment {
 
     private void addListData(View view) {
 
+        dialog.show();
+
         AdminData adminData = new AdminData();
         adminData.setListValue(valueList);
-
-        dialog.show();
 
         if (valSwitch.isChecked()) {
 
@@ -185,6 +189,8 @@ public class ListValuesFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "List values read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });

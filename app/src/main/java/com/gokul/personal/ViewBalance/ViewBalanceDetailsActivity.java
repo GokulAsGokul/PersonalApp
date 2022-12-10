@@ -1,42 +1,32 @@
 package com.gokul.personal.ViewBalance;
 
-import android.app.Dialog;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-import io.github.muddz.styleabletoast.StyleableToast;
-
 public class ViewBalanceDetailsActivity extends AppCompatActivity {
-
-    private PieChart balancePieChart;
-    private final ArrayList<PieEntry> entries = new ArrayList<>();
-    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,81 +42,67 @@ public class ViewBalanceDetailsActivity extends AppCompatActivity {
         actionBar.setTitle("Balances");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        balancePieChart = findViewById(R.id.balancePieChart);
+        TabLayout tabLayout1 = findViewById(R.id.tabLayoutBal);
+        ViewPager viewPager1 = findViewById(R.id.viewPagerBal);
 
-        dialog = new Dialog(ViewBalanceDetailsActivity.this);
-        dialog.setContentView(R.layout.loading_dialog);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        }
+        ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
 
-        setupPieChart();
-        loadPieChartDataCall();
-    }
-
-    private void setupPieChart() {
-        balancePieChart.setDrawHoleEnabled(true);
-        balancePieChart.setUsePercentValues(true);
-        balancePieChart.setEntryLabelTextSize(10);
-        balancePieChart.setEntryLabelColor(Color.BLACK);
-        balancePieChart.setCenterText("Balance Details");
-        balancePieChart.setCenterTextSize(20);
-        Description description = new Description();
-        description.setText("");
-        balancePieChart.setDescription(description);
-        balancePieChart.getLegend().setEnabled(false);
-        balancePieChart.setNoDataText("");
-    }
-
-    private void loadPieChartDataCall() {
-
-        databaseReference.child("India Balance Details").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    String amount = childDataSnapshot.child("amount").getValue(String.class);
-                    assert amount != null;
-                    entries.add(new PieEntry(Float.parseFloat(amount), childDataSnapshot.child("source").getValue(String.class)));
-
-                }
-                loadPieChartData();
-                dialog.dismiss();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                StyleableToast.makeText(ViewBalanceDetailsActivity.this, "Chart Data Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
+        tabLayout1.setupWithViewPager(viewPager1);
+        prepareViewPager(viewPager1);
 
     }
 
-    private void loadPieChartData() {
+    private void prepareViewPager(ViewPager viewPager) {
+        ViewBalanceDetailsActivity.MainAdapter adapter = new ViewBalanceDetailsActivity.MainAdapter(getSupportFragmentManager());
+        IndiaBalanceFragment indiaFragment = new IndiaBalanceFragment();
+        OmanBalanceFragment omanFragment = new OmanBalanceFragment();
+        adapter.addFragment(indiaFragment);
+        adapter.addFragment(omanFragment);
+        viewPager.setAdapter(adapter);
+    }
 
-        ArrayList<Integer> colors = new ArrayList<>();
-        for (int color : ColorTemplate.MATERIAL_COLORS) {
-            colors.add(color);
+    private class MainAdapter extends FragmentPagerAdapter {
+
+        ArrayList<Fragment> fragmentArrayList = new ArrayList<>();
+        int[] imageList = {R.drawable.ic_india_flag, R.drawable.ic_oman_flag};
+
+        private void addFragment(Fragment fragment) {
+            fragmentArrayList.add(fragment);
         }
 
-        for (int color : ColorTemplate.VORDIPLOM_COLORS) {
-            colors.add(color);
+        public MainAdapter(FragmentManager supportFragmentManager) {
+            super(supportFragmentManager);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(colors);
+        @NonNull
+        @Override
+        public Fragment getItem(int position) {
+            return fragmentArrayList.get(position);
+        }
 
-        PieData data = new PieData(dataSet);
-        data.setDrawValues(true);
-        data.setValueFormatter(new PercentFormatter(balancePieChart));
-        data.setValueTextSize(12f);
-        data.setValueTextColor(Color.BLACK);
+        @Override
+        public int getCount() {
+            return fragmentArrayList.size();
+        }
 
-        balancePieChart.setData(data);
-        balancePieChart.invalidate();
+        @RequiresApi(api = Build.VERSION_CODES.Q)
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), imageList[position]);
+            assert drawable != null;
+            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            SpannableString spannableString = new SpannableString(" ");
+            ImageSpan imageSpan = new ImageSpan(drawable, ImageSpan.ALIGN_CENTER);
+            spannableString.setSpan(imageSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return spannableString;
+        }
+    }
 
-        balancePieChart.animateY(1400, Easing.EaseInOutQuad);
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
     }
 
 }
