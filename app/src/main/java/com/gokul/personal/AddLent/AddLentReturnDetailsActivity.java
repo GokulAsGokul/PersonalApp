@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -99,6 +100,11 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
 
         lentRetFrom.setInputType(InputType.TYPE_NULL);
+        lentRetFrom.setClickable(false);
+        lentRetFrom.setFocusable(false);
+        lentRetFromLayout.setClickable(false);
+
+        lentRetFrom.setInputType(InputType.TYPE_NULL);
         lentRetFrom.setClickable(true);
         lentRetFrom.setFocusable(false);
         lentRetFromLayout.setClickable(true);
@@ -115,6 +121,7 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
                 lentRetFrom.setAdapter(sourceAdapter);
                 dialog.dismiss();
                 lentRetFrom.setOnItemClickListener((parent, view, position, id) -> {
+                    remAmountCall();
                     UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
                     fromDropDown = parent.getItemAtPosition(position).toString();
                 });
@@ -144,6 +151,7 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
                 lentRetTo.setAdapter(sourceAdapter);
                 dialog.dismiss();
                 lentRetTo.setOnItemClickListener((parent, view, position, id) -> {
+                    remAmountCall();
                     UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
                     toDropDown = parent.getItemAtPosition(position).toString();
                 });
@@ -172,10 +180,30 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
             return false;
         });
 
-        lentRetSubmit.setOnClickListener(view1 -> {
-            addBalanceDetails();
-        });
+        lentRetSubmit.setOnClickListener(view1 -> addBalanceDetails());
 
+    }
+
+    private void remAmountCall() {
+
+        if ((Objects.requireNonNull(lentRetAmount.getText()).toString()).isEmpty()) {
+            lentRetAmountLayout.setErrorEnabled(true);
+            lentRetAmountLayout.setError("Amount is required");
+        } else if ((lentRetAmount.getText().toString()).equalsIgnoreCase("0")) {
+            lentRetAmountLayout.setErrorEnabled(true);
+            lentRetAmountLayout.setError("Amount is required");
+        } else if (Integer.parseInt(getIntent().getStringExtra("amount")) < (Integer.parseInt(Objects.requireNonNull(lentRetAmount.getText()).toString()))) {
+            lentRetAmountLayout.setErrorEnabled(true);
+            lentRetAmountLayout.setError("Entered amount is high");
+        } else {
+            lentRetAmountLayout.setError(null);
+            lentRetAmountLayout.setErrorEnabled(false);
+            if (getIntent().getStringExtra("country").equalsIgnoreCase("India")) {
+                lentRetRemAmount.setText(String.valueOf(Integer.parseInt(getIntent().getStringExtra("amount")) - Integer.parseInt(lentRetAmount.getText().toString())));
+            } else {
+                lentRetRemAmount.setText(String.valueOf(BigDecimal.valueOf(Double.parseDouble(getIntent().getStringExtra("amount"))).subtract(BigDecimal.valueOf(Double.parseDouble(lentRetAmount.getText().toString())))));
+            }
+        }
     }
 
     private void dayPicker() {

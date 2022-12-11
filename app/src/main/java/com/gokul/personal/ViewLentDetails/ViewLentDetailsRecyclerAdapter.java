@@ -44,6 +44,7 @@ import com.orhanobut.dialogplus.ViewHolder;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -229,17 +230,15 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
             }
         });
 
-        holder.lentDetReturnBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ConnectionCheck.getConnectionType(context) == 0) {
-                    ConnectionCheck.connectionDialogShow(context, activity);
-                } else {
-                    Intent intent = new Intent(context, AddLentReturnDetailsActivity.class);
-                    intent.putExtra("country", country);
-                    intent.putExtra("updateFinder", data.getUpdateFinder());
-                    context.startActivity(intent);
-                }
+        holder.lentDetReturnBtn.setOnClickListener(view -> {
+            if (ConnectionCheck.getConnectionType(context) == 0) {
+                ConnectionCheck.connectionDialogShow(context, activity);
+            } else {
+                Intent intent = new Intent(context, AddLentReturnDetailsActivity.class);
+                intent.putExtra("country", country);
+                intent.putExtra("amount", data.getAmount());
+                intent.putExtra("updateFinder", data.getUpdateFinder());
+                context.startActivity(intent);
             }
         });
 
@@ -292,9 +291,9 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 } else if (country.equalsIgnoreCase("Oman")) {
 
                     if (temp == null) {
-                        availableBalanceSubmit(source, String.valueOf(Double.parseDouble(amount)), dialogCall);
+                        availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount))), dialogCall);
                     } else {
-                        availableBalanceSubmit(source, String.valueOf(Double.parseDouble(temp) + Double.parseDouble(amount)), dialogCall);
+                        availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), dialogCall);
                     }
                 }
             }

@@ -24,7 +24,6 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.AddInvestmentDetails.InvestmentData;
 import com.gokul.personal.AddInvestmentDetails.UpdateInvestmentDetailsActivity;
-import com.gokul.personal.AddLent.UpdateLentDetailsActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.firebase.database.DataSnapshot;
@@ -96,7 +95,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
                             loadingDialog.show();
                             list.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
-                            availableBalanceUpdateCall(data.getSource(), data.getAmount(), loadingDialog);
+                            deleteBalanceDetails(data.getSource(), data.getAmount(), data.getUpdateFinder(), loadingDialog);
                         }).
                         addOnFailureListener(e ->
                                 StyleableToast.makeText(activity, "Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show()));
@@ -118,6 +117,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
                 intent.putExtra("amount", data.getAmount());
                 intent.putExtra("folio", data.getFolioNumber());
                 intent.putExtra("term", data.getTerm());
+                intent.putExtra("source", data.getSource());
                 intent.putExtra("date", data.getDate());
                 intent.putExtra("remarks", data.getRemarks());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
@@ -125,6 +125,14 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             }
         });
 
+    }
+
+    private void deleteBalanceDetails(String source, String amount, String updateFinder, Dialog dialogCall) {
+        databaseReference.child("Balance Details India").child(source).child(updateFinder).removeValue().
+                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, dialogCall)).addOnFailureListener(e -> {
+            dialogCall.dismiss();
+            StyleableToast.makeText(activity, "Balance Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
     }
 
     private void availableBalanceUpdateCall(String source, String amount, Dialog dialogCall) {
@@ -164,9 +172,9 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             if (list.isEmpty()) {
                 animationView.setVisibility(View.VISIBLE);
                 animationView.playAnimation();
-                dialogCall.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             }
+            dialogCall.dismiss();
             StyleableToast.makeText(activity, "Investment Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
         }).addOnFailureListener(e1 -> {
             dialogCall.dismiss();
