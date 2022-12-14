@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
-                    android:text="Name            :"
+                    android:text="Name                :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -67,7 +67,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="Amount        :"
+                    android:text="Amount            :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -92,7 +92,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="From             :"
+                    android:text="Rem Amount   :"
+                    android:textColor="@color/background"
+                    android:textSize="17sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/lentDetRemAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/background"
+                    android:textSize="17sp"
+                    android:textStyle="italic|bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="From                 :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -117,7 +142,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="To                  :"
+                    android:text="To                      :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -142,7 +167,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="Date              :"
+                    android:text="Date                  :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -168,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"
-                    android:text="Remarks      :"
+                    android:text="Remarks           :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -195,7 +220,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"
-                    android:text="No of Days  :"
+                    android:text="No of Days       :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -227,7 +252,7 @@
                 android:id="@+id/lentDetEditBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="40dp"
                 android:contentDescription="@string/lent_details_edit_btn"
                 android:src="@drawable/ic_edit"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -248,7 +273,7 @@
                 android:id="@+id/lentDetReturnBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="40dp"
                 android:contentDescription="@string/lent_details_return_btn"
                 android:src="@drawable/ic_return"
                 app:layout_constraintEnd_toEndOf="parent"

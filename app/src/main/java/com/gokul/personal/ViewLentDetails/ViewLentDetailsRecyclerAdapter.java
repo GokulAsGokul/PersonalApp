@@ -97,6 +97,11 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
         } else {
             holder.lentDetAmount.setText(String.format("Ro %s", data.getAmount()));
         }
+        if (country.equalsIgnoreCase("India")) {
+            holder.lentDetRemAmount.setText(String.format("Rs %s", data.getRemAmount()));
+        } else {
+            holder.lentDetRemAmount.setText(String.format("Ro %s", data.getRemAmount()));
+        }
         holder.lentDetFrom.setText(data.getFrom());
         holder.lentDetTo.setText(data.getTo());
         holder.lentDetDate.setText(data.getDate());
@@ -142,42 +147,74 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                     lentReturnSource.setClickable(true);
                     lentReturnSourceLayout.setClickable(true);
                     lentReturnSource.setFocusable(false);
-                    databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                                String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                                loadingDialog.show();
-                                sourceList.add(temp);
+                    if (country.equalsIgnoreCase("India")) {
+                        sourceList.clear();
+                        databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                                    loadingDialog.show();
+                                    sourceList.add(temp);
+                                }
+                                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(context, R.layout.dropdown_list, sourceList);
+                                sourceAdapter.sort(Comparator.naturalOrder());
+                                lentReturnSource.setAdapter(sourceAdapter);
+                                loadingDialog.dismiss();
+                                lentReturnSource.setOnItemClickListener((parent, view, position, id) -> {
+                                    UIUtil.hideKeyboard(activity);
+                                    sourceDropDown = parent.getItemAtPosition(position).toString();
+                                });
                             }
-                            ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(context, R.layout.dropdown_list, sourceList);
-                            sourceAdapter.sort(Comparator.naturalOrder());
-                            lentReturnSource.setAdapter(sourceAdapter);
-                            loadingDialog.dismiss();
-                            lentReturnSource.setOnItemClickListener((parent, view, position, id) -> {
-                                UIUtil.hideKeyboard(activity);
-                                sourceDropDown = parent.getItemAtPosition(position).toString();
-                            });
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            loadingDialog.dismiss();
-                            StyleableToast.makeText(context, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                        }
-                    });
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                loadingDialog.dismiss();
+                                StyleableToast.makeText(context, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                            }
+                        });
+                    } else {
+                        sourceList.clear();
+                        databaseReference.child("DropDown Values").child("OmanSource").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                                    loadingDialog.show();
+                                    sourceList.add(temp);
+                                }
+                                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(context, R.layout.dropdown_list, sourceList);
+                                sourceAdapter.sort(Comparator.naturalOrder());
+                                lentReturnSource.setAdapter(sourceAdapter);
+                                loadingDialog.dismiss();
+                                lentReturnSource.setOnItemClickListener((parent, view, position, id) -> {
+                                    UIUtil.hideKeyboard(activity);
+                                    sourceDropDown = parent.getItemAtPosition(position).toString();
+                                });
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                loadingDialog.dismiss();
+                                StyleableToast.makeText(context, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                            }
+                        });
+                    }
 
                     lentReturnUpdateBtn.setOnClickListener(view2 -> {
                         String source = lentReturnSource.getText().toString();
 
+                        loadingDialog.show();
+
                         if (source.isEmpty()) {
                             lentReturnSourceLayout.setErrorEnabled(true);
                             lentReturnSourceLayout.setError("Source is required");
+                            loadingDialog.dismiss();
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         } else {
                             lentReturnSourceLayout.setError(null);
                             lentReturnSourceLayout.setErrorEnabled(false);
                             dialogPlus.dismiss();
-                            loadingDialog.show();
 
                             databaseReference.child("Lent Details " + country).child(data.getUpdateFinder()).removeValue().
                                     addOnSuccessListener(unused -> {
@@ -220,6 +257,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 Intent intent = new Intent(context, UpdateLentDetailsActivity.class);
                 intent.putExtra("name", data.getName());
                 intent.putExtra("amount", data.getAmount());
+                intent.putExtra("remAmount", data.getRemAmount());
                 intent.putExtra("from", data.getFrom());
                 intent.putExtra("to", data.getTo());
                 intent.putExtra("date", data.getDate());
@@ -227,6 +265,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 intent.putExtra("country", country);
                 intent.putExtra("updateFinder", data.getUpdateFinder());
                 context.startActivity(intent);
+                ((Activity) context).finish();
             }
         });
 
@@ -239,6 +278,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 intent.putExtra("amount", data.getAmount());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
                 context.startActivity(intent);
+                ((Activity) context).finish();
             }
         });
 
@@ -260,14 +300,15 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
         data.setSource(source);
         data.setAmount(amount);
         data.setTransAmount(amount);
-        data.setCategory("Lent");
+        data.setCategory("Lent Return");
         data.setType("Income");
-        data.setDate(new SimpleDateFormat("dd-MM-yyyy_HH", Locale.getDefault()).format(new Date()));
-        data.setRemarks("Lent Amount Returned");
+        data.setDate(new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()));
+        data.setRemarks("Rem Amount Returned");
         data.setUpdateFinder(date1);
+        data.setFilter(new SimpleDateFormat("MM_yyyy", Locale.getDefault()).format(new Date()));
 
         databaseReference.child("Balance Details " + country).child(source).child(date1).setValue(data).
-                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, loadingDialog)).addOnFailureListener(e -> {
+                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, dialogCall)).addOnFailureListener(e -> {
             dialogCall.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(context, "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -345,13 +386,14 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView lentDetName, lentDetAmount, lentDetFrom, lentDetTo, lentDetDate, lentDetRemarks, lentDetDays;
+        TextView lentDetName, lentDetAmount, lentDetRemAmount, lentDetFrom, lentDetTo, lentDetDate, lentDetRemarks, lentDetDays;
         ImageView lentDetDeleteBtn, lentDetEditBtn, lentDetReturnBtn;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             lentDetName = itemView.findViewById(R.id.lentDetName);
             lentDetAmount = itemView.findViewById(R.id.lentDetAmount);
+            lentDetRemAmount = itemView.findViewById(R.id.lentDetRemAmount);
             lentDetFrom = itemView.findViewById(R.id.lentDetFrom);
             lentDetTo = itemView.findViewById(R.id.lentDetTo);
             lentDetDate = itemView.findViewById(R.id.lentDetDate);

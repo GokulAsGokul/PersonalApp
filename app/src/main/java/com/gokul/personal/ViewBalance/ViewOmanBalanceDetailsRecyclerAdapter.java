@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -155,9 +156,9 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
                     }
                 } else {
                     if (temp == null) {
-                        availableBalanceSubmit((String.valueOf(Double.parseDouble(amount))), category, updateFinder, dialogCall);
+                        availableBalanceSubmit((String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
                     } else {
-                        availableBalanceSubmit(String.valueOf(Double.parseDouble(temp) + Double.parseDouble(amount)), category, updateFinder, dialogCall);
+                        availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
                     }
                 }
             }

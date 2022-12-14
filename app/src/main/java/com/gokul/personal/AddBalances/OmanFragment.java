@@ -325,7 +325,7 @@ public class OmanFragment extends Fragment {
                     balTranDateLayout.setError(null);
                     balTranDateLayout.setErrorEnabled(false);
                     balDecRemarksLayout.setErrorEnabled(true);
-                    balDecRemarksLayout.setError("Mention the Source of Amount");
+                    balDecRemarksLayout.setError("Mention Source of Amount");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -343,7 +343,7 @@ public class OmanFragment extends Fragment {
                     balTranDateLayout.setError(null);
                     balTranDateLayout.setErrorEnabled(false);
                     balDecRemarksLayout.setErrorEnabled(true);
-                    balDecRemarksLayout.setError("Mention the Category of Amount");
+                    balDecRemarksLayout.setError("Mention Category of Amount");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);

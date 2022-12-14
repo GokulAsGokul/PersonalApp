@@ -324,7 +324,7 @@ public class AddLentOmanFragment extends Fragment {
                     lendDecTranDateLayout.setError(null);
                     lendDecTranDateLayout.setErrorEnabled(false);
                     lendDecRemarksLayout.setErrorEnabled(true);
-                    lendDecRemarksLayout.setError("Mention the From Detail");
+                    lendDecRemarksLayout.setError("Mention From Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -342,7 +342,7 @@ public class AddLentOmanFragment extends Fragment {
                     lendDecTranDateLayout.setError(null);
                     lendDecTranDateLayout.setErrorEnabled(false);
                     lendDecRemarksLayout.setErrorEnabled(true);
-                    lendDecRemarksLayout.setError("Mention the Bank Name");
+                    lendDecRemarksLayout.setError("Mention Bank Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -360,7 +360,7 @@ public class AddLentOmanFragment extends Fragment {
                     lendDecTranDateLayout.setError(null);
                     lendDecTranDateLayout.setErrorEnabled(false);
                     lendDecRemarksLayout.setErrorEnabled(true);
-                    lendDecRemarksLayout.setError("Mention the To Detail");
+                    lendDecRemarksLayout.setError("Mention To Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -443,11 +443,8 @@ public class AddLentOmanFragment extends Fragment {
 
             LentData data = new LentData();
             data.setName(name);
-            if (amount.contains(".")) {
-                data.setAmount(amount);
-            } else {
-                data.setAmount(amount + ".000");
-            }
+            data.setAmount(amount);
+            data.setRemAmount(amount);
             data.setFrom(from);
             data.setTo(to);
             data.setDate(date);

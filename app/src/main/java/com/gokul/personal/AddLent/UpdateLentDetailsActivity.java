@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat;
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
-import com.gokul.personal.ViewInvestmentDetails.ViewInvestmentDetailsActivity;
 import com.gokul.personal.ViewLentDetails.ViewLentDetailsActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -52,12 +51,12 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class UpdateLentDetailsActivity extends AppCompatActivity {
 
-    private TextInputLayout lendUpdateNameLayout, lendUpdateAmountLayout, lendUpdateFromLayout, lendUpdateToLayout, lendUpdateTranDateLayout, lendUpdateRemarksLayout;
-    private TextInputEditText lendUpdateName, lendUpdateAmount, lendUpdateRemarks;
+    private TextInputLayout lendUpdateNameLayout, lendUpdateAmountLayout, lendUpdateRemAmountLayout, lendUpdateFromLayout, lendUpdateToLayout, lendUpdateTranDateLayout, lendUpdateRemarksLayout;
+    private TextInputEditText lendUpdateName, lendUpdateAmount, lendUpdateRemAmount, lendUpdateRemarks;
     private AutoCompleteTextView lendUpdateFrom, lendUpdateTo, lendUpdateTranDate;
     private String toDropDown = "";
     private Vibrator vibrator;
-    private String name, amount, from, to, date, remarks, name1, amount1, to1, date1, remarks1, country, updateFinder;
+    private String name, amount, remAmount, from, to, date, remarks, name1, amount1, to1, date1, remarks1, country, updateFinder;
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> toList = new ArrayList<>();
@@ -77,12 +76,14 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
         lendUpdateNameLayout = findViewById(R.id.lendUpdateNameLayout);
         lendUpdateAmountLayout = findViewById(R.id.lendUpdateAmountLayout);
+        lendUpdateRemAmountLayout = findViewById(R.id.lendUpdateRemAmountLayout);
         lendUpdateFromLayout = findViewById(R.id.lendUpdateFromLayout);
         lendUpdateToLayout = findViewById(R.id.lendUpdateToLayout);
         lendUpdateTranDateLayout = findViewById(R.id.lendUpdateTranDateLayout);
         lendUpdateRemarksLayout = findViewById(R.id.lendUpdateRemarksLayout);
         lendUpdateName = findViewById(R.id.lendUpdateName);
         lendUpdateAmount = findViewById(R.id.lendUpdateAmount);
+        lendUpdateRemAmount = findViewById(R.id.lendUpdateRemAmount);
         lendUpdateRemarks = findViewById(R.id.lendUpdateRemarks);
         lendUpdateFrom = findViewById(R.id.lendUpdateFrom);
         lendUpdateTo = findViewById(R.id.lendUpdateTo);
@@ -108,6 +109,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
         name1 = getIntent().getStringExtra("name");
         amount1 = getIntent().getStringExtra("amount");
+        String remAmount1 = getIntent().getStringExtra("remAmount");
         to1 = getIntent().getStringExtra("to");
         date1 = getIntent().getStringExtra("date");
         remarks1 = getIntent().getStringExtra("remarks");
@@ -116,6 +118,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
         lendUpdateName.setText(name1);
         lendUpdateAmount.setText(amount1);
+        lendUpdateRemAmount.setText(remAmount1);
         lendUpdateFrom.setText(getIntent().getStringExtra("from"));
         lendUpdateTo.setText(to1);
         lendUpdateTranDate.setText(date1);
@@ -230,6 +233,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
             name = Objects.requireNonNull(lendUpdateName.getText()).toString();
             amount = Objects.requireNonNull(lendUpdateAmount.getText()).toString();
+            remAmount = Objects.requireNonNull(lendUpdateRemAmount.getText()).toString();
             from = lendUpdateFrom.getText().toString().trim();
             to = lendUpdateTo.getText().toString().trim();
             date = lendUpdateTranDate.getText().toString().trim();
@@ -253,17 +257,29 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateAmountLayout.setErrorEnabled(true);
                 lendUpdateAmountLayout.setError("Amount is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equalsIgnoreCase(amount1)) {
+            } else if (remAmount.isEmpty()) {
                 lendUpdateNameLayout.setError(null);
                 lendUpdateNameLayout.setErrorEnabled(false);
-                lendUpdateAmountLayout.setErrorEnabled(true);
-                lendUpdateAmountLayout.setError("New Amount is Required");
+                lendUpdateAmountLayout.setError(null);
+                lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setErrorEnabled(true);
+                lendUpdateRemAmountLayout.setError("Amount is Required");
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (remAmount.equals("0")) {
+                lendUpdateNameLayout.setError(null);
+                lendUpdateNameLayout.setErrorEnabled(false);
+                lendUpdateAmountLayout.setError(null);
+                lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setErrorEnabled(true);
+                lendUpdateRemAmountLayout.setError("Amount is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (from.isEmpty()) {
                 lendUpdateNameLayout.setError(null);
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
                 lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setError(null);
+                lendUpdateRemAmountLayout.setErrorEnabled(false);
                 lendUpdateFromLayout.setErrorEnabled(true);
                 lendUpdateFromLayout.setError("From is Required");
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -272,6 +288,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
                 lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setError(null);
+                lendUpdateRemAmountLayout.setErrorEnabled(false);
                 lendUpdateFromLayout.setError(null);
                 lendUpdateFromLayout.setErrorEnabled(false);
                 lendUpdateToLayout.setErrorEnabled(true);
@@ -282,6 +300,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
                 lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setError(null);
+                lendUpdateRemAmountLayout.setErrorEnabled(false);
                 lendUpdateFromLayout.setError(null);
                 lendUpdateFromLayout.setErrorEnabled(false);
                 lendUpdateToLayout.setError(null);
@@ -294,6 +314,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
                 lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setError(null);
+                lendUpdateRemAmountLayout.setErrorEnabled(false);
                 lendUpdateFromLayout.setError(null);
                 lendUpdateFromLayout.setErrorEnabled(false);
                 lendUpdateToLayout.setError(null);
@@ -308,6 +330,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
                 lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setError(null);
+                lendUpdateRemAmountLayout.setErrorEnabled(false);
                 lendUpdateFromLayout.setError(null);
                 lendUpdateFromLayout.setErrorEnabled(false);
                 lendUpdateToLayout.setError(null);
@@ -323,6 +347,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     lendUpdateNameLayout.setErrorEnabled(false);
                     lendUpdateAmountLayout.setError(null);
                     lendUpdateAmountLayout.setErrorEnabled(false);
+                    lendUpdateRemAmountLayout.setError(null);
+                    lendUpdateRemAmountLayout.setErrorEnabled(false);
                     lendUpdateFromLayout.setError(null);
                     lendUpdateFromLayout.setErrorEnabled(false);
                     lendUpdateToLayout.setError(null);
@@ -330,7 +356,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     lendUpdateTranDateLayout.setError(null);
                     lendUpdateTranDateLayout.setErrorEnabled(false);
                     lendUpdateRemarksLayout.setErrorEnabled(true);
-                    lendUpdateRemarksLayout.setError("Mention the From Detail");
+                    lendUpdateRemarksLayout.setError("Mention From Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceUpdateCall();
@@ -341,6 +367,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     lendUpdateNameLayout.setErrorEnabled(false);
                     lendUpdateAmountLayout.setError(null);
                     lendUpdateAmountLayout.setErrorEnabled(false);
+                    lendUpdateRemAmountLayout.setError(null);
+                    lendUpdateRemAmountLayout.setErrorEnabled(false);
                     lendUpdateFromLayout.setError(null);
                     lendUpdateFromLayout.setErrorEnabled(false);
                     lendUpdateToLayout.setError(null);
@@ -348,7 +376,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     lendUpdateTranDateLayout.setError(null);
                     lendUpdateTranDateLayout.setErrorEnabled(false);
                     lendUpdateRemarksLayout.setErrorEnabled(true);
-                    lendUpdateRemarksLayout.setError("Mention the Bank Name");
+                    lendUpdateRemarksLayout.setError("Mention Bank Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceUpdateCall();
@@ -359,6 +387,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     lendUpdateNameLayout.setErrorEnabled(false);
                     lendUpdateAmountLayout.setError(null);
                     lendUpdateAmountLayout.setErrorEnabled(false);
+                    lendUpdateRemAmountLayout.setError(null);
+                    lendUpdateRemAmountLayout.setErrorEnabled(false);
                     lendUpdateFromLayout.setError(null);
                     lendUpdateFromLayout.setErrorEnabled(false);
                     lendUpdateToLayout.setError(null);
@@ -366,7 +396,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     lendUpdateTranDateLayout.setError(null);
                     lendUpdateTranDateLayout.setErrorEnabled(false);
                     lendUpdateRemarksLayout.setErrorEnabled(true);
-                    lendUpdateRemarksLayout.setError("Mention the To Detail");
+                    lendUpdateRemarksLayout.setError("Mention To Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceUpdateCall();
@@ -377,6 +407,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
                 lendUpdateAmountLayout.setErrorEnabled(false);
+                lendUpdateRemAmountLayout.setError(null);
+                lendUpdateRemAmountLayout.setErrorEnabled(false);
                 lendUpdateFromLayout.setError(null);
                 lendUpdateFromLayout.setErrorEnabled(false);
                 lendUpdateToLayout.setError(null);
@@ -484,29 +516,26 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
             String finalAmount = decimalFormat.format(Double.parseDouble(amount));
             lentData.setAmount(finalAmount);
         }
+        if (country.equalsIgnoreCase("India")) {
+            lentData.setRemAmount(remAmount);
+        } else {
+            DecimalFormat decimalFormat = new DecimalFormat("0.000");
+            String finalAmount = decimalFormat.format(Double.parseDouble(remAmount));
+            lentData.setRemAmount(finalAmount);
+        }
         lentData.setFrom(from);
         lentData.setTo(to);
         lentData.setDate(date);
         lentData.setRemarks(remarks);
         lentData.setUpdateFinder(updateFinder);
 
-        if (country.equalsIgnoreCase("India")) {
+        databaseReference.child("Lent Details " + country).child(updateFinder).setValue(lentData).
+                addOnCompleteListener(task -> balanceDetailsUpdate()).addOnFailureListener(e -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(UpdateLentDetailsActivity.this, "Lent Details Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
 
-            databaseReference.child("Lent Details " + country).child(updateFinder).setValue(lentData).
-                    addOnCompleteListener(task -> balanceDetailsUpdate()).addOnFailureListener(e -> {
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                StyleableToast.makeText(UpdateLentDetailsActivity.this, "Lent Details Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            });
-        } else if (country.equalsIgnoreCase("Oman")) {
-
-            databaseReference.child("Lent Details " + country).child(updateFinder).setValue(lentData).
-                    addOnCompleteListener(task -> balanceDetailsUpdate()).addOnFailureListener(e -> {
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                StyleableToast.makeText(UpdateLentDetailsActivity.this, "Amount Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            });
-        }
     }
 
     private void balanceDetailsUpdate() {
@@ -544,7 +573,8 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            startActivity(new Intent(UpdateLentDetailsActivity.this, ViewInvestmentDetailsActivity.class));
+            startActivity(new Intent(UpdateLentDetailsActivity.this, ViewLentDetailsActivity.class));
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -556,4 +586,10 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(UpdateLentDetailsActivity.this, ViewLentDetailsActivity.class));
+        finish();
+    }
 }

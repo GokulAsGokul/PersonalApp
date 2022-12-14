@@ -313,7 +313,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                     updateInvestTranDateLayout.setError(null);
                     updateInvestTranDateLayout.setErrorEnabled(false);
                     updateInvestRemarksLayout.setErrorEnabled(true);
-                    updateInvestRemarksLayout.setError("Mention the Source Detail");
+                    updateInvestRemarksLayout.setError("Mention Source Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceUpdateCall();
@@ -333,7 +333,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                     updateInvestTranDateLayout.setError(null);
                     updateInvestTranDateLayout.setErrorEnabled(false);
                     updateInvestRemarksLayout.setErrorEnabled(true);
-                    updateInvestRemarksLayout.setError("Mention the Bank Name");
+                    updateInvestRemarksLayout.setError("Mention Bank Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceUpdateCall();

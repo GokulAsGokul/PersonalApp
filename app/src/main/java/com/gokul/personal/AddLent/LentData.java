@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class LentData {
 
-    private String Name, Amount, From, To, Date, Remarks, UpdateFinder;
+    private String Name, Amount, RemAmount, From, To, Date, Remarks, UpdateFinder;
 
     public String getName() {
         return Name;
@@ -25,6 +25,14 @@ public class LentData {
 
     public void setAmount(String amount) {
         Amount = amount;
+    }
+
+    public String getRemAmount() {
+        return RemAmount;
+    }
+
+    public void setRemAmount(String remAmount) {
+        RemAmount = remAmount;
     }
 
     public String getFrom() {

@@ -322,7 +322,7 @@ public class AddLentIndiaFragment extends Fragment {
                     lendDecTranDateLayout.setError(null);
                     lendDecTranDateLayout.setErrorEnabled(false);
                     lendDecRemarksLayout.setErrorEnabled(true);
-                    lendDecRemarksLayout.setError("Mention the From Detail");
+                    lendDecRemarksLayout.setError("Mention From Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -340,7 +340,7 @@ public class AddLentIndiaFragment extends Fragment {
                     lendDecTranDateLayout.setError(null);
                     lendDecTranDateLayout.setErrorEnabled(false);
                     lendDecRemarksLayout.setErrorEnabled(true);
-                    lendDecRemarksLayout.setError("Mention the Bank Name");
+                    lendDecRemarksLayout.setError("Mention Bank Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -358,7 +358,7 @@ public class AddLentIndiaFragment extends Fragment {
                     lendDecTranDateLayout.setError(null);
                     lendDecTranDateLayout.setErrorEnabled(false);
                     lendDecRemarksLayout.setErrorEnabled(true);
-                    lendDecRemarksLayout.setError("Mention the To Detail");
+                    lendDecRemarksLayout.setError("Mention To Detail");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -443,6 +443,7 @@ public class AddLentIndiaFragment extends Fragment {
             LentData lentData = new LentData();
             lentData.setName(name);
             lentData.setAmount(amount);
+            lentData.setRemAmount(amount);
             lentData.setFrom(from);
             lentData.setTo(to);
             lentData.setDate(date);

@@ -120,7 +120,6 @@
     <string name="lent_details_return_btn">LentDetailsReturnBtn</string>
     <string name="add_return_source_detail">Add Return Source Details</string>
     <string name="add_lent_return_details">Add Lent Return Details</string>
-    <string name="enter_remaining_amount">Enter Remaining Amount</string>
     <string name="balance_details_delete_button">Balance Details Delete Button</string>
     <string name="bank_details_share_button">Bank Details Share Button</string>
     <string name="select_received_from">Select Received From</string>
@@ -131,4 +130,5 @@
     <string name="add_oman_balance_details">Add Oman Balance Details</string>
     <string name="add_lending_details">Add Lending Details</string>
     <string name="add_balance_details">Add Balance Details</string>
+    <string name="enter_remaining_amount">Enter Remaining Amount</string>
 </resources>
