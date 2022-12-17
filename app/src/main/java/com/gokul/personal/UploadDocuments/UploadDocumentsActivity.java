@@ -50,9 +50,8 @@ public class UploadDocumentsActivity extends AppCompatActivity {
     private TextInputLayout docUploadNameLayout, docUpCategoryLayout, docUploadFileLayout;
     private AutoCompleteTextView docUploadName, docUpCategory, docUploadFile;
     private Vibrator vibrator;
-    private String categoryDropDown = "";
     private Uri fileUri;
-    private String fileName, fileCategory, fileUrl, fileExtension;
+    private String fileName, fileCategory, fileUrl, fileExtension, categoryDropDown;
     private Dialog dialog1, dialog2;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> categoryList = new ArrayList<>();
@@ -162,7 +161,10 @@ public class UploadDocumentsActivity extends AppCompatActivity {
             }
         });
 
-        docUploadButton.setOnClickListener(view -> docUploadCall());
+        docUploadButton.setOnClickListener(view -> {
+            dialog2.show();
+            docUploadCall();
+        });
 
     }
 
@@ -172,17 +174,20 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         String file = Objects.requireNonNull(docUploadFile.getText()).toString().trim();
 
         if (ConnectionCheck.getConnectionType(getApplicationContext()) == 0) {
+            dialog2.dismiss();
             ConnectionCheck.connectionDialogShow(getApplicationContext(), UploadDocumentsActivity.this);
         } else {
             if (fileName.isEmpty()) {
                 docUploadNameLayout.setErrorEnabled(true);
                 docUploadNameLayout.setError("File Name is Required");
+                dialog2.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (fileCategory.isEmpty()) {
                 docUploadNameLayout.setErrorEnabled(false);
                 docUploadNameLayout.setError(null);
                 docUpCategoryLayout.setErrorEnabled(true);
                 docUpCategoryLayout.setError("Category is Required");
+                dialog2.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (file.isEmpty()) {
                 docUploadNameLayout.setErrorEnabled(false);
@@ -191,6 +196,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                 docUpCategoryLayout.setError(null);
                 docUploadFileLayout.setErrorEnabled(true);
                 docUploadFileLayout.setError("Document is required");
+                dialog2.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 docUploadNameLayout.setErrorEnabled(false);
@@ -200,6 +206,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                 docUploadFileLayout.setErrorEnabled(false);
                 docUploadFileLayout.setError(null);
                 UIUtil.hideKeyboard(UploadDocumentsActivity.this);
+                dialog2.dismiss();
                 dialog1.show();
                 docUpload();
             }
@@ -228,7 +235,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
                     data.setFileUrl(fileUrl);
                     data.setFileExtension(fileExtension);
 
-                    FirebaseDatabase.getInstance().getReference("Documents Data").child(fileName).setValue(data).
+                    databaseReference.child("Documents Data").child(fileName).setValue(data).
                             addOnSuccessListener(unused -> {
                                 Objects.requireNonNull(docUploadName.getText()).clear();
                                 Objects.requireNonNull(docUpCategory.getText()).clear();

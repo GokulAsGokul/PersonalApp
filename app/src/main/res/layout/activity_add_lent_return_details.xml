@@ -81,8 +81,6 @@
             app:boxStrokeColor="@color/grey"
             app:boxStrokeWidth="2dp"
             app:boxStrokeWidthFocused="2dp"
-            app:endIconMode="clear_text"
-            app:endIconTint="@color/background"
             app:errorTextColor="@color/red"
             app:hintTextColor="@color/background"
             app:layout_constraintEnd_toEndOf="@+id/lentRetAmountLayout"

@@ -44,6 +44,7 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
     private ProgressBar downloadDialogBar;
     private final Activity activity;
     private final Vibrator vibrator;
+    private Dialog dialog;
 
     public ViewDocumentsRecyclerAdapter(Context context, ArrayList<GeneralData> list, Activity activity, Vibrator vibrator) {
         this.context = context;
@@ -72,9 +73,9 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
             if (ConnectionCheck.getConnectionType(context) == 0) {
                 ConnectionCheck.connectionDialogShow(context, activity);
             } else {
-                Dialog dialog = new Dialog(holder.itemView.getRootView().getContext());
+                dialog = new Dialog(holder.itemView.getRootView().getContext());
                 dialog.setContentView(R.layout.downloading_dialog);
-                dialog.setCancelable(true);
+                dialog.setCancelable(false);
                 dialog.setCanceledOnTouchOutside(false);
                 if (dialog.getWindow() != null) {
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -198,6 +199,7 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
                         downloadDialogBar.setVisibility(View.GONE);
                         downloadDialogText1.setText("Completed");
                         downloadDialogText3.setText("Path: Download/Personal/Documents");
+                        dialog.setCancelable(true);
                     }
                 });
                 cursor.close();

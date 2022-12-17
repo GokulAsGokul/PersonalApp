@@ -122,6 +122,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
                 intent.putExtra("remarks", data.getRemarks());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
                 context.startActivity(intent);
+                ((Activity) context).finish();
             }
         });
 

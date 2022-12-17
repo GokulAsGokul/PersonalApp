@@ -49,7 +49,7 @@ public class AppUploadFragment extends Fragment {
     private TextInputEditText appVersionNo, appUpNote;
     private AutoCompleteTextView appUpFile;
     private Vibrator vibrator;
-    private Dialog dialog1;
+    private Dialog dialog;
     private String versionNo, appVersionNote, appName, appUrl, appExtension;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private Uri appUri;
@@ -81,16 +81,18 @@ public class AppUploadFragment extends Fragment {
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
 
-        dialog1 = new Dialog(view.getContext());
-        dialog1.setContentView(R.layout.uploading_dialog);
-        dialog1.setCancelable(false);
-        dialog1.setCanceledOnTouchOutside(false);
-        if (dialog1.getWindow() != null) {
-            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        dialog = new Dialog(view.getContext());
+        dialog.setContentView(R.layout.uploading_dialog);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         }
 
         appUpNote.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
+                dialog.setCancelable(false);
+                dialog.show();
                 appUploadCall(view);
                 return true;
             }
@@ -113,7 +115,11 @@ public class AppUploadFragment extends Fragment {
                 appContent.launch("application/vnd.android.package-archive");
             }
         });
-        appUploadButton.setOnClickListener(view2 -> appUploadCall(view));
+        appUploadButton.setOnClickListener(view2 -> {
+            dialog.setCancelable(false);
+            dialog.show();
+            appUploadCall(view);
+        });
 
         return view;
     }
@@ -124,17 +130,20 @@ public class AppUploadFragment extends Fragment {
         appVersionNote = Objects.requireNonNull(appUpNote.getText()).toString().trim();
 
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
             if (versionNo.isEmpty()) {
                 appUpVersionLayout.setErrorEnabled(true);
                 appUpVersionLayout.setError("Version No is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (appName.isEmpty()) {
                 appUpVersionLayout.setErrorEnabled(false);
                 appUpVersionLayout.setError(null);
                 appUpFileLayout.setErrorEnabled(true);
                 appUpFileLayout.setError("Select an updated APK file");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (appVersionNote.isEmpty()) {
                 appUpVersionLayout.setErrorEnabled(false);
@@ -143,6 +152,7 @@ public class AppUploadFragment extends Fragment {
                 appUpFileLayout.setError(null);
                 appUpNoteLayout.setErrorEnabled(true);
                 appUpNoteLayout.setError("New Version Note is required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 appUpVersionLayout.setErrorEnabled(false);
@@ -161,10 +171,9 @@ public class AppUploadFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void uploadNewApp(View view) {
         if (appUri != null) {
-            dialog1.show();
             FirebaseStorage.getInstance().getReference().child("APK Files/" + appUpFile.getText() + ".apk")
                     .getDownloadUrl().addOnSuccessListener(uri -> {
-                dialog1.dismiss();
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Updated app already available", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }).addOnFailureListener(e -> {
@@ -189,30 +198,32 @@ public class AppUploadFragment extends Fragment {
                                 Objects.requireNonNull(appUpNote.getText()).clear();
                             }).addOnFailureListener(e1 -> {
                         appUpFile.setText(R.string.firebaseUpdateError);
+                        dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "App Data Updating in Firebase Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     });
 
-                    dialog1.dismiss();
+                    dialog.dismiss();
                     StyleableToast.makeText(view.getContext(), "Uploaded Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                 }).addOnFailureListener(e12 -> {
-                    dialog1.dismiss();
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Failed to capture app URL: " + e12.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     appUpFile.setText(R.string.uploadError);
                 })).addOnFailureListener(e1 -> {
-                    dialog1.dismiss();
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Updated App Upload Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }).addOnProgressListener(snapshot -> {
-                    ProgressBar downloadDialogBar = dialog1.findViewById(R.id.uploadDialogBar);
-                    TextView uploadDialog2 = dialog1.findViewById(R.id.uploadDialog2);
+                    ProgressBar downloadDialogBar = dialog.findViewById(R.id.uploadDialogBar);
+                    TextView uploadDialog2 = dialog.findViewById(R.id.uploadDialog2);
                     final int progress = (int) ((snapshot.getBytesTransferred() * 100L) / snapshot.getTotalByteCount());
                     downloadDialogBar.setProgress(progress);
                     uploadDialog2.setText((snapshot.getBytesTransferred()) / (1024L) + " KB of " + (snapshot.getTotalByteCount()) / (1024L) + " KB");
                 });
             });
         } else {
+            dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(view.getContext(), "Please select an updated APK file", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         }

@@ -105,7 +105,11 @@ public class PersonalDetailsFragment extends Fragment {
             }
         });
 
-        personalSubmit.setOnClickListener((View view1) -> addPersonalDetails(view));
+        personalSubmit.setOnClickListener((View view1) -> {
+            dialog.show();
+            dialog.setCancelable(true);
+            addPersonalDetails(view);
+        });
 
         return view;
     }
@@ -117,17 +121,26 @@ public class PersonalDetailsFragment extends Fragment {
         String typePersonal = Objects.requireNonNull(personalType.getText()).toString().trim();
 
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
+            personalNameLayout.setErrorEnabled(false);
+            personalNameLayout.setError(null);
+            personalValueLayout.setErrorEnabled(false);
+            personalValueLayout.setError(null);
+            personalTypeLayout.setErrorEnabled(false);
+            personalTypeLayout.setError(null);
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
             if (namePersonal.isEmpty()) {
                 personalNameLayout.setErrorEnabled(true);
                 personalNameLayout.setError("Name is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (valuePersonal.isEmpty()) {
                 personalNameLayout.setErrorEnabled(false);
                 personalNameLayout.setError(null);
                 personalValueLayout.setErrorEnabled(true);
                 personalValueLayout.setError("Value is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (typePersonal.isEmpty()) {
                 personalNameLayout.setErrorEnabled(false);
@@ -136,6 +149,7 @@ public class PersonalDetailsFragment extends Fragment {
                 personalValueLayout.setError(null);
                 personalTypeLayout.setErrorEnabled(true);
                 personalTypeLayout.setError("Type is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 personalNameLayout.setErrorEnabled(false);
@@ -144,9 +158,6 @@ public class PersonalDetailsFragment extends Fragment {
                 personalValueLayout.setError(null);
                 personalTypeLayout.setErrorEnabled(false);
                 personalTypeLayout.setError(null);
-
-                dialog.show();
-                dialog.setCancelable(true);
 
                 AdminData adminData = new AdminData();
                 adminData.setPersonalName(namePersonal);
@@ -183,6 +194,7 @@ public class PersonalDetailsFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "Personal details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     }

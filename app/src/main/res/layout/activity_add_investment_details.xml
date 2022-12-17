@@ -132,7 +132,7 @@
                 android:id="@+id/investDecFolio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:inputType="number"
                 android:textColor="@color/background"
                 android:textCursorDrawable="@drawable/color_cursor"

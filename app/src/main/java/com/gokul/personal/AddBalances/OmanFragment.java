@@ -1,6 +1,5 @@
 package com.gokul.personal.AddBalances;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
@@ -164,7 +163,11 @@ public class OmanFragment extends Fragment {
             OmanFragment.this.dayPicker(view);
         });
 
-        balDecSubmit.setOnClickListener(view1 -> submitBalanceCall(view));
+        balDecSubmit.setOnClickListener(view1 -> {
+            dialog.setCancelable(false);
+            dialog.show();
+            submitBalanceCall(view);
+        });
 
         return view;
     }
@@ -213,6 +216,7 @@ public class OmanFragment extends Fragment {
             balDecRemarksLayout.setError(null);
             balDecRemarksLayout.setErrorEnabled(false);
             UIUtil.hideKeyboard(requireActivity());
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), getActivity());
         } else {
 
@@ -233,18 +237,21 @@ public class OmanFragment extends Fragment {
             if (source.isEmpty()) {
                 balSourceNameLayout.setErrorEnabled(true);
                 balSourceNameLayout.setError("Source Name is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (amount.isEmpty()) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (amount.equals("0.000") && !source.equalsIgnoreCase("SplitWise")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (transAmount.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -253,6 +260,7 @@ public class OmanFragment extends Fragment {
                 balAmountLayout.setErrorEnabled(false);
                 balTransAmountLayout.setErrorEnabled(true);
                 balTransAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (transAmount.equals("0.000") && !source.equalsIgnoreCase("SplitWise")) {
                 balSourceNameLayout.setError(null);
@@ -261,6 +269,7 @@ public class OmanFragment extends Fragment {
                 balAmountLayout.setErrorEnabled(false);
                 balTransAmountLayout.setErrorEnabled(true);
                 balTransAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (category.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -271,6 +280,7 @@ public class OmanFragment extends Fragment {
                 balTransAmountLayout.setErrorEnabled(false);
                 balCategoryLayout.setErrorEnabled(true);
                 balCategoryLayout.setError("Category is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (date.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -283,6 +293,7 @@ public class OmanFragment extends Fragment {
                 balCategoryLayout.setErrorEnabled(false);
                 balTranDateLayout.setErrorEnabled(true);
                 balTranDateLayout.setError("Date is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (remarks.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -297,6 +308,7 @@ public class OmanFragment extends Fragment {
                 balTranDateLayout.setErrorEnabled(false);
                 balDecRemarksLayout.setErrorEnabled(true);
                 balDecRemarksLayout.setError("Remarks is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (!remarks.matches(remarksPattern)) {
                 balSourceNameLayout.setError(null);
@@ -311,6 +323,7 @@ public class OmanFragment extends Fragment {
                 balTranDateLayout.setErrorEnabled(false);
                 balDecRemarksLayout.setErrorEnabled(true);
                 balDecRemarksLayout.setError("Remarks should be length of 4 to 20 alphanumeric");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (source.equals("Others")) {
                 if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
@@ -326,6 +339,7 @@ public class OmanFragment extends Fragment {
                     balTranDateLayout.setErrorEnabled(false);
                     balDecRemarksLayout.setErrorEnabled(true);
                     balDecRemarksLayout.setError("Mention Source of Amount");
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -344,6 +358,7 @@ public class OmanFragment extends Fragment {
                     balTranDateLayout.setErrorEnabled(false);
                     balDecRemarksLayout.setErrorEnabled(true);
                     balDecRemarksLayout.setError("Mention Category of Amount");
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -356,67 +371,6 @@ public class OmanFragment extends Fragment {
     }
 
     private void availableBalanceSubmitCall(View view) {
-
-        dialog.setCancelable(false);
-        dialog.show();
-
-        if (source.equalsIgnoreCase("SplitWise")) {
-            availableBalanceSubmit("0", view);
-        } else {
-            databaseReference.child("Available Balance Details Oman").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String temp = snapshot.getValue(String.class);
-                    if (balSwitch.isChecked()) {
-                        if (temp == null) {
-                            availableBalanceSubmit(transAmount, view);
-                            dialog.dismiss();
-                        } else {
-                            if (Double.parseDouble(transAmount) <= Double.parseDouble(temp)) {
-                                availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(transAmount)))), view);
-                            } else {
-                                dialog.dismiss();
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                                StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                            }
-                        }
-                    } else {
-                        if (temp == null) {
-                            availableBalanceSubmit(transAmount, view);
-                        } else {
-                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(transAmount)))), view);
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    dialog.dismiss();
-                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                    StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                }
-            });
-        }
-
-    }
-
-    private void availableBalanceSubmit(String sourceAmount, View view) {
-
-        @SuppressLint("DefaultLocale") String amount = String.format("%.3f", Float.parseFloat(sourceAmount));
-
-        BalanceDetailsData data = new BalanceDetailsData();
-        data.setSource(source);
-        data.setAmount(amount);
-
-        databaseReference.child("Available Balance Details Oman").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(view)).addOnFailureListener(e1 -> {
-            dialog.dismiss();
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-        });
-
-    }
-
-    private void submitBalance(View view) {
 
         balSourceNameLayout.setError(null);
         balSourceNameLayout.setErrorEnabled(false);
@@ -432,44 +386,102 @@ public class OmanFragment extends Fragment {
         balDecRemarksLayout.setErrorEnabled(false);
         UIUtil.hideKeyboard(requireActivity());
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
-            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
-            BalanceDetailsData data = new BalanceDetailsData();
-            data.setSource(source);
-            data.setAmount(amount);
             if (source.equalsIgnoreCase("SplitWise")) {
-                data.setTransAmount("0.000");
+                availableBalanceSubmit("0", view);
             } else {
-                data.setTransAmount(transAmount);
-            }
-            data.setCategory(category);
-            if (balSwitch.isChecked()) {
-                data.setType("Expense");
-            } else {
-                data.setType("Income");
-            }
-            data.setDate(date);
-            data.setRemarks(remarks);
-            data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
-            data.setUpdateFinder(date1);
+                databaseReference.child("Available Balance Details Oman").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String temp = snapshot.getValue(String.class);
+                        if (balSwitch.isChecked()) {
+                            if (temp == null) {
+                                availableBalanceSubmit(transAmount, view);
+                                dialog.dismiss();
+                            } else {
+                                if (Double.parseDouble(transAmount) <= Double.parseDouble(temp)) {
+                                    availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(transAmount)))), view);
+                                } else {
+                                    dialog.dismiss();
+                                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                                    StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                                }
+                            }
+                        } else {
+                            if (temp == null) {
+                                availableBalanceSubmit(transAmount, view);
+                            } else {
+                                availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(transAmount)))), view);
+                            }
+                        }
+                    }
 
-            databaseReference.child("Balance Details Oman").child(source).child(date1).setValue(data).addOnCompleteListener(task -> {
-                dialog.dismiss();
-                balSourceName.getText().clear();
-                Objects.requireNonNull(balAmount.getText()).clear();
-                Objects.requireNonNull(balTransAmount.getText()).clear();
-                balCategory.getText().clear();
-                balTranDate.getText().clear();
-                balDecRemarks.setText(R.string.mention_if_any);
-                StyleableToast.makeText(view.getContext(), "Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-            }).addOnFailureListener(e -> {
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                    }
+                });
+            }
+
         }
+    }
+
+    private void availableBalanceSubmit(String sourceAmount, View view) {
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(new DecimalFormat("0.000").format(Double.parseDouble(sourceAmount)));
+
+        databaseReference.child("Available Balance Details Oman").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(view)).addOnFailureListener(e1 -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
+
+    }
+
+    private void submitBalance(View view) {
+
+        String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(amount);
+        if (source.equalsIgnoreCase("SplitWise")) {
+            data.setTransAmount("0.000");
+        } else {
+            data.setTransAmount(transAmount);
+        }
+        data.setCategory(category);
+        if (balSwitch.isChecked()) {
+            data.setType("Expense");
+        } else {
+            data.setType("Income");
+        }
+        data.setDate(date);
+        data.setRemarks(remarks);
+        data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
+        data.setUpdateFinder(date1);
+
+        databaseReference.child("Balance Details Oman").child(source).child(date1).setValue(data).addOnCompleteListener(task -> {
+            dialog.dismiss();
+            balSourceName.getText().clear();
+            Objects.requireNonNull(balAmount.getText()).clear();
+            Objects.requireNonNull(balTransAmount.getText()).clear();
+            balCategory.getText().clear();
+            balTranDate.getText().clear();
+            balDecRemarks.setText(R.string.mention_if_any);
+            StyleableToast.makeText(view.getContext(), "Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+        }).addOnFailureListener(e -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
     }
 
 }

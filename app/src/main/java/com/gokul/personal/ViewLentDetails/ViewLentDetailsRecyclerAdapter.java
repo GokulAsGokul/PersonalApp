@@ -220,7 +220,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                                     addOnSuccessListener(unused -> {
                                         list.remove(holder.getAdapterPosition());
                                         notifyItemRemoved(holder.getAdapterPosition());
-                                        addBalanceDetails(data.getFrom(), data.getAmount(), loadingDialog);
+                                        addBalanceDetails(source, data.getRemAmount(), loadingDialog);
                                     }).
                                     addOnFailureListener(e -> {
                                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -275,7 +275,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
             } else {
                 Intent intent = new Intent(context, AddLentReturnDetailsActivity.class);
                 intent.putExtra("country", country);
-                intent.putExtra("amount", data.getAmount());
+                intent.putExtra("amount", data.getRemAmount());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
                 context.startActivity(intent);
                 ((Activity) context).finish();

@@ -230,6 +230,7 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(DashboardActivity.this, ViewInvestmentDetailsActivity.class));
             } else {
                 drawerLayout.closeDrawer(GravityCompat.START);
+                dialog.show();
                 appVersionChecker();
             }
             return true;
@@ -374,6 +375,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void appVersionChecker() {
 
         if (ConnectionCheck.getConnectionType(getApplicationContext()) == 0) {
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
         } else {
 
@@ -381,6 +383,7 @@ public class DashboardActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (!snapshot.exists()) {
+                        dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(DashboardActivity.this, "App details not available", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     } else {
@@ -401,9 +404,11 @@ public class DashboardActivity extends AppCompatActivity {
                                     DialogPlus dialogPlus = dialogPlusBuilder.create();
                                     View view1 = dialogPlus.getHolderView();
                                     Button downloadAppBtn = view1.findViewById(R.id.downloadAppBtn);
+                                    dialog.dismiss();
                                     dialogPlus.show();
                                     downloadAppBtn.setOnClickListener(v -> {
                                         if (ConnectionCheck.getConnectionType(DashboardActivity.this) == 0) {
+                                            dialogPlus.dismiss();
                                             ConnectionCheck.connectionDialogShow(DashboardActivity.this, DashboardActivity.this);
                                         } else {
                                             downloadAppCall(appURL);
@@ -411,9 +416,9 @@ public class DashboardActivity extends AppCompatActivity {
                                         }
                                     });
                                 } else {
+                                    dialog.dismiss();
                                     StyleableToast.makeText(DashboardActivity.this, "You are using updated app", Toast.LENGTH_LONG, R.style.CustomToast).show();
                                 }
-
                             }
 
                             @Override
@@ -440,7 +445,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void downloadAppCall(String url) {
         Dialog dialog = new Dialog(DashboardActivity.this);
         dialog.setContentView(R.layout.downloading_app_dialog);
-        dialog.setCancelable(true);
+        dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

@@ -52,9 +52,8 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
     private TextInputLayout lentRetAmountLayout, lentRetRemAmountLayout, lentRetFromLayout, lentRetToLayout, lentRetTranDateLayout, lentRetRemarksLayout;
     private TextInputEditText lentRetAmount, lentRetRemAmount, lentRetRemarks;
     private AutoCompleteTextView lentRetFrom, lentRetTo, lentRetTranDate;
-    private String fromDropDown, toDropDown = "";
     private Vibrator vibrator;
-    private String amount, remAmount, to, date, remarks, country, updateFinder;
+    private String amount, remAmount, to, remarks, country, updateFinder, fromDropDown, toDropDown;
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> fromList = new ArrayList<>();
@@ -121,61 +120,119 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         lentRetFrom.setClickable(true);
         lentRetFrom.setFocusable(false);
         lentRetFromLayout.setClickable(true);
-        databaseReference.child("DropDown Values").child("IndiaLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog.show();
-                    fromList.add(temp);
-                }
-                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentReturnDetailsActivity.this, R.layout.dropdown_list, fromList);
-                sourceAdapter.sort(Comparator.naturalOrder());
-                lentRetFrom.setAdapter(sourceAdapter);
-                dialog.dismiss();
-                lentRetFrom.setOnItemClickListener((parent, view, position, id) -> {
-                    remAmountCall();
-                    UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
-                    fromDropDown = parent.getItemAtPosition(position).toString();
-                });
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                dialog.dismiss();
-                StyleableToast.makeText(AddLentReturnDetailsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
+        if (country.equalsIgnoreCase("India")) {
+            databaseReference.child("DropDown Values").child("IndiaLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                        String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                        dialog.show();
+                        fromList.add(temp);
+                    }
+                    ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentReturnDetailsActivity.this, R.layout.dropdown_list, fromList);
+                    sourceAdapter.sort(Comparator.naturalOrder());
+                    lentRetFrom.setAdapter(sourceAdapter);
+                    dialog.dismiss();
+                    lentRetFrom.setOnItemClickListener((parent, view, position, id) -> {
+                        remAmountCall();
+                        UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+                        fromDropDown = parent.getItemAtPosition(position).toString();
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        } else {
+            databaseReference.child("DropDown Values").child("OmanLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                        String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                        dialog.show();
+                        fromList.add(temp);
+                    }
+                    ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentReturnDetailsActivity.this, R.layout.dropdown_list, fromList);
+                    sourceAdapter.sort(Comparator.naturalOrder());
+                    lentRetFrom.setAdapter(sourceAdapter);
+                    dialog.dismiss();
+                    lentRetFrom.setOnItemClickListener((parent, view, position, id) -> {
+                        remAmountCall();
+                        UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+                        fromDropDown = parent.getItemAtPosition(position).toString();
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        }
 
         lentRetTo.setInputType(InputType.TYPE_NULL);
         lentRetTo.setClickable(true);
         lentRetTo.setFocusable(false);
         lentRetToLayout.setClickable(true);
-        databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog.show();
-                    toList.add(temp);
-                }
-                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentReturnDetailsActivity.this, R.layout.dropdown_list, toList);
-                sourceAdapter.sort(Comparator.naturalOrder());
-                lentRetTo.setAdapter(sourceAdapter);
-                dialog.dismiss();
-                lentRetTo.setOnItemClickListener((parent, view, position, id) -> {
-                    remAmountCall();
-                    UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
-                    toDropDown = parent.getItemAtPosition(position).toString();
-                });
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                dialog.dismiss();
-                StyleableToast.makeText(AddLentReturnDetailsActivity.this, "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
+        if (country.equalsIgnoreCase("India")) {
+            databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                        String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                        dialog.show();
+                        toList.add(temp);
+                    }
+                    ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentReturnDetailsActivity.this, R.layout.dropdown_list, toList);
+                    sourceAdapter.sort(Comparator.naturalOrder());
+                    lentRetTo.setAdapter(sourceAdapter);
+                    dialog.dismiss();
+                    lentRetTo.setOnItemClickListener((parent, view, position, id) -> {
+                        remAmountCall();
+                        UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+                        toDropDown = parent.getItemAtPosition(position).toString();
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        } else {
+            databaseReference.child("DropDown Values").child("OmanSource").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                        String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                        dialog.show();
+                        toList.add(temp);
+                    }
+                    ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(AddLentReturnDetailsActivity.this, R.layout.dropdown_list, toList);
+                    sourceAdapter.sort(Comparator.naturalOrder());
+                    lentRetTo.setAdapter(sourceAdapter);
+                    dialog.dismiss();
+                    lentRetTo.setOnItemClickListener((parent, view, position, id) -> {
+                        remAmountCall();
+                        UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+                        toDropDown = parent.getItemAtPosition(position).toString();
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        }
 
         lentRetTranDate.setInputType(InputType.TYPE_NULL);
         lentRetTranDate.setClickable(true);
@@ -188,13 +245,18 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
 
         lentRetRemarks.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
+                remAmountCall();
                 addReturnDetailsCall();
                 return true;
             }
             return false;
         });
 
-        lentRetSubmit.setOnClickListener(view1 -> addReturnDetailsCall());
+        lentRetSubmit.setOnClickListener(view1 -> {
+            remAmountCall();
+            addReturnDetailsCall();
+
+        });
 
     }
 
@@ -203,15 +265,19 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         if ((Objects.requireNonNull(lentRetAmount.getText()).toString()).isEmpty()) {
             lentRetAmountLayout.setErrorEnabled(true);
             lentRetAmountLayout.setError("Amount is required");
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
         } else if ((lentRetAmount.getText().toString()).equalsIgnoreCase("0")) {
             lentRetAmountLayout.setErrorEnabled(true);
             lentRetAmountLayout.setError("Amount is required");
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
         } else if ((getIntent().getStringExtra("country").equalsIgnoreCase("India")) && (Integer.parseInt(getIntent().getStringExtra("amount")) < (Integer.parseInt(Objects.requireNonNull(lentRetAmount.getText()).toString())))) {
             lentRetAmountLayout.setErrorEnabled(true);
             lentRetAmountLayout.setError("Entered amount is high");
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
         } else if ((getIntent().getStringExtra("country").equalsIgnoreCase("Oman")) && (Double.parseDouble(getIntent().getStringExtra("amount")) < (Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString())))) {
             lentRetAmountLayout.setErrorEnabled(true);
             lentRetAmountLayout.setError("Entered amount is high");
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             lentRetAmountLayout.setError(null);
             lentRetAmountLayout.setErrorEnabled(false);
@@ -252,95 +318,13 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
     }
 
     private void addReturnDetailsCall() {
-        dialog.show();
 
-        if (ConnectionCheck.getConnectionType(getApplicationContext()) == 0) {
-            lentRetAmountLayout.setError(null);
-            lentRetAmountLayout.setErrorEnabled(false);
-            lentRetRemAmountLayout.setError(null);
-            lentRetRemAmountLayout.setErrorEnabled(false);
-            lentRetFromLayout.setError(null);
-            lentRetFromLayout.setErrorEnabled(false);
-            lentRetToLayout.setError(null);
-            lentRetToLayout.setErrorEnabled(false);
-            lentRetTranDateLayout.setError(null);
-            lentRetTranDateLayout.setErrorEnabled(false);
-            lentRetTranDateLayout.setError(null);
-            lentRetTranDateLayout.setErrorEnabled(false);
-            lentRetRemarksLayout.setError(null);
-            lentRetRemarksLayout.setErrorEnabled(false);
-            UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
-            dialog.dismiss();
-            ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
-        } else {
+        if (!lentRetAmountLayout.isErrorEnabled()) {
 
-            UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+            dialog.setCancelable(true);
+            dialog.show();
 
-            if ((Objects.requireNonNull(lentRetRemarks.getText()).toString()).equalsIgnoreCase("Mention If Any")) {
-                lentRetRemarks.setText(R.string.nill);
-            }
-
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString().trim()));
-            remAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetRemAmount.getText()).toString().trim()));
-            String from = lentRetFrom.getText().toString().trim();
-            to = lentRetTo.getText().toString().trim();
-            date = lentRetTranDate.getText().toString().trim();
-            remarks = lentRetRemarks.getText().toString().trim();
-
-            String remarksPattern = "^[a-zA-Z0-9\\s]{4,20}$";
-
-            if (amount.isEmpty()) {
-                lentRetAmountLayout.setErrorEnabled(true);
-                lentRetAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0")) {
-                lentRetAmountLayout.setErrorEnabled(true);
-                lentRetAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (remAmount.isEmpty()) {
-                lentRetAmountLayout.setError(null);
-                lentRetAmountLayout.setErrorEnabled(false);
-                lentRetRemAmountLayout.setErrorEnabled(true);
-                lentRetRemAmountLayout.setError("Remaining Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (from.isEmpty()) {
-                lentRetAmountLayout.setError(null);
-                lentRetAmountLayout.setErrorEnabled(false);
-                lentRetRemAmountLayout.setError(null);
-                lentRetRemAmountLayout.setErrorEnabled(false);
-                lentRetFromLayout.setErrorEnabled(true);
-                lentRetFromLayout.setError("From is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (to.isEmpty()) {
-                lentRetAmountLayout.setError(null);
-                lentRetAmountLayout.setErrorEnabled(false);
-                lentRetRemAmountLayout.setError(null);
-                lentRetRemAmountLayout.setErrorEnabled(false);
-                lentRetFromLayout.setError(null);
-                lentRetFromLayout.setErrorEnabled(false);
-                lentRetToLayout.setErrorEnabled(true);
-                lentRetToLayout.setError("To is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (date.isEmpty()) {
-                lentRetAmountLayout.setError(null);
-                lentRetAmountLayout.setErrorEnabled(false);
-                lentRetRemAmountLayout.setError(null);
-                lentRetRemAmountLayout.setErrorEnabled(false);
-                lentRetFromLayout.setError(null);
-                lentRetFromLayout.setErrorEnabled(false);
-                lentRetToLayout.setError(null);
-                lentRetToLayout.setErrorEnabled(false);
-                lentRetTranDateLayout.setErrorEnabled(true);
-                lentRetTranDateLayout.setError("Date is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (remarks.isEmpty()) {
+            if (ConnectionCheck.getConnectionType(getApplicationContext()) == 0) {
                 lentRetAmountLayout.setError(null);
                 lentRetAmountLayout.setErrorEnabled(false);
                 lentRetRemAmountLayout.setError(null);
@@ -351,119 +335,231 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
                 lentRetToLayout.setErrorEnabled(false);
                 lentRetTranDateLayout.setError(null);
                 lentRetTranDateLayout.setErrorEnabled(false);
-                lentRetRemarksLayout.setErrorEnabled(true);
-                lentRetRemarksLayout.setError("Remarks is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (!remarks.matches(remarksPattern)) {
-                lentRetAmountLayout.setError(null);
-                lentRetAmountLayout.setErrorEnabled(false);
-                lentRetRemAmountLayout.setError(null);
-                lentRetRemAmountLayout.setErrorEnabled(false);
-                lentRetFromLayout.setError(null);
-                lentRetFromLayout.setErrorEnabled(false);
-                lentRetToLayout.setError(null);
-                lentRetToLayout.setErrorEnabled(false);
                 lentRetTranDateLayout.setError(null);
                 lentRetTranDateLayout.setErrorEnabled(false);
-                lentRetRemarksLayout.setErrorEnabled(true);
-                lentRetRemarksLayout.setError("Remarks should be length of 4 to 20 alphanumeric");
+                lentRetRemarksLayout.setError(null);
+                lentRetRemarksLayout.setErrorEnabled(false);
+                UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
                 dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (from.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
-                    lentRetAmountLayout.setError(null);
-                    lentRetAmountLayout.setErrorEnabled(false);
-                    lentRetRemAmountLayout.setError(null);
-                    lentRetRemAmountLayout.setErrorEnabled(false);
-                    lentRetFromLayout.setError(null);
-                    lentRetFromLayout.setErrorEnabled(false);
-                    lentRetToLayout.setError(null);
-                    lentRetToLayout.setErrorEnabled(false);
-                    lentRetTranDateLayout.setError(null);
-                    lentRetTranDateLayout.setErrorEnabled(false);
-                    lentRetRemarksLayout.setErrorEnabled(true);
-                    lentRetRemarksLayout.setError("Mention From Detail");
-                    dialog.dismiss();
-                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else {
-                    availableBalanceUpdateCall();
-                }
-            } else if (to.equalsIgnoreCase("Bank Account")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
-                    lentRetAmountLayout.setError(null);
-                    lentRetAmountLayout.setErrorEnabled(false);
-                    lentRetRemAmountLayout.setError(null);
-                    lentRetRemAmountLayout.setErrorEnabled(false);
-                    lentRetFromLayout.setError(null);
-                    lentRetFromLayout.setErrorEnabled(false);
-                    lentRetToLayout.setError(null);
-                    lentRetToLayout.setErrorEnabled(false);
-                    lentRetTranDateLayout.setError(null);
-                    lentRetTranDateLayout.setErrorEnabled(false);
-                    lentRetRemarksLayout.setErrorEnabled(true);
-                    lentRetRemarksLayout.setError("Mention Bank Name");
-                    dialog.dismiss();
-                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else {
-                    availableBalanceUpdateCall();
-                }
-            } else if (to.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
-                    lentRetAmountLayout.setError(null);
-                    lentRetAmountLayout.setErrorEnabled(false);
-                    lentRetRemAmountLayout.setError(null);
-                    lentRetRemAmountLayout.setErrorEnabled(false);
-                    lentRetFromLayout.setError(null);
-                    lentRetFromLayout.setErrorEnabled(false);
-                    lentRetToLayout.setError(null);
-                    lentRetToLayout.setErrorEnabled(false);
-                    lentRetTranDateLayout.setError(null);
-                    lentRetTranDateLayout.setErrorEnabled(false);
-                    lentRetRemarksLayout.setErrorEnabled(true);
-                    lentRetRemarksLayout.setError("Mention To Details");
-                    dialog.dismiss();
-                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else {
-                    availableBalanceUpdateCall();
-                }
+                ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
             } else {
-                availableBalanceUpdateCall();
+
+                UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+
+                if ((Objects.requireNonNull(lentRetRemarks.getText()).toString()).equalsIgnoreCase("Mention If Any")) {
+                    lentRetRemarks.setText(R.string.nill);
+                }
+
+                if (country.equalsIgnoreCase("Oman")) {
+                    DecimalFormat decimalFormat = new DecimalFormat("0.000");
+                    amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString().trim()));
+                    remAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetRemAmount.getText()).toString().trim()));
+                } else {
+                    amount = Objects.requireNonNull(lentRetAmount.getText()).toString().trim();
+                    remAmount = Objects.requireNonNull(lentRetRemAmount.getText()).toString().trim();
+                }
+                String from = lentRetFrom.getText().toString().trim();
+                to = lentRetTo.getText().toString().trim();
+                String date = lentRetTranDate.getText().toString().trim();
+                remarks = lentRetRemarks.getText().toString().trim();
+
+                String remarksPattern = "^[a-zA-Z0-9\\s]{4,20}$";
+
+                if (amount.isEmpty()) {
+                    lentRetAmountLayout.setErrorEnabled(true);
+                    lentRetAmountLayout.setError("Amount is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (amount.equals("0")) {
+                    lentRetAmountLayout.setErrorEnabled(true);
+                    lentRetAmountLayout.setError("Amount is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (remAmount.isEmpty()) {
+                    lentRetAmountLayout.setError(null);
+                    lentRetAmountLayout.setErrorEnabled(false);
+                    lentRetRemAmountLayout.setErrorEnabled(true);
+                    lentRetRemAmountLayout.setError("Remaining Amount is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (from.isEmpty()) {
+                    lentRetAmountLayout.setError(null);
+                    lentRetAmountLayout.setErrorEnabled(false);
+                    lentRetRemAmountLayout.setError(null);
+                    lentRetRemAmountLayout.setErrorEnabled(false);
+                    lentRetFromLayout.setErrorEnabled(true);
+                    lentRetFromLayout.setError("From is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (to.isEmpty()) {
+                    lentRetAmountLayout.setError(null);
+                    lentRetAmountLayout.setErrorEnabled(false);
+                    lentRetRemAmountLayout.setError(null);
+                    lentRetRemAmountLayout.setErrorEnabled(false);
+                    lentRetFromLayout.setError(null);
+                    lentRetFromLayout.setErrorEnabled(false);
+                    lentRetToLayout.setErrorEnabled(true);
+                    lentRetToLayout.setError("To is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (date.isEmpty()) {
+                    lentRetAmountLayout.setError(null);
+                    lentRetAmountLayout.setErrorEnabled(false);
+                    lentRetRemAmountLayout.setError(null);
+                    lentRetRemAmountLayout.setErrorEnabled(false);
+                    lentRetFromLayout.setError(null);
+                    lentRetFromLayout.setErrorEnabled(false);
+                    lentRetToLayout.setError(null);
+                    lentRetToLayout.setErrorEnabled(false);
+                    lentRetTranDateLayout.setErrorEnabled(true);
+                    lentRetTranDateLayout.setError("Date is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (remarks.isEmpty()) {
+                    lentRetAmountLayout.setError(null);
+                    lentRetAmountLayout.setErrorEnabled(false);
+                    lentRetRemAmountLayout.setError(null);
+                    lentRetRemAmountLayout.setErrorEnabled(false);
+                    lentRetFromLayout.setError(null);
+                    lentRetFromLayout.setErrorEnabled(false);
+                    lentRetToLayout.setError(null);
+                    lentRetToLayout.setErrorEnabled(false);
+                    lentRetTranDateLayout.setError(null);
+                    lentRetTranDateLayout.setErrorEnabled(false);
+                    lentRetRemarksLayout.setErrorEnabled(true);
+                    lentRetRemarksLayout.setError("Remarks is Required");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (!remarks.matches(remarksPattern)) {
+                    lentRetAmountLayout.setError(null);
+                    lentRetAmountLayout.setErrorEnabled(false);
+                    lentRetRemAmountLayout.setError(null);
+                    lentRetRemAmountLayout.setErrorEnabled(false);
+                    lentRetFromLayout.setError(null);
+                    lentRetFromLayout.setErrorEnabled(false);
+                    lentRetToLayout.setError(null);
+                    lentRetToLayout.setErrorEnabled(false);
+                    lentRetTranDateLayout.setError(null);
+                    lentRetTranDateLayout.setErrorEnabled(false);
+                    lentRetRemarksLayout.setErrorEnabled(true);
+                    lentRetRemarksLayout.setError("Remarks should be length of 4 to 20 alphanumeric");
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else if (from.equals("Others")) {
+                    if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                        lentRetAmountLayout.setError(null);
+                        lentRetAmountLayout.setErrorEnabled(false);
+                        lentRetRemAmountLayout.setError(null);
+                        lentRetRemAmountLayout.setErrorEnabled(false);
+                        lentRetFromLayout.setError(null);
+                        lentRetFromLayout.setErrorEnabled(false);
+                        lentRetToLayout.setError(null);
+                        lentRetToLayout.setErrorEnabled(false);
+                        lentRetTranDateLayout.setError(null);
+                        lentRetTranDateLayout.setErrorEnabled(false);
+                        lentRetRemarksLayout.setErrorEnabled(true);
+                        lentRetRemarksLayout.setError("Mention From Detail");
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        availableBalanceUpdateCall();
+                    }
+                } else if (to.equalsIgnoreCase("Bank Account")) {
+                    if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                        lentRetAmountLayout.setError(null);
+                        lentRetAmountLayout.setErrorEnabled(false);
+                        lentRetRemAmountLayout.setError(null);
+                        lentRetRemAmountLayout.setErrorEnabled(false);
+                        lentRetFromLayout.setError(null);
+                        lentRetFromLayout.setErrorEnabled(false);
+                        lentRetToLayout.setError(null);
+                        lentRetToLayout.setErrorEnabled(false);
+                        lentRetTranDateLayout.setError(null);
+                        lentRetTranDateLayout.setErrorEnabled(false);
+                        lentRetRemarksLayout.setErrorEnabled(true);
+                        lentRetRemarksLayout.setError("Mention Bank Name");
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        availableBalanceUpdateCall();
+                    }
+                } else if (to.equals("Others")) {
+                    if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                        lentRetAmountLayout.setError(null);
+                        lentRetAmountLayout.setErrorEnabled(false);
+                        lentRetRemAmountLayout.setError(null);
+                        lentRetRemAmountLayout.setErrorEnabled(false);
+                        lentRetFromLayout.setError(null);
+                        lentRetFromLayout.setErrorEnabled(false);
+                        lentRetToLayout.setError(null);
+                        lentRetToLayout.setErrorEnabled(false);
+                        lentRetTranDateLayout.setError(null);
+                        lentRetTranDateLayout.setErrorEnabled(false);
+                        lentRetRemarksLayout.setErrorEnabled(true);
+                        lentRetRemarksLayout.setError("Mention To Details");
+                        dialog.dismiss();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        availableBalanceUpdateCall();
+                    }
+                } else {
+                    availableBalanceUpdateCall();
+                }
             }
         }
     }
 
     private void availableBalanceUpdateCall() {
+        lentRetAmountLayout.setError(null);
+        lentRetAmountLayout.setErrorEnabled(false);
+        lentRetRemAmountLayout.setError(null);
+        lentRetRemAmountLayout.setErrorEnabled(false);
+        lentRetFromLayout.setError(null);
+        lentRetFromLayout.setErrorEnabled(false);
+        lentRetToLayout.setError(null);
+        lentRetToLayout.setErrorEnabled(false);
+        lentRetTranDateLayout.setError(null);
+        lentRetTranDateLayout.setErrorEnabled(false);
+        lentRetTranDateLayout.setError(null);
+        lentRetTranDateLayout.setErrorEnabled(false);
+        lentRetRemarksLayout.setError(null);
+        lentRetRemarksLayout.setErrorEnabled(false);
+        UIUtil.hideKeyboard(AddLentReturnDetailsActivity.this);
+        if (ConnectionCheck.getConnectionType(getApplicationContext()) == 0) {
+            dialog.dismiss();
+            ConnectionCheck.connectionDialogShow(getApplicationContext(), AddLentReturnDetailsActivity.this);
+        } else {
+            databaseReference.child("Available Balance Details " + country).child(to).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String temp = snapshot.getValue(String.class);
 
-        databaseReference.child("Available Balance Details " + country).child(to).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String temp = snapshot.getValue(String.class);
+                    if (country.equalsIgnoreCase("India")) {
 
-                if (country.equalsIgnoreCase("India")) {
+                        if (temp == null) {
+                            availableBalanceSubmit(String.valueOf(Integer.parseInt(amount)), updateFinder);
+                        } else {
+                            availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) + Integer.parseInt(amount)), updateFinder);
+                        }
 
-                    if (temp == null) {
-                        availableBalanceSubmit(String.valueOf(Integer.parseInt(amount)), updateFinder);
-                    } else {
-                        availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) + Integer.parseInt(amount)), updateFinder);
-                    }
-
-                } else if (country.equalsIgnoreCase("Oman")) {
-                    if (temp == null) {
-                        availableBalanceSubmit((String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount)))), updateFinder);
-                    } else {
-                        availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), updateFinder);
+                    } else if (country.equalsIgnoreCase("Oman")) {
+                        if (temp == null) {
+                            availableBalanceSubmit((String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount)))), updateFinder);
+                        } else {
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), updateFinder);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        }
+
     }
 
     private void availableBalanceSubmit(String updateAmount, String updateFinder) {
@@ -509,17 +605,17 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(to);
         if (country.equalsIgnoreCase("India")) {
-            data.setAmount(remAmount);
-            data.setTransAmount(remAmount);
+            data.setAmount(amount);
+            data.setTransAmount(amount);
         } else {
             DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            String finalAmount = decimalFormat.format(Double.parseDouble(remAmount));
+            String finalAmount = decimalFormat.format(Double.parseDouble(amount));
             data.setAmount(finalAmount);
             data.setTransAmount(finalAmount);
         }
         data.setCategory("Lent Return");
-        data.setType("Expense");
-        data.setDate(date);
+        data.setType("Income");
+        data.setDate(new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()));
         data.setRemarks(remarks);
         data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
         data.setUpdateFinder(date);

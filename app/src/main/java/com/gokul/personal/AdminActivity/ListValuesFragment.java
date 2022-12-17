@@ -86,6 +86,8 @@ public class ListValuesFragment extends Fragment {
         });
 
         listSubmit.setOnClickListener(view1 -> {
+            dialog.setCancelable(false);
+            dialog.show();
             valueList = Objects.requireNonNull(listValue.getText()).toString().trim();
             nameList = Objects.requireNonNull(listName.getText()).toString().trim();
 
@@ -95,12 +97,14 @@ public class ListValuesFragment extends Fragment {
                 if (valueList.isEmpty()) {
                     listValueLayout.setErrorEnabled(true);
                     listValueLayout.setError("List Value is Required");
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else if (nameList.isEmpty()) {
                     listValueLayout.setErrorEnabled(false);
                     listValueLayout.setError(null);
                     listNameLayout.setErrorEnabled(true);
                     listNameLayout.setError("Select a List");
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     listValueLayout.setErrorEnabled(false);
@@ -116,8 +120,6 @@ public class ListValuesFragment extends Fragment {
     }
 
     private void addListData(View view) {
-
-        dialog.show();
 
         AdminData adminData = new AdminData();
         adminData.setListValue(valueList);
@@ -153,6 +155,8 @@ public class ListValuesFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "List values read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });

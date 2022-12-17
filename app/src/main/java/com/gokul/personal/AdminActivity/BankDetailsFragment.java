@@ -76,13 +76,19 @@ public class BankDetailsFragment extends Fragment {
 
         bnkBranch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
+                dialog.setCancelable(false);
+                dialog.show();
                 bankSubmitCall(view);
                 return true;
             }
             return false;
         });
 
-        bnkSubmit.setOnClickListener(this::bankSubmitCall);
+        bnkSubmit.setOnClickListener(view1 -> {
+            dialog.setCancelable(false);
+            dialog.show();
+            bankSubmitCall(view1);
+        });
 
         return view;
     }
@@ -97,17 +103,20 @@ public class BankDetailsFragment extends Fragment {
         bankBranch = Objects.requireNonNull(bnkBranch.getText()).toString().trim();
 
         if (ConnectionCheck.getConnectionType(view1.getContext()) == 0) {
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view1.getContext(), requireActivity());
         } else {
             if (bankName.isEmpty()) {
                 bnkNameLayout.setErrorEnabled(true);
                 bnkNameLayout.setError("Bank Name is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (bankCIF.isEmpty()) {
                 bnkNameLayout.setErrorEnabled(false);
                 bnkNameLayout.setError(null);
                 bnkCIFLayout.setErrorEnabled(true);
                 bnkCIFLayout.setError("CIF is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (bankAccount.isEmpty()) {
                 bnkNameLayout.setErrorEnabled(false);
@@ -116,6 +125,7 @@ public class BankDetailsFragment extends Fragment {
                 bnkCIFLayout.setError(null);
                 bnkAcntNumberLayout.setErrorEnabled(true);
                 bnkAcntNumberLayout.setError("Account Number is required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (bankIFSC.isEmpty()) {
                 bnkNameLayout.setErrorEnabled(false);
@@ -126,6 +136,7 @@ public class BankDetailsFragment extends Fragment {
                 bnkAcntNumberLayout.setError(null);
                 bnkIFSCLayout.setErrorEnabled(true);
                 bnkIFSCLayout.setError("IFSC Code is required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (bankMICR.isEmpty()) {
                 bnkNameLayout.setErrorEnabled(false);
@@ -138,6 +149,7 @@ public class BankDetailsFragment extends Fragment {
                 bnkIFSCLayout.setError(null);
                 bnkMICRLayout.setErrorEnabled(true);
                 bnkMICRLayout.setError("MICR Code is required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (bankBranch.isEmpty()) {
                 bnkNameLayout.setErrorEnabled(false);
@@ -152,6 +164,7 @@ public class BankDetailsFragment extends Fragment {
                 bnkMICRLayout.setError(null);
                 bnkBranchLayout.setErrorEnabled(true);
                 bnkBranchLayout.setError("Branch Name is required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 bnkNameLayout.setErrorEnabled(false);
@@ -174,8 +187,6 @@ public class BankDetailsFragment extends Fragment {
     }
 
     private void bankSubmit(View view1) {
-
-        dialog.show();
 
         AdminData data = new AdminData();
         data.setBankName(bankName);
@@ -216,6 +227,8 @@ public class BankDetailsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view1.getContext(), "Bank details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });

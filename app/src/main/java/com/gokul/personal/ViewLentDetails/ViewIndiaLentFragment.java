@@ -88,7 +88,6 @@ public class ViewIndiaLentFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     LentData data1 = dataSnapshot.getValue(LentData.class);
                     list.add(data1);
-                    dialog.dismiss();
                 }
                 adapter.notifyDataSetChanged();
                 if (list.isEmpty()) {
@@ -99,6 +98,7 @@ public class ViewIndiaLentFragment extends Fragment {
                     animationView.playAnimation();
                     dialog.dismiss();
                 } else {
+                    dialog.dismiss();
                     list.sort((l1, l2) -> {
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                         try {

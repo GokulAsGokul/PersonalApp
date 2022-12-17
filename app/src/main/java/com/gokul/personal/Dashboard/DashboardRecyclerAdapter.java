@@ -48,22 +48,19 @@ public class DashboardRecyclerAdapter extends RecyclerView.Adapter<DashboardRecy
         holder.ifscCode.setText(data.getBankIFSC());
         holder.branchName.setText(data.getBankBranch());
 
-        holder.dashShareBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ConnectionCheck.getConnectionType(context) == 0) {
-                    ConnectionCheck.connectionDialogShow(context, activity);
-                } else {
-                    String shareTextBody = "***** *Bank Details* *****" + "\n" + "\n" +
-                            "_Name_               : " + "*Gokul P*" + "\n" +
-                            "_Bank Name_     : " + "*" + list.get(position).getBankName() + "*" + "\n" +
-                            "_Account No_     : " + "*" + list.get(position).getBankAccount() + "*" + "\n" +
-                            "_IFSC Code_       : " + "*" + list.get(position).getBankIFSC() + "*" + "\n" +
-                            "_MICR Code_      : " + "*" + list.get(position).getBankMICR() + "*" + "\n" +
-                            "_Branch_              : " + "*" + list.get(position).getBankBranch() + "*" + "\n" + "\n" +
-                            "*********************************";
-                    shareContDet(position, shareTextBody);
-                }
+        holder.dashShareBtn.setOnClickListener(view -> {
+            if (ConnectionCheck.getConnectionType(context) == 0) {
+                ConnectionCheck.connectionDialogShow(context, activity);
+            } else {
+                String shareTextBody = "***** *Bank Details* *****" + "\n" + "\n" +
+                        "_Name_               : " + "*Gokul P*" + "\n" +
+                        "_Bank Name_     : " + "*" + list.get(position).getBankName() + "*" + "\n" +
+                        "_Account No_     : " + "*" + list.get(position).getBankAccount() + "*" + "\n" +
+                        "_IFSC Code_       : " + "*" + list.get(position).getBankIFSC() + "*" + "\n" +
+                        "_MICR Code_      : " + "*" + list.get(position).getBankMICR() + "*" + "\n" +
+                        "_Branch_              : " + "*" + list.get(position).getBankBranch() + "*" + "\n" + "\n" +
+                        "*********************************";
+                shareContDet(position, shareTextBody);
             }
         });
 

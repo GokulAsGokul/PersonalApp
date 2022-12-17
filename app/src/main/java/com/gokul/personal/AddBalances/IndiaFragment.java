@@ -161,7 +161,11 @@ public class IndiaFragment extends Fragment {
             IndiaFragment.this.dayPicker(view);
         });
 
-        balDecSubmit.setOnClickListener(view1 -> submitBalanceCall(view));
+        balDecSubmit.setOnClickListener(view1 -> {
+            dialog.setCancelable(false);
+            dialog.show();
+            submitBalanceCall(view);
+        });
 
         return view;
     }
@@ -210,6 +214,7 @@ public class IndiaFragment extends Fragment {
             balDecRemarksLayout.setError(null);
             balDecRemarksLayout.setErrorEnabled(false);
             UIUtil.hideKeyboard(requireActivity());
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), getActivity());
         } else {
 
@@ -229,18 +234,21 @@ public class IndiaFragment extends Fragment {
             if (source.isEmpty()) {
                 balSourceNameLayout.setErrorEnabled(true);
                 balSourceNameLayout.setError("Source Name is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (amount.isEmpty()) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (amount.equals("0")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (transAmount.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -249,6 +257,7 @@ public class IndiaFragment extends Fragment {
                 balAmountLayout.setErrorEnabled(false);
                 balTransAmountLayout.setErrorEnabled(true);
                 balTransAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (transAmount.equals("0")) {
                 balSourceNameLayout.setError(null);
@@ -257,6 +266,7 @@ public class IndiaFragment extends Fragment {
                 balAmountLayout.setErrorEnabled(false);
                 balTransAmountLayout.setErrorEnabled(true);
                 balTransAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (category.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -267,6 +277,7 @@ public class IndiaFragment extends Fragment {
                 balTransAmountLayout.setErrorEnabled(false);
                 balCategoryLayout.setErrorEnabled(true);
                 balCategoryLayout.setError("Category is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (date.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -279,6 +290,7 @@ public class IndiaFragment extends Fragment {
                 balCategoryLayout.setErrorEnabled(false);
                 balTranDateLayout.setErrorEnabled(true);
                 balTranDateLayout.setError("Date is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (remarks.isEmpty()) {
                 balSourceNameLayout.setError(null);
@@ -293,6 +305,7 @@ public class IndiaFragment extends Fragment {
                 balTranDateLayout.setErrorEnabled(false);
                 balDecRemarksLayout.setErrorEnabled(true);
                 balDecRemarksLayout.setError("Remarks is Required");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (!remarks.matches(remarksPattern)) {
                 balSourceNameLayout.setError(null);
@@ -307,6 +320,7 @@ public class IndiaFragment extends Fragment {
                 balTranDateLayout.setErrorEnabled(false);
                 balDecRemarksLayout.setErrorEnabled(true);
                 balDecRemarksLayout.setError("Remarks should be length of 4 to 20 alphanumeric");
+                dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (source.equals("Others")) {
                 if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
@@ -322,6 +336,7 @@ public class IndiaFragment extends Fragment {
                     balTranDateLayout.setErrorEnabled(false);
                     balDecRemarksLayout.setErrorEnabled(true);
                     balDecRemarksLayout.setError("Mention Source of Amount");
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -340,6 +355,7 @@ public class IndiaFragment extends Fragment {
                     balTranDateLayout.setErrorEnabled(false);
                     balDecRemarksLayout.setErrorEnabled(true);
                     balDecRemarksLayout.setError("Mention Category of Amount");
+                    dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     availableBalanceSubmitCall(view);
@@ -352,10 +368,6 @@ public class IndiaFragment extends Fragment {
     }
 
     private void availableBalanceSubmitCall(View view) {
-
-        dialog.setCancelable(false);
-        dialog.show();
-
         balSourceNameLayout.setError(null);
         balSourceNameLayout.setErrorEnabled(false);
         balAmountLayout.setError(null);
@@ -370,9 +382,9 @@ public class IndiaFragment extends Fragment {
         balDecRemarksLayout.setErrorEnabled(false);
         UIUtil.hideKeyboard(requireActivity());
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
+            dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
-
             databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -407,7 +419,6 @@ public class IndiaFragment extends Fragment {
                 }
             });
         }
-
     }
 
     private void availableBalanceSubmit(int sourceAmount, View view) {
@@ -425,55 +436,37 @@ public class IndiaFragment extends Fragment {
 
     private void submitBalance(View view) {
 
-        balSourceNameLayout.setError(null);
-        balSourceNameLayout.setErrorEnabled(false);
-        balAmountLayout.setError(null);
-        balAmountLayout.setErrorEnabled(false);
-        balTransAmountLayout.setError(null);
-        balTransAmountLayout.setErrorEnabled(false);
-        balCategoryLayout.setError(null);
-        balCategoryLayout.setErrorEnabled(false);
-        balTranDateLayout.setError(null);
-        balTranDateLayout.setErrorEnabled(false);
-        balDecRemarksLayout.setError(null);
-        balDecRemarksLayout.setErrorEnabled(false);
-        UIUtil.hideKeyboard(requireActivity());
-        if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
-            ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
+        String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(amount);
+        data.setTransAmount(transAmount);
+        data.setCategory(category);
+        if (balSwitch.isChecked()) {
+            data.setType("Expense");
         } else {
-
-            String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
-
-            BalanceDetailsData data = new BalanceDetailsData();
-            data.setSource(source);
-            data.setAmount(amount);
-            data.setTransAmount(transAmount);
-            data.setCategory(category);
-            if (balSwitch.isChecked()) {
-                data.setType("Expense");
-            } else {
-                data.setType("Income");
-            }
-            data.setDate(date);
-            data.setRemarks(remarks);
-            data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
-            data.setUpdateFinder(date1);
-
-            databaseReference.child("Balance Details India").child(source).child(date1).setValue(data).addOnCompleteListener(task -> {
-                balSourceName.getText().clear();
-                Objects.requireNonNull(balAmount.getText()).clear();
-                Objects.requireNonNull(balTransAmount.getText()).clear();
-                balCategory.getText().clear();
-                balTranDate.getText().clear();
-                balDecRemarks.setText(R.string.mention_if_any);
-                dialog.dismiss();
-                StyleableToast.makeText(view.getContext(), "Balance Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-            }).addOnFailureListener(e -> {
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            });
+            data.setType("Income");
         }
+        data.setDate(date);
+        data.setRemarks(remarks);
+        data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
+        data.setUpdateFinder(date1);
+
+        databaseReference.child("Balance Details India").child(source).child(date1).setValue(data).addOnCompleteListener(task -> {
+            balSourceName.getText().clear();
+            Objects.requireNonNull(balAmount.getText()).clear();
+            Objects.requireNonNull(balTransAmount.getText()).clear();
+            balCategory.getText().clear();
+            balTranDate.getText().clear();
+            balDecRemarks.setText(R.string.mention_if_any);
+            dialog.dismiss();
+            StyleableToast.makeText(view.getContext(), "Balance Details Submitted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+        }).addOnFailureListener(e -> {
+            dialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
     }
 
 }

@@ -91,7 +91,6 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     InvestmentData data1 = dataSnapshot.getValue(InvestmentData.class);
                     list.add(data1);
-                    dialog.dismiss();
                 }
                 adapter.notifyDataSetChanged();
                 if (list.isEmpty()) {
@@ -103,6 +102,7 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
+                    dialog.dismiss();
                     list.sort((i1, i2) -> {
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                         try {
