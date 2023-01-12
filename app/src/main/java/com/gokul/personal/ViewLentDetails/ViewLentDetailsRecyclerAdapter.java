@@ -274,6 +274,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 ConnectionCheck.connectionDialogShow(context, activity);
             } else {
                 Intent intent = new Intent(context, AddLentReturnDetailsActivity.class);
+                intent.putExtra("name", data.getName());
                 intent.putExtra("country", country);
                 intent.putExtra("amount", data.getRemAmount());
                 intent.putExtra("updateFinder", data.getUpdateFinder());

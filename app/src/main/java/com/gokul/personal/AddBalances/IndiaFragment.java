@@ -243,7 +243,7 @@ public class IndiaFragment extends Fragment {
                 balAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0")) {
+            } else if (amount.equals("0") && !source.equalsIgnoreCase("Zenovic Trust")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);

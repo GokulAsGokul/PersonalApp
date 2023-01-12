@@ -56,7 +56,7 @@ public class ViewIndiaBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter
     @NonNull
     @Override
     public ViewIndiaBalanceDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.view_balance_details, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.view_balance_details_view, parent, false);
         return new ViewIndiaBalanceDetailsRecyclerAdapter.MyViewHolder(v);
     }
 

@@ -18,8 +18,8 @@
             android:id="@+id/deleteDialogText1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
             android:text="@string/are_you_sure_want_to_delete_this"
             android:textColor="@color/background"
             android:textSize="20sp"
@@ -32,26 +32,26 @@
             android:id="@+id/deleteDialogText2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
             android:layout_gravity="end"
+            android:layout_marginTop="70dp"
             android:layout_marginEnd="15dp"
             android:text="@string/delete"
             android:textColor="@color/background"
             android:textSize="20sp"
             android:textStyle="bold|italic"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/deleteDialogText3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
             android:layout_gravity="end"
+            android:layout_marginTop="70dp"
             android:layout_marginEnd="120dp"
             android:text="@string/cancel"
             android:textColor="@color/background"
             android:textSize="20sp"
-            android:textStyle="bold|italic"/>
+            android:textStyle="bold|italic" />
 
     </androidx.cardview.widget.CardView>
 

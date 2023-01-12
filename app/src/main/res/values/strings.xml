@@ -122,8 +122,6 @@
     <string name="add_lent_return_details">Add Lent Return Details</string>
     <string name="balance_details_delete_button">Balance Details Delete Button</string>
     <string name="bank_details_share_button">Bank Details Share Button</string>
-    <string name="select_received_from">Select Received From</string>
-    <string name="select_received_to">Select Received To</string>
     <string name="add_india_lent_details">Add India Lent Details</string>
     <string name="add_oman_lent_details">Add Oman Lent Details</string>
     <string name="add_india_balance_details">Add India Balance Details</string>
@@ -131,4 +129,8 @@
     <string name="add_lending_details">Add Lending Details</string>
     <string name="add_balance_details">Add Balance Details</string>
     <string name="enter_remaining_amount">Enter Remaining Amount</string>
+    <string name="investmentdetailsmaturebtn">InvestmentDetailsMatureBtn</string>
+    <string name="investment_mature_details">Investment Mature Details</string>
+    <string name="enter_maturity_amount">Enter Maturity Amount</string>
+    <string name="remaining_amount">Remaining Amount</string>
 </resources>

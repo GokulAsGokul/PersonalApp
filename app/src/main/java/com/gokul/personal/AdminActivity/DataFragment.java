@@ -614,6 +614,7 @@ public class DataFragment extends Fragment {
                         }
                     }
                 }
+
                 investmentDetails(function);
             }
 
@@ -944,16 +945,6 @@ public class DataFragment extends Fragment {
                             balList.add(data);
                         }
                     }
-//                    List<BalanceDetailsData> balList2 = balList.stream().distinct().sorted((b1, b2) -> {
-//                        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-//                        try {
-//                            return String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()).compareTo(
-//                                    String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()));
-//                        } catch (ParseException e) {
-//                            StyleableToast.makeText(view.getContext(), "India Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-//                        }
-//                        return 0;
-//                    }).collect(Collectors.toList());
                     balList1.addAll(balList);
                     balList.clear();
                     if (finalI == (indiaBalanceNameList.size() - 1)) {
@@ -966,8 +957,8 @@ public class DataFragment extends Fragment {
                             List<BalanceDetailsData> balList2 = balList1.stream().distinct().sorted((b1, b2) -> {
                                 @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                                 try {
-                                    return String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()).compareTo(
-                                            String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()));
+                                    return String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()).compareTo(
+                                            String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()));
                                 } catch (ParseException e) {
                                     StyleableToast.makeText(view.getContext(), "India Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                                 }
@@ -1043,18 +1034,8 @@ public class DataFragment extends Fragment {
                             balList.add(data);
                         }
                     }
-                    List<BalanceDetailsData> balList2 = balList.stream().distinct().sorted((b1, b2) -> {
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                        try {
-                            return String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()).compareTo(
-                                    String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()));
-                        } catch (ParseException e) {
-                            StyleableToast.makeText(view.getContext(), "Oman Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                        }
-                        return 0;
-                    }).collect(Collectors.toList());
-                    balList1.addAll(balList2);
-                    balList2.clear();
+                    balList1.addAll(balList);
+                    balList.clear();
                     if (finalI == (omanBalanceNameList.size() - 1)) {
                         if (balList1.size() == 0) {
                             table24.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -1062,20 +1043,30 @@ public class DataFragment extends Fragment {
                             table24.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph("Balance Details Not Available")));
                             document.add(table24);
                         } else {
+                            List<BalanceDetailsData> balList2 = balList1.stream().distinct().sorted((b1, b2) -> {
+                                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                                try {
+                                    return String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()).compareTo(
+                                            String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()));
+                                } catch (ParseException e) {
+                                    StyleableToast.makeText(view.getContext(), "Oman Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                                }
+                                return 0;
+                            }).collect(Collectors.toList());
                             document.add(table22);
                             int count = 0;
-                            for (int i = 0; i < balList1.size(); i++) {
-                                int count1 = balList1.size();
+                            for (int i = 0; i < balList2.size(); i++) {
+                                int count1 = balList2.size();
                                 count++;
                                 table23.setHorizontalAlignment(HorizontalAlignment.CENTER);
                                 table23.setVerticalAlignment(VerticalAlignment.MIDDLE);
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getDate())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getAmount())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getTransAmount())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getCategory())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getSource())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getType())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getRemarks())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getDate())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getAmount())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getTransAmount())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getCategory())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getSource())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getType())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getRemarks())));
                                 if (count1 == count) {
                                     document.add(table23);
                                     pdfClose();
@@ -1089,7 +1080,7 @@ public class DataFragment extends Fragment {
                 public void onCancelled(@NonNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                    StyleableToast.makeText(view.getContext(), "India Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                    StyleableToast.makeText(view.getContext(), "Oman Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });
         }

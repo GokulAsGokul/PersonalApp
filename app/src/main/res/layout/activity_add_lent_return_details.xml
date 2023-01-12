@@ -102,48 +102,12 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/lentRetFromLayout"
+            android:id="@+id/lentRetSourceLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:hint="@string/select_received_from"
-            android:textColorHint="@color/background"
-            android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
-            app:boxCornerRadiusBottomEnd="10dp"
-            app:boxCornerRadiusBottomStart="10dp"
-            app:boxCornerRadiusTopEnd="10dp"
-            app:boxCornerRadiusTopStart="10dp"
-            app:boxStrokeColor="@color/grey"
-            app:boxStrokeWidth="2dp"
-            app:boxStrokeWidthFocused="2dp"
-            app:endIconTint="@color/background"
-            app:errorTextColor="@color/red"
-            app:hintTextColor="@color/background"
-            app:layout_constraintEnd_toEndOf="@+id/lentRetRemAmountLayout"
-            app:layout_constraintStart_toStartOf="@+id/lentRetRemAmountLayout"
-            app:layout_constraintTop_toBottomOf="@+id/lentRetRemAmountLayout"
-            app:startIconDrawable="@drawable/ic_view_balance"
-            app:startIconTint="@color/background">
-
-            <AutoCompleteTextView
-                android:id="@+id/lentRetFrom"
-                android:layout_width="match_parent"
-                android:layout_height="60sp"
-                android:inputType="none"
-                android:textColor="@color/background"
-                android:textSize="20sp"
-                android:textStyle="bold|italic"
-                tools:ignore="LabelFor" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/lentRetToLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:hint="@string/select_received_to"
+            android:hint="@string/select_source"
             android:textColorHint="@color/background"
             android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
             app:boxCornerRadiusBottomEnd="10dp"
@@ -156,14 +120,14 @@
             app:endIconTint="@color/background"
             app:errorTextColor="@color/red"
             app:hintTextColor="@color/background"
-            app:layout_constraintEnd_toEndOf="@+id/lentRetFromLayout"
-            app:layout_constraintStart_toStartOf="@+id/lentRetFromLayout"
-            app:layout_constraintTop_toBottomOf="@+id/lentRetFromLayout"
+            app:layout_constraintEnd_toEndOf="@+id/lentRetRemAmountLayout"
+            app:layout_constraintStart_toStartOf="@+id/lentRetRemAmountLayout"
+            app:layout_constraintTop_toBottomOf="@+id/lentRetRemAmountLayout"
             app:startIconDrawable="@drawable/ic_account_balance"
             app:startIconTint="@color/background">
 
             <AutoCompleteTextView
-                android:id="@+id/lentRetTo"
+                android:id="@+id/lentRetSource"
                 android:layout_width="match_parent"
                 android:layout_height="60sp"
                 android:inputType="none"
@@ -190,9 +154,9 @@
             app:boxStrokeWidth="2dp"
             app:boxStrokeWidthFocused="2dp"
             app:errorTextColor="@color/red"
-            app:layout_constraintEnd_toEndOf="@+id/lentRetToLayout"
-            app:layout_constraintStart_toStartOf="@+id/lentRetToLayout"
-            app:layout_constraintTop_toBottomOf="@+id/lentRetToLayout"
+            app:layout_constraintEnd_toEndOf="@+id/lentRetSourceLayout"
+            app:layout_constraintStart_toStartOf="@+id/lentRetSourceLayout"
+            app:layout_constraintTop_toBottomOf="@+id/lentRetSourceLayout"
             app:startIconDrawable="@drawable/ic_date"
             app:startIconTint="@color/background">
 

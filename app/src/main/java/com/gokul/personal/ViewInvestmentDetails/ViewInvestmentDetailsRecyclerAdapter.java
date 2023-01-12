@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.AddInvestmentDetails.InvestmentData;
+import com.gokul.personal.AddInvestmentDetails.MatureInvestmentDetailsActivity;
 import com.gokul.personal.AddInvestmentDetails.UpdateInvestmentDetailsActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
@@ -126,6 +127,19 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             }
         });
 
+        holder.investDetMatureBtn.setOnClickListener(view -> {
+            if (ConnectionCheck.getConnectionType(context) == 0) {
+                ConnectionCheck.connectionDialogShow(context, activity);
+            } else {
+                Intent intent = new Intent(context, MatureInvestmentDetailsActivity.class);
+                intent.putExtra("folio", data.getFolioNumber());
+                intent.putExtra("amount", data.getAmount());
+                intent.putExtra("updateFinder", data.getUpdateFinder());
+                context.startActivity(intent);
+                ((Activity) context).finish();
+            }
+        });
+
     }
 
     private void deleteBalanceDetails(String source, String amount, String updateFinder, Dialog dialogCall) {
@@ -192,7 +206,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView invDetCompany, invDetAmount, invDetFolio, invDetTerm, invDetSource, invDetDate, invDetRemarks;
-        ImageView investDetEditBtn, investDetDeleteBtn;
+        ImageView investDetEditBtn, investDetDeleteBtn, investDetMatureBtn;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -205,6 +219,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             invDetRemarks = itemView.findViewById(R.id.invDetRemarks);
             investDetEditBtn = itemView.findViewById(R.id.investDetEditBtn);
             investDetDeleteBtn = itemView.findViewById(R.id.investDetDeleteBtn);
+            investDetMatureBtn = itemView.findViewById(R.id.investDetMatureBtn);
 
         }
     }
