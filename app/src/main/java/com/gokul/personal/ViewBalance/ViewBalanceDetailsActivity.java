@@ -1,5 +1,6 @@
 package com.gokul.personal.ViewBalance;
 
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -20,6 +21,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.gokul.personal.Dashboard.DashboardActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.tabs.TabLayout;
@@ -98,6 +100,14 @@ public class ViewBalanceDetailsActivity extends AppCompatActivity {
             spannableString.setSpan(imageSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             return spannableString;
         }
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            startActivity(new Intent(ViewBalanceDetailsActivity.this, DashboardActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -281,6 +281,14 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         return typeMap.getExtensionFromMimeType(resolver.getType(fileUri));
     }
 
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            startActivity(new Intent(UploadDocumentsActivity.this, DashboardActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

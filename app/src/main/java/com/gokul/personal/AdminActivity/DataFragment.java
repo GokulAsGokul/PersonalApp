@@ -462,6 +462,7 @@ public class DataFragment extends Fragment {
                         }
                     }
                 }
+
                 investmentDetails(function);
             }
 
