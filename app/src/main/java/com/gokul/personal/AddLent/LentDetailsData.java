@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class LentData {
+public class LentDetailsData {
 
     private String Name, Amount, RemAmount, From, To, Date, Remarks, UpdateFinder;
 
@@ -75,7 +75,22 @@ public class LentData {
         UpdateFinder = updateFinder;
     }
 
-    public static Comparator<LentData> lentComparatorLatest = (l1, l2) -> {
+    public static Comparator<String> lentComparatorFilter = (f1, f2) -> {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy");
+        try {
+            if (!f2.equalsIgnoreCase("All")) {
+                return String.valueOf(Objects.requireNonNull(dateFormat.parse(f2)).getTime()).compareToIgnoreCase(
+                        String.valueOf(Objects.requireNonNull(dateFormat.parse(f1)).getTime()));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    };
+
+    public static Comparator<LentDetailsData> lentComparatorName = (l1, l2) -> l1.getName().compareToIgnoreCase(l2.getName());
+
+    public static Comparator<LentDetailsData> lentComparatorLatest = (l1, l2) -> {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         try {
             return String.valueOf(Objects.requireNonNull(dateFormat.parse(l2.getDate())).getTime()).compareToIgnoreCase(
@@ -86,7 +101,7 @@ public class LentData {
         return 0;
     };
 
-    public static Comparator<LentData> lentComparatorOldest = (l1, l2) -> {
+    public static Comparator<LentDetailsData> lentComparatorOldest = (l1, l2) -> {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         try {
             return String.valueOf(Objects.requireNonNull(dateFormat.parse(l1.getDate())).getTime()).compareToIgnoreCase(
@@ -96,5 +111,11 @@ public class LentData {
         }
         return 0;
     };
+
+    public static Comparator<LentDetailsData> lentComparatorLowest = (l1, l2) -> Double.compare(Double.parseDouble(l1.getAmount()), Double.parseDouble(l2.getAmount()));
+
+    public static Comparator<LentDetailsData> lentComparatorHighest = (l1, l2) -> Double.compare(Double.parseDouble(l2.getAmount()), Double.parseDouble(l1.getAmount()));
+
+    public static Comparator<LentDetailsData> lentComparatorRemAmount = (l1, l2) -> Double.compare(Double.parseDouble(l2.getRemAmount()), Double.parseDouble(l1.getRemAmount()));
 
 }

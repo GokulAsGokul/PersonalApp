@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -63,8 +64,9 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
         BalanceDetailsData data = list.get(position);
         holder.allBalViewSource.setText(data.getSource());
         holder.allBalViewCategory.setText(data.getCategory());
-        holder.allBalViewAmount.setText(String.format("Ro %s", data.getAmount()));
-        holder.allBalViewTransAmount.setText(String.format("Ro %s", data.getTransAmount()));
+        holder.allBalViewAmount.setText(String.format("OMR %s", data.getAmount()));
+        holder.allBalViewTransAmount.setText(String.format("OMR %s", data.getTransAmount()));
+        holder.allBalViewAvlAmount.setText(String.format("OMR %s", data.getAvailableAmount()));
         holder.allBalViewMode.setText(data.getType());
         holder.allBalViewDate.setText(data.getDate());
         holder.allBalViewRemarks.setText(data.getRemarks());
@@ -125,7 +127,7 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
                         availableBalanceSubmit(balName, (String.valueOf(Double.parseDouble(amount))), category, updateFinder, dialogCall);
                     } else {
                         if (Double.parseDouble(amount) <= Double.parseDouble(temp)) {
-                            availableBalanceSubmit(balName, (String.valueOf(Double.parseDouble(temp) - Double.parseDouble(amount))), category, updateFinder, dialogCall);
+                            availableBalanceSubmit(balName, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
                         } else {
                             if (list.isEmpty()) {
                                 animationView.setVisibility(View.VISIBLE);
@@ -140,7 +142,7 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
                     if (temp == null) {
                         availableBalanceSubmit(balName, (String.valueOf(Double.parseDouble(amount))), category, updateFinder, dialogCall);
                     } else {
-                        availableBalanceSubmit(balName, String.valueOf(Double.parseDouble(temp) + Double.parseDouble(amount)), category, updateFinder, dialogCall);
+                        availableBalanceSubmit(balName, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
                     }
                 }
 
@@ -237,7 +239,7 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView allBalViewSource, allBalViewCategory, allBalViewAmount, allBalViewTransAmount, allBalViewMode, allBalViewDate, allBalViewRemarks;
+        TextView allBalViewSource, allBalViewCategory, allBalViewAmount, allBalViewTransAmount, allBalViewAvlAmount, allBalViewMode, allBalViewDate, allBalViewRemarks;
         ImageView allBalViewDeleteBtn;
 
         public MyViewHolder(View itemView) {
@@ -246,6 +248,7 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
             allBalViewCategory = itemView.findViewById(R.id.allBalViewCategory);
             allBalViewAmount = itemView.findViewById(R.id.allBalViewAmount);
             allBalViewTransAmount = itemView.findViewById(R.id.allBalViewTransAmount);
+            allBalViewAvlAmount = itemView.findViewById(R.id.allBalViewAvlAmount);
             allBalViewMode = itemView.findViewById(R.id.allBalViewMode);
             allBalViewDate = itemView.findViewById(R.id.allBalViewDate);
             allBalViewRemarks = itemView.findViewById(R.id.allBalViewRemarks);

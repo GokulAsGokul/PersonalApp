@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class InvestmentData {
 
-    private String Name, Amount, FolioNumber, Term, Source, Date, Remarks, UpdateFinder;
+    private String Name, Amount, RemAmount, FolioNumber, Term, Source, Date, Remarks, UpdateFinder;
 
     public String getName() {
         return Name;
@@ -25,6 +25,14 @@ public class InvestmentData {
 
     public void setAmount(String amount) {
         Amount = amount;
+    }
+
+    public String getRemAmount() {
+        return RemAmount;
+    }
+
+    public void setRemAmount(String remAmount) {
+        RemAmount = remAmount;
     }
 
     public String getFolioNumber() {

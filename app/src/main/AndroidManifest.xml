@@ -26,7 +26,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         app:lottie_enableMergePathsForKitKatAndAbove="true">
-        <activity android:name=".AddLent.AddLentReturnDetailsActivity"></activity>
+        <activity android:name=".ViewLentDetails.ViewLentDetailsRecyclerActivity"></activity>
+        <activity android:name=".AddInvestmentDetails.MatureInvestmentDetailsActivity" />
+        <activity android:name=".AddLent.AddLentReturnDetailsActivity" />
         <activity android:name=".AddLent.UpdateLentDetailsActivity" />
         <activity android:name=".AddInvestmentDetails.UpdateInvestmentDetailsActivity" />
         <activity android:name=".PersonalBoard.PersonalBoardActivity" />

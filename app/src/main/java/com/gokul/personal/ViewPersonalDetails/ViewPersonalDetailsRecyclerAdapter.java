@@ -171,6 +171,7 @@ public class ViewPersonalDetailsRecyclerAdapter extends RecyclerView.Adapter<Vie
             databaseReference.child("Personal Details").child(updater).child("personalValue").setValue(value).
                     addOnCompleteListener(task -> {
                         context.startActivity(new Intent(context, DashboardActivity.class));
+                        activity.finish();
                         context.startActivity(new Intent(context, ViewPersonalDetailsActivity.class));
                         loadingDialog.dismiss();
                         StyleableToast.makeText(context, "Updated Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();

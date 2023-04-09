@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -38,11 +40,13 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import io.github.muddz.styleabletoast.StyleableToast;
 
@@ -59,6 +63,7 @@ public class AddLentOmanFragment extends Fragment {
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> fromList = new ArrayList<>();
     private final ArrayList<String> toList = new ArrayList<>();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.000");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,6 +78,7 @@ public class AddLentOmanFragment extends Fragment {
         lendDecRemarksLayout = view.findViewById(R.id.lendDecRemarksLayoutOM);
         lendDecName = view.findViewById(R.id.lendDecNameOM);
         lendDecAmount = view.findViewById(R.id.lendDecAmountOM);
+        lendDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
         lendDecRemarks = view.findViewById(R.id.lendDecRemarksOM);
         lendDecFrom = view.findViewById(R.id.lendDecFromOM);
         lendDecTo = view.findViewById(R.id.lendDecToOM);
@@ -233,8 +239,7 @@ public class AddLentOmanFragment extends Fragment {
                 lendDecRemarks.setText(R.string.nill);
             }
 
-            name = Objects.requireNonNull(lendDecName.getText()).toString();
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
+            name = capitalizeAll(Objects.requireNonNull(lendDecName.getText()).toString());
             amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lendDecAmount.getText()).toString().trim()));
             from = lendDecFrom.getText().toString().trim();
             to = lendDecTo.getText().toString().trim();
@@ -442,9 +447,10 @@ public class AddLentOmanFragment extends Fragment {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(from);
-        data.setAmount(amount);
+        String avlAmount = decimalFormat.format(Double.parseDouble(sourceAmount));
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details Oman").child(from).setValue(data).addOnCompleteListener(task -> lentSubmit(view)).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details Oman").child(from).setValue(data).addOnCompleteListener(task -> lentSubmit(avlAmount, view)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -453,14 +459,14 @@ public class AddLentOmanFragment extends Fragment {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private void lentSubmit(View view) {
+    private void lentSubmit(String avlAmount, View view) {
 
         String finder = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
-        LentData data = new LentData();
+        LentDetailsData data = new LentDetailsData();
         data.setName(name);
-        data.setAmount(amount);
-        data.setRemAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setRemAmount(decimalFormat.format(Double.parseDouble(amount)));
         data.setFrom(from);
         data.setTo(to);
         data.setDate(date);
@@ -468,8 +474,9 @@ public class AddLentOmanFragment extends Fragment {
         data.setUpdateFinder(finder);
 
         BalanceDetailsData balanceDetailsData = new BalanceDetailsData();
-        balanceDetailsData.setAmount(amount);
-        balanceDetailsData.setTransAmount(amount);
+        balanceDetailsData.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        balanceDetailsData.setTransAmount(decimalFormat.format(Double.parseDouble(amount)));
+        balanceDetailsData.setAvailableAmount(avlAmount);
         balanceDetailsData.setCategory("Lent");
         balanceDetailsData.setDate(date);
         balanceDetailsData.setFilter(date.substring(3, 10).replaceAll("-", "_"));
@@ -502,6 +509,16 @@ public class AddLentOmanFragment extends Fragment {
             StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
 
+    }
+
+    private static String capitalizeAll(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        return Arrays.stream(str.split("\\s+"))
+                .map(t -> t.substring(0, 1).toUpperCase() + t.substring(1))
+                .collect(Collectors.joining(" "));
     }
 
 }

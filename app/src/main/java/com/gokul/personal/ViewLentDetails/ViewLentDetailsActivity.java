@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,8 +55,8 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
 
     private void prepareViewPager(ViewPager viewPager) {
         ViewLentDetailsActivity.MainAdapter adapter = new ViewLentDetailsActivity.MainAdapter(getSupportFragmentManager());
-        ViewIndiaLentFragment indiaFragment = new ViewIndiaLentFragment();
-        ViewOmanLentFragment omanFragment = new ViewOmanLentFragment();
+        IndiaLentFragment indiaFragment = new IndiaLentFragment();
+        OmanLentFragment omanFragment = new OmanLentFragment();
         adapter.addFragment(indiaFragment);
         adapter.addFragment(omanFragment);
         viewPager.setAdapter(adapter);
@@ -103,6 +104,14 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

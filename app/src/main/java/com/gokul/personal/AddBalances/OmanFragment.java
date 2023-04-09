@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -59,11 +61,12 @@ public class OmanFragment extends Fragment {
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> sourceList = new ArrayList<>();
     private final ArrayList<String> categoryList = new ArrayList<>();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.000");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_oman, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_oman_balance, container, false);
 
         balSourceNameLayout = view.findViewById(R.id.balSourceNameLayout1);
         balAmountLayout = view.findViewById(R.id.balAmountLayout1);
@@ -72,7 +75,9 @@ public class OmanFragment extends Fragment {
         balTranDateLayout = view.findViewById(R.id.balTranDateLayout1);
         balSourceName = view.findViewById(R.id.balSourceName1);
         balAmount = view.findViewById(R.id.balAmount1);
+        balAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
         balTransAmount = view.findViewById(R.id.balTransAmount1);
+        balTransAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
         balCategory = view.findViewById(R.id.balCategory1);
         balTranDate = view.findViewById(R.id.balTranDate1);
         balDecRemarksLayout = view.findViewById(R.id.balDecRemarksLayout1);
@@ -225,9 +230,8 @@ public class OmanFragment extends Fragment {
             }
 
             source = balSourceName.getText().toString();
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balAmount.getText()).toString().trim()));
-            transAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balTransAmount.getText()).toString().trim()));
+            amount = Objects.requireNonNull(balAmount.getText()).toString().trim();
+            transAmount = Objects.requireNonNull(balTransAmount.getText()).toString().trim();
             category = Objects.requireNonNull(balCategory.getText()).toString().trim();
             date = Objects.requireNonNull(balTranDate.getText()).toString().trim();
             remarks = balDecRemarks.getText().toString().trim();
@@ -239,30 +243,15 @@ public class OmanFragment extends Fragment {
                 balSourceNameLayout.setError("Source Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.isEmpty()) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0.000") && !source.equalsIgnoreCase("SplitWise")) {
-                balSourceNameLayout.setError(null);
-                balSourceNameLayout.setErrorEnabled(false);
-                balAmountLayout.setErrorEnabled(true);
-                balAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (transAmount.isEmpty()) {
-                balSourceNameLayout.setError(null);
-                balSourceNameLayout.setErrorEnabled(false);
-                balAmountLayout.setError(null);
-                balAmountLayout.setErrorEnabled(false);
-                balTransAmountLayout.setErrorEnabled(true);
-                balTransAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (transAmount.equals("0.000") && !source.equalsIgnoreCase("SplitWise")) {
+            } else if ((transAmount.startsWith(".") || transAmount.isEmpty() || transAmount.equals("0")) &&
+                    !source.equalsIgnoreCase("SplitWise")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
@@ -372,6 +361,9 @@ public class OmanFragment extends Fragment {
 
     private void availableBalanceSubmitCall(View view) {
 
+        amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balAmount.getText()).toString().trim()));
+        transAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balTransAmount.getText()).toString().trim()));
+
         balSourceNameLayout.setError(null);
         balSourceNameLayout.setErrorEnabled(false);
         balAmountLayout.setError(null);
@@ -435,9 +427,10 @@ public class OmanFragment extends Fragment {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(new DecimalFormat("0.000").format(Double.parseDouble(sourceAmount)));
+        String avlAmount = decimalFormat.format(Double.parseDouble(sourceAmount));
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details Oman").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(view)).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details Oman").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(avlAmount, view)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -445,17 +438,19 @@ public class OmanFragment extends Fragment {
 
     }
 
-    private void submitBalance(View view) {
+    private void submitBalance(String avlAmount, View view) {
 
         String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
         if (source.equalsIgnoreCase("SplitWise")) {
             data.setTransAmount("0.000");
+            data.setAvailableAmount("0.000");
         } else {
-            data.setTransAmount(transAmount);
+            data.setTransAmount(decimalFormat.format(Double.parseDouble(transAmount)));
+            data.setAvailableAmount(avlAmount);
         }
         data.setCategory(category);
         if (balSwitch.isChecked()) {

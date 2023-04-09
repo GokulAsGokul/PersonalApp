@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -34,14 +36,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import io.github.muddz.styleabletoast.StyleableToast;
 
@@ -58,6 +64,7 @@ public class AddLentIndiaFragment extends Fragment {
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> fromList = new ArrayList<>();
     private final ArrayList<String> toList = new ArrayList<>();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,6 +79,7 @@ public class AddLentIndiaFragment extends Fragment {
         lendDecRemarksLayout = view.findViewById(R.id.lendDecRemarksLayout);
         lendDecName = view.findViewById(R.id.lendDecName);
         lendDecAmount = view.findViewById(R.id.lendDecAmount);
+        lendDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         lendDecRemarks = view.findViewById(R.id.lendDecRemarks);
         lendDecFrom = view.findViewById(R.id.lendDecFrom);
         lendDecTo = view.findViewById(R.id.lendDecTo);
@@ -232,7 +240,7 @@ public class AddLentIndiaFragment extends Fragment {
                 lendDecRemarks.setText(R.string.nill);
             }
 
-            name = Objects.requireNonNull(lendDecName.getText()).toString();
+            name = capitalizeAll(Objects.requireNonNull(lendDecName.getText()).toString());
             amount = Objects.requireNonNull(lendDecAmount.getText()).toString();
             from = lendDecFrom.getText().toString().trim();
             to = lendDecTo.getText().toString().trim();
@@ -246,14 +254,7 @@ public class AddLentIndiaFragment extends Fragment {
                 lendDecNameLayout.setError("Borrower Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.isEmpty()) {
-                lendDecNameLayout.setError(null);
-                lendDecNameLayout.setErrorEnabled(false);
-                lendDecAmountLayout.setErrorEnabled(true);
-                lendDecAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0")) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
                 lendDecNameLayout.setError(null);
                 lendDecNameLayout.setErrorEnabled(false);
                 lendDecAmountLayout.setErrorEnabled(true);
@@ -401,6 +402,7 @@ public class AddLentIndiaFragment extends Fragment {
         lendDecRemarksLayout.setError(null);
         lendDecRemarksLayout.setErrorEnabled(false);
         UIUtil.hideKeyboard(requireActivity());
+
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
             dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
@@ -414,8 +416,8 @@ public class AddLentIndiaFragment extends Fragment {
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     } else {
-                        if (Integer.parseInt(amount) <= Integer.parseInt(temp)) {
-                            availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) - Integer.parseInt(amount)), view);
+                        if (Double.parseDouble(amount) <= Double.parseDouble(temp)) {
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))), view);
                         } else {
                             dialog.dismiss();
                             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -439,9 +441,10 @@ public class AddLentIndiaFragment extends Fragment {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(from);
-        data.setAmount(sourceAmount);
+        String avlAmount = decimalFormat.format(Double.parseDouble(sourceAmount));
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details India").child(from).setValue(data).addOnCompleteListener(task -> lentSubmit(view)).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details India").child(from).setValue(data).addOnCompleteListener(task -> lentSubmit(avlAmount, view)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -450,14 +453,14 @@ public class AddLentIndiaFragment extends Fragment {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private void lentSubmit(View view) {
+    private void lentSubmit(String avlAmount, View view) {
 
         String finder = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
-        LentData lentData = new LentData();
+        LentDetailsData lentData = new LentDetailsData();
         lentData.setName(name);
-        lentData.setAmount(amount);
-        lentData.setRemAmount(amount);
+        lentData.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        lentData.setRemAmount(decimalFormat.format(Double.parseDouble(amount)));
         lentData.setFrom(from);
         lentData.setTo(to);
         lentData.setDate(date);
@@ -465,8 +468,9 @@ public class AddLentIndiaFragment extends Fragment {
         lentData.setUpdateFinder(finder);
 
         BalanceDetailsData balanceDetailsData = new BalanceDetailsData();
-        balanceDetailsData.setAmount(amount);
-        balanceDetailsData.setTransAmount(amount);
+        balanceDetailsData.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        balanceDetailsData.setTransAmount(decimalFormat.format(Double.parseDouble(amount)));
+        balanceDetailsData.setAvailableAmount(avlAmount);
         balanceDetailsData.setCategory("Lent");
         balanceDetailsData.setDate(date);
         balanceDetailsData.setFilter(date.substring(3, 10).replaceAll("-", "_"));
@@ -499,6 +503,16 @@ public class AddLentIndiaFragment extends Fragment {
             StyleableToast.makeText(view.getContext(), "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
 
+    }
+
+    private static String capitalizeAll(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        return Arrays.stream(str.split("\\s+"))
+                .map(t -> t.substring(0, 1).toUpperCase() + t.substring(1))
+                .collect(Collectors.joining(" "));
     }
 
 }

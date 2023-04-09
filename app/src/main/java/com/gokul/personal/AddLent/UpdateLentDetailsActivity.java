@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.gokul.personal.ViewLentDetails.ViewLentDetailsActivity;
 import com.google.android.material.textfield.TextInputEditText;
@@ -71,6 +73,15 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        oldName = getIntent().getStringExtra("name");
+        oldAmount = getIntent().getStringExtra("amount");
+        String remoldAmount = getIntent().getStringExtra("remAmount");
+        oldTo = getIntent().getStringExtra("to");
+        oldDate = getIntent().getStringExtra("date");
+        oldRemarks = getIntent().getStringExtra("remarks");
+        country = getIntent().getStringExtra("country");
+        updateFinder = getIntent().getStringExtra("updateFinder");
+
         lendUpdateNameLayout = findViewById(R.id.lendUpdateNameLayout);
         lendUpdateAmountLayout = findViewById(R.id.lendUpdateAmountLayout);
         lendUpdateRemAmountLayout = findViewById(R.id.lendUpdateRemAmountLayout);
@@ -81,6 +92,13 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         lendUpdateName = findViewById(R.id.lendUpdateName);
         lendUpdateAmount = findViewById(R.id.lendUpdateAmount);
         lendUpdateRemAmount = findViewById(R.id.lendUpdateRemAmount);
+        if (country.equalsIgnoreCase("India")) {
+            lendUpdateAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+            lendUpdateRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        } else {
+            lendUpdateAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+            lendUpdateRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+        }
         lendUpdateRemarks = findViewById(R.id.lendUpdateRemarks);
         lendUpdateFrom = findViewById(R.id.lendUpdateFrom);
         lendUpdateTo = findViewById(R.id.lendUpdateTo);
@@ -103,15 +121,6 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         }
 
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
-
-        oldName = getIntent().getStringExtra("name");
-        oldAmount = getIntent().getStringExtra("amount");
-        String remoldAmount = getIntent().getStringExtra("remAmount");
-        oldTo = getIntent().getStringExtra("to");
-        oldDate = getIntent().getStringExtra("date");
-        oldRemarks = getIntent().getStringExtra("remarks");
-        country = getIntent().getStringExtra("country");
-        updateFinder = getIntent().getStringExtra("updateFinder");
 
         lendUpdateName.setText(oldName);
         lendUpdateAmount.setText(oldAmount);
@@ -250,30 +259,14 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setError("Borrower Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.isEmpty()) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
                 lendUpdateNameLayout.setError(null);
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setErrorEnabled(true);
                 lendUpdateAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0")) {
-                lendUpdateNameLayout.setError(null);
-                lendUpdateNameLayout.setErrorEnabled(false);
-                lendUpdateAmountLayout.setErrorEnabled(true);
-                lendUpdateAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (remAmount.isEmpty()) {
-                lendUpdateNameLayout.setError(null);
-                lendUpdateNameLayout.setErrorEnabled(false);
-                lendUpdateAmountLayout.setError(null);
-                lendUpdateAmountLayout.setErrorEnabled(false);
-                lendUpdateRemAmountLayout.setErrorEnabled(true);
-                lendUpdateRemAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (remAmount.equals("0")) {
+            } else if (remAmount.startsWith(".") || remAmount.isEmpty() || remAmount.equals("0")) {
                 lendUpdateNameLayout.setError(null);
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
@@ -465,55 +458,28 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
 
-                    if (country.equalsIgnoreCase("India")) {
-
-                        final boolean validate = Integer.parseInt(amount) < Integer.parseInt(oldAmount);
-                        if (temp == null) {
-                            if (validate) {
-                                availableBalanceSubmit(String.valueOf(Integer.parseInt(oldAmount) - Integer.parseInt(amount)));
-                            } else {
-                                dialog.dismiss();
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                                StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                            }
+                    final boolean validate = Double.parseDouble(amount) < Double.parseDouble(oldAmount);
+                    if (temp == null) {
+                        if (validate) {
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))));
                         } else {
-                            if (validate) {
-                                availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) + (Integer.parseInt(oldAmount) - Integer.parseInt(amount))));
-                            } else {
-                                if (Integer.parseInt(temp) > (Integer.parseInt(amount) - Integer.parseInt(oldAmount))) {
-                                    availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) - (Integer.parseInt(amount) - Integer.parseInt(oldAmount))));
-                                } else {
-                                    dialog.dismiss();
-                                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                                    StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                                }
-                            }
+                            dialog.dismiss();
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                         }
-                    } else if (country.equalsIgnoreCase("Oman")) {
-                        final boolean validate = Double.parseDouble(amount) < Double.parseDouble(oldAmount);
-                        if (temp == null) {
-                            if (validate) {
-                                availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))));
-                            } else {
-                                dialog.dismiss();
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                                StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                            }
+                    } else {
+                        if (validate) {
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount))))));
                         } else {
-                            if (validate) {
+                            if (Double.parseDouble(temp) > (Double.parseDouble(amount) - Double.parseDouble(oldAmount))) {
                                 availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount))))));
                             } else {
-                                if (Double.parseDouble(temp) > (Double.parseDouble(amount) - Double.parseDouble(oldAmount))) {
-                                    availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount))))));
-                                } else {
-                                    dialog.dismiss();
-                                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                                    StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                                }
+                                dialog.dismiss();
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                                StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                             }
                         }
                     }
-
                 }
 
                 @Override
@@ -530,37 +496,31 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(from);
+        String avlAmount;
         if (country.equalsIgnoreCase("India")) {
-            data.setAmount(updateAmount);
+            avlAmount = new DecimalFormat("0.00").format(Double.parseDouble(updateAmount));
         } else {
-            DecimalFormat decimalFormat = new DecimalFormat("#.000");
-            data.setAmount(decimalFormat.format(Double.parseDouble(updateAmount)));
+            avlAmount = new DecimalFormat("0.000").format(Double.parseDouble(updateAmount));
         }
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details " + country).child(from).setValue(data).addOnCompleteListener(task -> updateLentDetails()).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details " + country).child(from).setValue(data).addOnCompleteListener(task -> updateLentDetails(avlAmount)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void updateLentDetails() {
+    private void updateLentDetails(String avlAmount) {
 
-        LentData lentData = new LentData();
+        LentDetailsData lentData = new LentDetailsData();
         lentData.setName(name);
         if (country.equalsIgnoreCase("India")) {
-            lentData.setAmount(amount);
+            lentData.setAmount(new DecimalFormat("0.00").format(Double.parseDouble(amount)));
+            lentData.setRemAmount(new DecimalFormat("0.00").format(Double.parseDouble(remAmount)));
         } else {
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            String finalAmount = decimalFormat.format(Double.parseDouble(amount));
-            lentData.setAmount(finalAmount);
-        }
-        if (country.equalsIgnoreCase("India")) {
-            lentData.setRemAmount(remAmount);
-        } else {
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            String finalAmount = decimalFormat.format(Double.parseDouble(remAmount));
-            lentData.setRemAmount(finalAmount);
+            lentData.setAmount(new DecimalFormat("0.000").format(Double.parseDouble(amount)));
+            lentData.setAmount(new DecimalFormat("0.000").format(Double.parseDouble(remAmount)));
         }
         lentData.setFrom(from);
         lentData.setTo(to);
@@ -569,7 +529,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         lentData.setUpdateFinder(updateFinder);
 
         databaseReference.child("Lent Details " + country).child(updateFinder).setValue(lentData).
-                addOnCompleteListener(task -> balanceDetailsUpdate()).addOnFailureListener(e -> {
+                addOnCompleteListener(task -> balanceDetailsUpdate(avlAmount)).addOnFailureListener(e -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(UpdateLentDetailsActivity.this, "Lent Details Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -577,19 +537,19 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
     }
 
-    private void balanceDetailsUpdate() {
+    private void balanceDetailsUpdate(String avlAmount) {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(from);
+        String newAmount;
         if (country.equalsIgnoreCase("India")) {
-            data.setAmount(amount);
-            data.setTransAmount(amount);
+            newAmount = new DecimalFormat("0.00").format(Double.parseDouble(amount));
         } else {
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            String finalAmount = decimalFormat.format(Double.parseDouble(amount));
-            data.setAmount(finalAmount);
-            data.setTransAmount(finalAmount);
+            newAmount = new DecimalFormat("0.000").format(Double.parseDouble(amount));
         }
+        data.setAmount(newAmount);
+        data.setTransAmount(newAmount);
+        data.setAvailableAmount(avlAmount);
         data.setCategory("Lent");
         data.setType("Expense");
         data.setDate(date);

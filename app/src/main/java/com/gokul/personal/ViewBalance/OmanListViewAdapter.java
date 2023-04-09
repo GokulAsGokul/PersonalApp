@@ -1,6 +1,7 @@
 package com.gokul.personal.ViewBalance;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -14,11 +15,12 @@ import androidx.annotation.Nullable;
 
 import com.gokul.personal.R;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class OmanListViewAdapter extends ArrayAdapter<BalanceData> {
+public class OmanListViewAdapter extends ArrayAdapter<BalanceListViewData> {
 
-    public OmanListViewAdapter(Context context, ArrayList<BalanceData> balanceData) {
+    public OmanListViewAdapter(Context context, ArrayList<BalanceListViewData> balanceData) {
         super(context, R.layout.bal_list_view, balanceData);
     }
 
@@ -27,7 +29,7 @@ public class OmanListViewAdapter extends ArrayAdapter<BalanceData> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-        BalanceData balanceData = getItem(position);
+        BalanceListViewData balanceData = getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.bal_list_view, parent, false);
@@ -38,15 +40,17 @@ public class OmanListViewAdapter extends ArrayAdapter<BalanceData> {
         TextView listBalButton = convertView.findViewById(R.id.listBalButton);
 
         listBalName.setText(balanceData.name);
-        listBalAmount.setText(String.format(": Ro %s", balanceData.amount));
+        listBalAmount.setText(String.format(": OMR %s", new DecimalFormat("0.000").format(Double.parseDouble(balanceData.amount))));
         listBalButton.setOnClickListener(view -> {
 
             if (balanceData.name.equalsIgnoreCase("All")) {
                 view.getContext().startActivity(new Intent(view.getContext(), ViewAllOmanBalanceRecyclerActivity.class));
+                ((Activity) view.getContext()).finish();
             } else {
                 Intent intent = new Intent(view.getContext(), ViewOmanBalanceRecyclerActivity.class);
                 intent.putExtra("category", balanceData.name);
                 view.getContext().startActivity(intent);
+                ((Activity) view.getContext()).finish();
             }
 
         });

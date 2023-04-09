@@ -31,7 +31,7 @@ import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.AddInvestmentDetails.InvestmentData;
-import com.gokul.personal.AddLent.LentData;
+import com.gokul.personal.AddLent.LentDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputLayout;
@@ -63,14 +63,8 @@ import com.itextpdf.layout.property.VerticalAlignment;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,15 +79,14 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public class DataFragment extends Fragment {
 
-    private TextInputLayout dataTableLayout, dataTypeLayout, dataUploadNameLayout, dataUploadFileLayout;
-    private AutoCompleteTextView dataTable, dataType, dataUploadName, dataUploadFile;
+    private TextInputLayout dataTableLayout, dataUploadNameLayout, dataUploadFileLayout;
+    private AutoCompleteTextView dataTable, dataUploadName, dataUploadFile;
     private Button dataUploadButton;
     private View view;
     private Vibrator vibrator;
     private Dialog dialog;
     private File pdfFile;
     private final String[] nameList = {"All", "Balance Details India", "Balance Details Oman", "Lent Details", "Personal Details"};
-    private final String[] typeList = {"As PDF", "As Excel"};
     private String tableDropDown1, tableDropDown2, tableDropDown3;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private Document document;
@@ -101,9 +94,7 @@ public class DataFragment extends Fragment {
     private long downloadID;
     private final Color colorBackground = new DeviceRgb(0, 74, 153);
     private final ArrayList<String> indiaBalanceNameList = new ArrayList<>();
-    private final ArrayList<String> indiaBalanceList = new ArrayList<>();
     private final ArrayList<String> omanBalanceNameList = new ArrayList<>();
-    private final ArrayList<String> omanBalanceList = new ArrayList<>();
 
     float[] columnWidth1 = {520};
     float[] columnWidth2 = {135, 85, 128, 94, 78};
@@ -158,11 +149,9 @@ public class DataFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_data, container, false);
 
         dataTableLayout = view.findViewById(R.id.dataTableLayout);
-        dataTypeLayout = view.findViewById(R.id.dataTypeLayout);
         dataUploadNameLayout = view.findViewById(R.id.dataUploadNameLayout);
         dataUploadFileLayout = view.findViewById(R.id.dataUploadFileLayout);
         dataTable = view.findViewById(R.id.dataTable);
-        dataType = view.findViewById(R.id.dataType);
         dataUploadName = view.findViewById(R.id.dataUploadName);
         dataUploadFile = view.findViewById(R.id.dataUploadFile);
         Button dataDownloadButton = view.findViewById(R.id.dataDownloadButton);
@@ -191,17 +180,6 @@ public class DataFragment extends Fragment {
             tableDropDown1 = parent.getItemAtPosition(position).toString();
         });
 
-        dataTypeLayout.setClickable(true);
-        dataType.setInputType(InputType.TYPE_NULL);
-        dataType.setClickable(true);
-        dataType.setFocusable(false);
-        ArrayAdapter<String> listAdapter2 = new ArrayAdapter<>(view.getContext(), R.layout.dropdown_list, typeList);
-        dataType.setAdapter(listAdapter2);
-        dataType.setOnItemClickListener((parent, view1, position, id) -> {
-            UIUtil.hideKeyboard(requireActivity());
-            tableDropDown2 = parent.getItemAtPosition(position).toString();
-        });
-
         dataUploadNameLayout.setClickable(true);
         dataUploadName.setInputType(InputType.TYPE_NULL);
         dataUploadName.setClickable(true);
@@ -223,28 +201,15 @@ public class DataFragment extends Fragment {
                 ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
             } else {
                 String tableName = dataTable.getText().toString();
-                String fileType = dataType.getText().toString();
                 if (tableName.isEmpty()) {
                     dataTableLayout.setErrorEnabled(true);
                     dataTableLayout.setError("Select Data Table Name");
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else if (fileType.isEmpty()) {
-                    dataTableLayout.setErrorEnabled(false);
-                    dataTableLayout.setError(null);
-                    dataTypeLayout.setErrorEnabled(true);
-                    dataTypeLayout.setError("Select File Type");
-                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     dataTableLayout.setErrorEnabled(false);
                     dataTableLayout.setError(null);
-                    dataTypeLayout.setErrorEnabled(false);
-                    dataTypeLayout.setError(null);
                     dialog.show();
-                    if (fileType.equalsIgnoreCase("As PDF")) {
-                        pdfDataCall(tableDropDown1);
-                    } else if (fileType.equalsIgnoreCase("As Excel")) {
-                        excelDataCall(tableDropDown1);
-                    }
+                    pdfDataCall(tableDropDown1);
                 }
             }
         });
@@ -259,7 +224,6 @@ public class DataFragment extends Fragment {
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     indiaBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
-                    indiaBalanceList.add(childDataSnapshot.child("amount").getValue(String.class));
                 }
 
                 databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -267,7 +231,6 @@ public class DataFragment extends Fragment {
                     public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
                         for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                             omanBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
-                            omanBalanceList.add(childDataSnapshot.child("amount").getValue(String.class));
                         }
 
                         pdfGenerationCall(function);
@@ -433,121 +396,6 @@ public class DataFragment extends Fragment {
 
     }
 
-    private void excelDataCall(String function) {
-
-        dialog.show();
-
-        databaseReference.child("Available Balance Details India").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    indiaBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
-                    indiaBalanceList.add(childDataSnapshot.child("amount").getValue(String.class));
-                }
-
-                databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                            omanBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
-                            omanBalanceList.add(childDataSnapshot.child("amount").getValue(String.class));
-                        }
-
-                        excelGenerationCall(function);
-
-                    }
-
-                    @Override
-                    public void onCancelled(@androidx.annotation.NonNull DatabaseError error) {
-                        dialog.dismiss();
-                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                        StyleableToast.makeText(view.getContext(), "Oman Balance Names Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                    }
-                });
-
-            }
-
-            @Override
-            public void onCancelled(@androidx.annotation.NonNull DatabaseError error) {
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                StyleableToast.makeText(view.getContext(), "India Balance Names Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
-
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private void excelGenerationCall(String function) {
-
-        File filePath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/PersonalApp/Statement/"
-                + "PersonalAppStatement" + new SimpleDateFormat("ddMMyyhhmmss").format(Calendar.getInstance().getTime()) + ".xls");
-
-        HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
-        HSSFSheet hssfSheet = hssfWorkbook.createSheet("Overview");
-
-        HSSFRow row1 = hssfSheet.createRow(1);
-        HSSFCell cell1 = row1.createCell(7);
-        HSSFRow row2 = hssfSheet.createRow(6);
-        HSSFCell cell2 = row2.createCell(6);
-        HSSFRow row3 = hssfSheet.createRow(6);
-        HSSFCell cell3 = row3.createCell(11);
-        HSSFRow row4 = hssfSheet.createRow(8);
-        HSSFCell cell4 = row4.createCell(6);
-        HSSFRow row5 = hssfSheet.createRow(8);
-        HSSFCell cell5 = row5.createCell(7);
-        HSSFRow row6 = hssfSheet.createRow(8);
-        HSSFCell cell6 = row6.createCell(11);
-        HSSFRow row7 = hssfSheet.createRow(8);
-        HSSFCell cell7 = row7.createCell(12);
-
-        cell1.setCellValue("Gokul'S Personal App Statement");
-        cell2.setCellValue("Available Balance - India");
-        cell3.setCellValue("Available Balance - Oman");
-        cell4.setCellValue("Name");
-        cell5.setCellValue("Amount");
-        cell6.setCellValue("Name");
-        cell7.setCellValue("Amount");
-
-        for (int i = 0; i < indiaBalanceNameList.size(); i++) {
-            HSSFRow row = hssfSheet.createRow(9 + i);
-            HSSFCell cell = row.createCell(6);
-            cell.setCellValue(indiaBalanceNameList.get(i));
-        }
-//        for (int i = 0; i < indiaBalanceList.size(); i++) {
-//            HSSFRow row = hssfSheet.createRow(9 + i);
-//            HSSFCell cell = row.createCell(7);
-//            cell.setCellValue(indiaBalanceList.get(i));
-//        }
-
-        FileOutputStream fileOutputStream = null;
-
-        try {
-            if (!filePath.exists()) {
-                filePath.createNewFile();
-            }
-
-            fileOutputStream = new FileOutputStream(filePath);
-            hssfWorkbook.write(fileOutputStream);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            dialog.dismiss();
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            StyleableToast.makeText(view.getContext(), "Excel Generation Call Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-        } finally {
-            try {
-                assert fileOutputStream != null;
-                fileOutputStream.flush();
-                fileOutputStream.close();
-                dialog.dismiss();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
     private void pdfSpace(int count) {
         for (int i = 0; i < count; i++) {
             document.add(new Paragraph(""));
@@ -624,7 +472,6 @@ public class DataFragment extends Fragment {
                 StyleableToast.makeText(view.getContext(), "Bank Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
-
     }
 
     private void investmentDetails(String function) {
@@ -683,11 +530,8 @@ public class DataFragment extends Fragment {
                             document.add(table8);
                         }
                     }
-
                 }
-
                 personalDetails(function);
-
             }
 
             @Override
@@ -697,7 +541,6 @@ public class DataFragment extends Fragment {
                 StyleableToast.makeText(view.getContext(), "Investment Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
         });
-
     }
 
     private void personalDetails(String function) {
@@ -789,13 +632,13 @@ public class DataFragment extends Fragment {
                     table11.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph("Lent Details Not Available")));
                     document.add(table11);
                 } else {
-                    List<LentData> lentList1 = new ArrayList<>();
+                    List<LentDetailsData> lentList1 = new ArrayList<>();
                     document.add(table10);
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        LentData data = dataSnapshot.getValue(LentData.class);
+                        LentDetailsData data = dataSnapshot.getValue(LentDetailsData.class);
                         lentList1.add(data);
                     }
-                    List<LentData> lentList2 = lentList1.stream().distinct().sorted((l1, l2) -> {
+                    List<LentDetailsData> lentList2 = lentList1.stream().distinct().sorted((l1, l2) -> {
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                         try {
                             return String.valueOf(Objects.requireNonNull(dateFormat.parse(l1.getDate())).getTime()).compareTo(
@@ -861,13 +704,13 @@ public class DataFragment extends Fragment {
                     table15.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph("Lent Details Not Available")));
                     document.add(table15);
                 } else {
-                    List<LentData> lentList1 = new ArrayList<>();
+                    List<LentDetailsData> lentList1 = new ArrayList<>();
                     document.add(table14);
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        LentData data = dataSnapshot.getValue(LentData.class);
+                        LentDetailsData data = dataSnapshot.getValue(LentDetailsData.class);
                         lentList1.add(data);
                     }
-                    List<LentData> lentList2 = lentList1.stream().distinct().sorted((l1, l2) -> {
+                    List<LentDetailsData> lentList2 = lentList1.stream().distinct().sorted((l1, l2) -> {
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                         try {
                             return String.valueOf(Objects.requireNonNull(dateFormat.parse(l1.getDate())).getTime()).compareTo(
@@ -944,16 +787,6 @@ public class DataFragment extends Fragment {
                             balList.add(data);
                         }
                     }
-//                    List<BalanceDetailsData> balList2 = balList.stream().distinct().sorted((b1, b2) -> {
-//                        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-//                        try {
-//                            return String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()).compareTo(
-//                                    String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()));
-//                        } catch (ParseException e) {
-//                            StyleableToast.makeText(view.getContext(), "India Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-//                        }
-//                        return 0;
-//                    }).collect(Collectors.toList());
                     balList1.addAll(balList);
                     balList.clear();
                     if (finalI == (indiaBalanceNameList.size() - 1)) {
@@ -966,8 +799,8 @@ public class DataFragment extends Fragment {
                             List<BalanceDetailsData> balList2 = balList1.stream().distinct().sorted((b1, b2) -> {
                                 @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                                 try {
-                                    return String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()).compareTo(
-                                            String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()));
+                                    return String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()).compareTo(
+                                            String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()));
                                 } catch (ParseException e) {
                                     StyleableToast.makeText(view.getContext(), "India Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                                 }
@@ -1043,18 +876,8 @@ public class DataFragment extends Fragment {
                             balList.add(data);
                         }
                     }
-                    List<BalanceDetailsData> balList2 = balList.stream().distinct().sorted((b1, b2) -> {
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                        try {
-                            return String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()).compareTo(
-                                    String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()));
-                        } catch (ParseException e) {
-                            StyleableToast.makeText(view.getContext(), "Oman Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                        }
-                        return 0;
-                    }).collect(Collectors.toList());
-                    balList1.addAll(balList2);
-                    balList2.clear();
+                    balList1.addAll(balList);
+                    balList.clear();
                     if (finalI == (omanBalanceNameList.size() - 1)) {
                         if (balList1.size() == 0) {
                             table24.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -1062,20 +885,30 @@ public class DataFragment extends Fragment {
                             table24.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph("Balance Details Not Available")));
                             document.add(table24);
                         } else {
+                            List<BalanceDetailsData> balList2 = balList1.stream().distinct().sorted((b1, b2) -> {
+                                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                                try {
+                                    return String.valueOf(Objects.requireNonNull(dateFormat.parse(b2.getDate())).getTime()).compareTo(
+                                            String.valueOf(Objects.requireNonNull(dateFormat.parse(b1.getDate())).getTime()));
+                                } catch (ParseException e) {
+                                    StyleableToast.makeText(view.getContext(), "Oman Balance List Sort Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                                }
+                                return 0;
+                            }).collect(Collectors.toList());
                             document.add(table22);
                             int count = 0;
-                            for (int i = 0; i < balList1.size(); i++) {
-                                int count1 = balList1.size();
+                            for (int i = 0; i < balList2.size(); i++) {
+                                int count1 = balList2.size();
                                 count++;
                                 table23.setHorizontalAlignment(HorizontalAlignment.CENTER);
                                 table23.setVerticalAlignment(VerticalAlignment.MIDDLE);
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getDate())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getAmount())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getTransAmount())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getCategory())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getSource())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getType())));
-                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList1.get(i).getRemarks())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getDate())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getAmount())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getTransAmount())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getCategory())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getSource())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getType())));
+                                table23.addCell(new Cell().setFontColor(ColorConstants.BLACK).setBackgroundColor(ColorConstants.WHITE).setTextAlignment(TextAlignment.CENTER).add(new Paragraph(balList2.get(i).getRemarks())));
                                 if (count1 == count) {
                                     document.add(table23);
                                     pdfClose();
@@ -1089,7 +922,7 @@ public class DataFragment extends Fragment {
                 public void onCancelled(@NonNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                    StyleableToast.makeText(view.getContext(), "India Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                    StyleableToast.makeText(view.getContext(), "Oman Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });
         }

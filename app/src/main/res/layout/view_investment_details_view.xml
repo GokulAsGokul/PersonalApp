@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
-                    android:text="Company   :"
+                    android:text="Name               :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -66,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="Amount      :"
+                    android:text="Amount           :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -91,8 +91,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
+                    android:text="Rem Amount  :"
+                    android:textColor="@color/background"
+                    android:textSize="17sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/invDetRemAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/background"
+                    android:textSize="17sp"
+                    android:textStyle="italic|bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"
-                    android:text="Folio Num  :"
+                    android:text="Folio Num       :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -120,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"
-                    android:text="Term           :"
+                    android:text="Term                :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -147,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="Source        :"
+                    android:text="Source             :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -172,7 +197,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="Date            :"
+                    android:text="Date                 :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -198,7 +223,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"
-                    android:text="Remarks     :"
+                    android:text="Remarks          :"
                     android:textColor="@color/background"
                     android:textSize="17sp"
                     tools:ignore="HardcodedText" />
@@ -227,17 +252,6 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/investDetEditBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="80dp"
-                android:contentDescription="@string/investment_details_edit_btn"
-                android:src="@drawable/ic_edit"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
                 android:id="@+id/investDetDeleteBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -246,6 +260,28 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/investDetEditBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:contentDescription="@string/investment_details_edit_btn"
+                android:src="@drawable/ic_edit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/investDetDeleteBtn" />
+
+            <ImageView
+                android:id="@+id/investDetMatureBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:contentDescription="@string/investmentDetailsMatureBtn"
+                android:src="@drawable/ic_return"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/investDetEditBtn" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

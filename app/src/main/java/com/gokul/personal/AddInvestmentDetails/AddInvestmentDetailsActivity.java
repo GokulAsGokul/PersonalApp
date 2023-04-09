@@ -3,11 +3,11 @@ package com.gokul.personal.AddInvestmentDetails;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -22,8 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
-import com.gokul.personal.Dashboard.DashboardActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -35,6 +35,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> sourceList = new ArrayList<>();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +82,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         investDecRemarksLayout = findViewById(R.id.investDecRemarksLayout);
         investDecName = findViewById(R.id.investDecName);
         investDecAmount = findViewById(R.id.investDecAmount);
+        investDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         investDecTerm = findViewById(R.id.investDecTerm);
         investDecRemarks = findViewById(R.id.investDecRemarks);
         investDecFolio = findViewById(R.id.investDecFolio);
@@ -227,14 +231,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecNameLayout.setError("Company Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.isEmpty()) {
-                investDecNameLayout.setError(null);
-                investDecNameLayout.setErrorEnabled(false);
-                investDecAmountLayout.setErrorEnabled(true);
-                investDecAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0")) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
                 investDecNameLayout.setError(null);
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setErrorEnabled(true);
@@ -247,7 +244,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecAmountLayout.setError(null);
                 investDecAmountLayout.setErrorEnabled(false);
                 investDecFolioLayout.setErrorEnabled(true);
-                investDecFolioLayout.setError("Frequency is Required");
+                investDecFolioLayout.setError("Folio Number is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (term.isEmpty()) {
@@ -402,8 +399,8 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                     } else {
-                        if (Integer.parseInt(amount) <= Integer.parseInt(temp)) {
-                            availableBalanceSubmit(String.valueOf((Integer.parseInt(temp) - Integer.parseInt(amount))));
+                        if (Double.parseDouble(amount) <= Double.parseDouble(temp)) {
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))));
                         } else {
                             dialog.dismiss();
                             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -426,9 +423,10 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(sourceAmount);
+        String avlAmount = decimalFormat.format(Double.parseDouble(sourceAmount));
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> investSubmit()).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> investSubmit(avlAmount)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
@@ -436,13 +434,13 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private void investSubmit() {
+    private void investSubmit(String avlAmount) {
 
         String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
         InvestmentData data = new InvestmentData();
         data.setName(name);
-        data.setAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
         data.setFolioNumber(folioNumber);
         data.setTerm(term);
         data.setSource(source);
@@ -450,19 +448,20 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         data.setRemarks(remarks);
         data.setUpdateFinder(date1);
 
-        databaseReference.child("Investment Details").child(date1).setValue(data).addOnCompleteListener(task -> balanceSubmit(date1)).addOnFailureListener(e -> {
+        databaseReference.child("Investment Details").child(date1).setValue(data).addOnCompleteListener(task -> balanceSubmit(avlAmount, date1)).addOnFailureListener(e -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Investment Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void balanceSubmit(String date1) {
+    private void balanceSubmit(String avlAmount, String date1) {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(amount);
-        data.setTransAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setTransAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setAvailableAmount(avlAmount);
         data.setCategory("Investment");
         data.setType("Expense");
         data.setDate(date);
@@ -491,7 +490,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            startActivity(new Intent(AddInvestmentDetailsActivity.this, DashboardActivity.class));
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);

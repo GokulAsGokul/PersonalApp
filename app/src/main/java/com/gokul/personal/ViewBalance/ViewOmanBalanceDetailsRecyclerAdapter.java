@@ -1,6 +1,5 @@
 package com.gokul.personal.ViewBalance;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -65,8 +65,9 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
     public void onBindViewHolder(@NonNull ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder holder, int position) {
         BalanceDetailsData data = list.get(position);
         holder.balViewCategory.setText(data.getCategory());
-        holder.balViewAmount.setText(String.format("Ro %s", data.getAmount()));
-        holder.balViewTransAmount.setText(String.format("Ro %s", data.getTransAmount()));
+        holder.balViewAmount.setText(String.format("OMR %s", data.getAmount()));
+        holder.balViewTransAmount.setText(String.format("OMR %s", data.getTransAmount()));
+        holder.balViewAvlAmount.setText(String.format("OMR %s", data.getAvailableAmount()));
         holder.balViewMode.setText(data.getType());
         holder.balViewDate.setText(data.getDate());
         holder.balViewRemarks.setText(data.getRemarks());
@@ -138,12 +139,13 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
 
+                final String s = String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount)));
                 if (balType.equalsIgnoreCase("Income")) {
                     if (temp == null) {
-                        availableBalanceSubmit((String.valueOf(Double.parseDouble(amount))), category, updateFinder, dialogCall);
+                        availableBalanceSubmit(s, category, updateFinder, dialogCall);
                     } else {
                         if (Double.parseDouble(amount) <= Double.parseDouble(temp)) {
-                            availableBalanceSubmit((String.valueOf(Double.parseDouble(temp) - Double.parseDouble(amount))), category, updateFinder, dialogCall);
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
                         } else {
                             if (list.isEmpty()) {
                                 animationView.setVisibility(View.VISIBLE);
@@ -156,7 +158,7 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
                     }
                 } else {
                     if (temp == null) {
-                        availableBalanceSubmit((String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
+                        availableBalanceSubmit(s, category, updateFinder, dialogCall);
                     } else {
                         availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), category, updateFinder, dialogCall);
                     }
@@ -178,11 +180,11 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
 
     private void availableBalanceSubmit(String sourceAmount, String category, String updateFinder, Dialog dialogCall) {
 
-        @SuppressLint("DefaultLocale") String amount = String.format("%.3f", Float.parseFloat(sourceAmount));
+        DecimalFormat decimalFormat = new DecimalFormat("0.000");
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(balName);
-        data.setAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(sourceAmount)));
 
         databaseReference.child("Available Balance Details Oman").child(balName).setValue(data).addOnCompleteListener(task -> {
             if (category.equals("Lent")) {
@@ -234,7 +236,7 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView balViewCategory, balViewAmount, balViewTransAmount, balViewMode, balViewDate, balViewRemarks;
+        TextView balViewCategory, balViewAmount, balViewTransAmount, balViewAvlAmount, balViewMode, balViewDate, balViewRemarks;
         ImageView balViewDeleteBtn;
 
         public MyViewHolder(View itemView) {
@@ -242,6 +244,7 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
             balViewCategory = itemView.findViewById(R.id.balViewCategory);
             balViewAmount = itemView.findViewById(R.id.balViewAmount);
             balViewTransAmount = itemView.findViewById(R.id.balViewTransAmount);
+            balViewAvlAmount = itemView.findViewById(R.id.balViewAvlAmount);
             balViewMode = itemView.findViewById(R.id.balViewMode);
             balViewDate = itemView.findViewById(R.id.balViewDate);
             balViewRemarks = itemView.findViewById(R.id.balViewRemarks);

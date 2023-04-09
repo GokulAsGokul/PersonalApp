@@ -297,7 +297,6 @@ public class ViewPersonalDetailsActivity extends AppCompatActivity {
         adapter.updateList(filterList);
     }
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

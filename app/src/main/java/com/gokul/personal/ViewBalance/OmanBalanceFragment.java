@@ -34,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -48,7 +49,7 @@ public class OmanBalanceFragment extends Fragment {
     private Dialog dialog;
     private Vibrator vibrator;
     private LottieAnimationView balanceOMAnimation;
-    private final ArrayList<BalanceData> balanceList = new ArrayList<>();
+    private final ArrayList<BalanceListViewData> balanceList = new ArrayList<>();
     private ListView omanBalListView;
     private View view;
     private Boolean balCall = false;
@@ -94,7 +95,7 @@ public class OmanBalanceFragment extends Fragment {
                     assert source != null;
                     assert amount != null;
                     entries.add(new PieEntry(Float.parseFloat(amount), source));
-                    BalanceData data = new BalanceData(source, amount);
+                    BalanceListViewData data = new BalanceListViewData(source, amount);
                     balanceList.add(data);
                     totalAmount = Double.parseDouble(String.valueOf(BigDecimal.valueOf(totalAmount).add(BigDecimal.valueOf(Double.parseDouble(amount)))));
                 }
@@ -105,7 +106,8 @@ public class OmanBalanceFragment extends Fragment {
                     CardView omanBalCard = view.findViewById(R.id.omanBalCard);
                     omanBalCard.setVisibility(View.GONE);
                 } else {
-                    BalanceData data = new BalanceData("All", String.valueOf(totalAmount));
+                    DecimalFormat decimalFormat = new DecimalFormat("0.000");
+                    BalanceListViewData data = new BalanceListViewData("All", String.valueOf(decimalFormat.format(totalAmount)));
                     balanceList.add(data);
                     balanceOMPieChart.setCenterText("Oman Balances");
                     balanceOMAnimation.setVisibility(View.GONE);

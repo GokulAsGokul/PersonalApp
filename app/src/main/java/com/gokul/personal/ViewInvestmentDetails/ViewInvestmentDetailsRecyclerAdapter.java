@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.AddInvestmentDetails.InvestmentData;
+import com.gokul.personal.AddInvestmentDetails.MatureInvestmentDetailsActivity;
 import com.gokul.personal.AddInvestmentDetails.UpdateInvestmentDetailsActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
@@ -65,6 +66,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
         InvestmentData data = list.get(position);
         holder.invDetCompany.setText(data.getName());
         holder.invDetAmount.setText(data.getAmount());
+        holder.invDetRemAmount.setText(data.getRemAmount());
         holder.invDetFolio.setText(data.getFolioNumber());
         holder.invDetTerm.setText(data.getTerm());
         holder.invDetSource.setText(data.getSource());
@@ -115,11 +117,25 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
                 Intent intent = new Intent(context, UpdateInvestmentDetailsActivity.class);
                 intent.putExtra("name", data.getName());
                 intent.putExtra("amount", data.getAmount());
+                intent.putExtra("remAmount", data.getRemAmount());
                 intent.putExtra("folio", data.getFolioNumber());
                 intent.putExtra("term", data.getTerm());
                 intent.putExtra("source", data.getSource());
                 intent.putExtra("date", data.getDate());
                 intent.putExtra("remarks", data.getRemarks());
+                intent.putExtra("updateFinder", data.getUpdateFinder());
+                context.startActivity(intent);
+                ((Activity) context).finish();
+            }
+        });
+
+        holder.investDetMatureBtn.setOnClickListener(view -> {
+            if (ConnectionCheck.getConnectionType(context) == 0) {
+                ConnectionCheck.connectionDialogShow(context, activity);
+            } else {
+                Intent intent = new Intent(context, MatureInvestmentDetailsActivity.class);
+                intent.putExtra("folio", data.getFolioNumber());
+                intent.putExtra("amount", data.getAmount());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
                 context.startActivity(intent);
                 ((Activity) context).finish();
@@ -191,13 +207,14 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView invDetCompany, invDetAmount, invDetFolio, invDetTerm, invDetSource, invDetDate, invDetRemarks;
-        ImageView investDetEditBtn, investDetDeleteBtn;
+        TextView invDetCompany, invDetAmount, invDetRemAmount, invDetFolio, invDetTerm, invDetSource, invDetDate, invDetRemarks;
+        ImageView investDetEditBtn, investDetDeleteBtn, investDetMatureBtn;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             invDetCompany = itemView.findViewById(R.id.invDetCompany);
             invDetAmount = itemView.findViewById(R.id.invDetAmount);
+            invDetRemAmount = itemView.findViewById(R.id.invDetRemAmount);
             invDetFolio = itemView.findViewById(R.id.invDetFolio);
             invDetTerm = itemView.findViewById(R.id.invDetTerm);
             invDetSource = itemView.findViewById(R.id.invDetSource);
@@ -205,6 +222,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             invDetRemarks = itemView.findViewById(R.id.invDetRemarks);
             investDetEditBtn = itemView.findViewById(R.id.investDetEditBtn);
             investDetDeleteBtn = itemView.findViewById(R.id.investDetDeleteBtn);
+            investDetMatureBtn = itemView.findViewById(R.id.investDetMatureBtn);
 
         }
     }

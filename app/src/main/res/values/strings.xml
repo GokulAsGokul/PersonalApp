@@ -107,14 +107,12 @@
     <string name="sort">Sort By</string>
     <string name="save_as_image">Save As Image</string>
     <string name="view">View</string>
-    <string name="download_amp_export_data"><![CDATA[Download & Export Data]]></string>
     <string name="select_data_table">Select Data Table Name</string>
     <string name="select_a_file_to_upload">Select A File To Upload</string>
     <string name="select_file_name">Select File Name</string>
     <string name="edit_icon">Edit Icon</string>
     <string name="personal_board">Personal Board</string>
     <string name="enter_transaction_amount">Enter Transaction Amount</string>
-    <string name="enter_invested_amount">Enter Invested Amount</string>
     <string name="update_investment_details">Update Investment Details</string>
     <string name="update_lent_details">Update Lent Details</string>
     <string name="lent_details_return_btn">LentDetailsReturnBtn</string>
@@ -131,4 +129,12 @@
     <string name="add_lending_details">Add Lending Details</string>
     <string name="add_balance_details">Add Balance Details</string>
     <string name="enter_remaining_amount">Enter Remaining Amount</string>
+    <string name="enter_available_amount">Enter Available Amount</string>
+    <string name="enter_invested_amount">Enter Invested Amount</string>
+    <string name="investment_mature_details">Add Maturity Details</string>
+    <string name="enter_maturity_amount">Ente Maturity Amount</string>
+    <string name="remaining_amount">Remaining Amount</string>
+    <string name="investmentDetailsMatureBtn">Investment Details Mature Btn</string>
+    <string name="download_amp_upload_data"><![CDATA[Download & Upload Data]]></string>
+    <string name="validationAmount">0.000</string>
 </resources>

@@ -88,8 +88,7 @@ public class DashboardActivity extends AppCompatActivity {
     private Vibrator vibrator;
     private TextView availableAmount, availableAmountText, lentAmount, lentAmountText, investmentAmount, investmentAmountText, totalAmount, totalAmountText,
             availableAmountOM, availableAmountTextOM, lentAmountOM, lentAmountTextOM, totalAmountOM, totalAmountTextOM;
-    private int totalLentAmount, totalAvailableAmount, totalInvestmentAmount;
-    private double totalAvailableAmountOM, totalLentAmountOM;
+    private double totalLentAmount, totalAvailableAmount, totalInvestmentAmount, totalAvailableAmountOM, totalLentAmountOM;
     private ConstraintLayout balanceCardLayout, balanceCardLayoutOM;
     private LottieAnimationView animationView;
     private RecyclerView recyclerView;
@@ -123,6 +122,7 @@ public class DashboardActivity extends AppCompatActivity {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+        getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
@@ -528,9 +528,10 @@ public class DashboardActivity extends AppCompatActivity {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
                     assert amount != null;
-                    totalAvailableAmount = totalAvailableAmount + Integer.parseInt(amount);
+                    totalAvailableAmount = totalAvailableAmount + Double.parseDouble(amount);
                 }
-                availableAmount.setText(String.valueOf(totalAvailableAmount));
+                @SuppressLint("DefaultLocale") String amount = String.format("%.2f", totalAvailableAmount);
+                availableAmount.setText(amount);
                 indiaLentAmountCall();
             }
 
@@ -550,11 +551,12 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    String amount = childDataSnapshot.child("amount").getValue(String.class);
+                    String amount = childDataSnapshot.child("remAmount").getValue(String.class);
                     assert amount != null;
-                    totalLentAmount = totalLentAmount + Integer.parseInt(amount);
+                    totalLentAmount = totalLentAmount + Double.parseDouble(amount);
                 }
-                lentAmount.setText(String.valueOf(totalLentAmount));
+                @SuppressLint("DefaultLocale") String amount = String.format("%.2f", totalLentAmount);
+                lentAmount.setText(amount);
                 indiaInvestmentCall();
             }
 
@@ -576,10 +578,12 @@ public class DashboardActivity extends AppCompatActivity {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
                     assert amount != null;
-                    totalInvestmentAmount = totalInvestmentAmount + Integer.parseInt(amount);
+                    totalInvestmentAmount = totalInvestmentAmount + Double.parseDouble(amount);
                 }
-                investmentAmount.setText(String.valueOf(totalInvestmentAmount));
-                totalAmount.setText(String.valueOf(totalAvailableAmount + totalLentAmount + totalInvestmentAmount));
+                @SuppressLint("DefaultLocale") String amount = String.format("%.2f", totalInvestmentAmount);
+                @SuppressLint("DefaultLocale") String amount1 = String.format("%.2f", (totalAvailableAmount + totalLentAmount + totalInvestmentAmount));
+                investmentAmount.setText(amount);
+                totalAmount.setText(amount1);
                 omanAvailableAmountCall();
             }
 

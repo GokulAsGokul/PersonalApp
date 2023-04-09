@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -47,11 +48,11 @@ public class IndiaBalanceFragment extends Fragment {
     private Dialog dialog;
     private Vibrator vibrator;
     private LottieAnimationView balanceAnimation;
-    private final ArrayList<BalanceData> balanceList = new ArrayList<>();
+    private final ArrayList<BalanceListViewData> balanceList = new ArrayList<>();
     private ListView indiaBalListView;
     private View view;
     private Boolean balCall = false;
-    private Integer totalAmount = 0;
+    private Double totalAmount = 0.00;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,9 +92,9 @@ public class IndiaBalanceFragment extends Fragment {
                     assert source != null;
                     assert amount != null;
                     entries.add(new PieEntry(Float.parseFloat(amount), source));
-                    BalanceData data = new BalanceData(source, amount);
+                    BalanceListViewData data = new BalanceListViewData(source, amount);
                     balanceList.add(data);
-                    totalAmount = totalAmount + Integer.parseInt(amount);
+                    totalAmount = totalAmount + Double.parseDouble(amount);
                 }
                 dialog.dismiss();
                 if (entries.size() == 0) {
@@ -102,7 +103,8 @@ public class IndiaBalanceFragment extends Fragment {
                     CardView indiaBalCard = view.findViewById(R.id.indiaBalCard);
                     indiaBalCard.setVisibility(View.GONE);
                 } else {
-                    BalanceData data = new BalanceData("All", String.valueOf(totalAmount));
+                    DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                    BalanceListViewData data = new BalanceListViewData("All", String.valueOf(decimalFormat.format(totalAmount)));
                     balanceList.add(data);
                     balancePieChart.setCenterText("India Balances");
                     balanceAnimation.setVisibility(View.GONE);
@@ -170,7 +172,7 @@ public class IndiaBalanceFragment extends Fragment {
         if (!balCall) {
             balanceList.clear();
             entries.clear();
-            totalAmount = 0;
+            totalAmount = 0.00;
             availableBalanceCall(view);
         }
     }

@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -32,6 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,11 +61,12 @@ public class IndiaFragment extends Fragment {
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> sourceList = new ArrayList<>();
     private final ArrayList<String> categoryList = new ArrayList<>();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_india, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_india_balance, container, false);
 
         balSourceNameLayout = view.findViewById(R.id.balSourceNameLayout);
         balAmountLayout = view.findViewById(R.id.balAmountLayout);
@@ -70,7 +75,9 @@ public class IndiaFragment extends Fragment {
         balTranDateLayout = view.findViewById(R.id.balTranDateLayout);
         balSourceName = view.findViewById(R.id.balSourceName);
         balAmount = view.findViewById(R.id.balAmount);
+        balAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         balTransAmount = view.findViewById(R.id.balTransAmount);
+        balTransAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         balCategory = view.findViewById(R.id.balCategory);
         balTranDate = view.findViewById(R.id.balTranDate);
         balDecRemarksLayout = view.findViewById(R.id.balDecRemarksLayout);
@@ -236,30 +243,14 @@ public class IndiaFragment extends Fragment {
                 balSourceNameLayout.setError("Source Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.isEmpty()) {
+            } else if ((amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) && !category.equalsIgnoreCase("Zenovic Trust")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0")) {
-                balSourceNameLayout.setError(null);
-                balSourceNameLayout.setErrorEnabled(false);
-                balAmountLayout.setErrorEnabled(true);
-                balAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (transAmount.isEmpty()) {
-                balSourceNameLayout.setError(null);
-                balSourceNameLayout.setErrorEnabled(false);
-                balAmountLayout.setError(null);
-                balAmountLayout.setErrorEnabled(false);
-                balTransAmountLayout.setErrorEnabled(true);
-                balTransAmountLayout.setError("Amount is Required");
-                dialog.dismiss();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (transAmount.equals("0")) {
+            } else if (transAmount.startsWith(".") || transAmount.isEmpty() || transAmount.equals("0")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
@@ -368,6 +359,10 @@ public class IndiaFragment extends Fragment {
     }
 
     private void availableBalanceSubmitCall(View view) {
+
+        amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balAmount.getText()).toString().trim()));
+        transAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balTransAmount.getText()).toString().trim()));
+
         balSourceNameLayout.setError(null);
         balSourceNameLayout.setErrorEnabled(false);
         balAmountLayout.setError(null);
@@ -381,22 +376,23 @@ public class IndiaFragment extends Fragment {
         balDecRemarksLayout.setError(null);
         balDecRemarksLayout.setErrorEnabled(false);
         UIUtil.hideKeyboard(requireActivity());
+
         if (ConnectionCheck.getConnectionType(view.getContext()) == 0) {
             dialog.dismiss();
             ConnectionCheck.connectionDialogShow(view.getContext(), requireActivity());
         } else {
+
             databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
                     if (balSwitch.isChecked()) {
                         if (temp == null) {
+                            availableBalanceSubmit(transAmount, view);
                             dialog.dismiss();
-                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                            StyleableToast.makeText(view.getContext(), "Available balance is less than entered amount", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                         } else {
-                            if (Integer.parseInt(transAmount) <= Integer.parseInt(temp)) {
-                                availableBalanceSubmit((Integer.parseInt(temp) - Integer.parseInt(transAmount)), view);
+                            if (Double.parseDouble(transAmount) <= Double.parseDouble(temp)) {
+                                availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).subtract(BigDecimal.valueOf(Double.parseDouble(transAmount)))), view);
                             } else {
                                 dialog.dismiss();
                                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -405,9 +401,9 @@ public class IndiaFragment extends Fragment {
                         }
                     } else {
                         if (temp == null) {
-                            availableBalanceSubmit(Integer.parseInt(transAmount), view);
+                            availableBalanceSubmit(transAmount, view);
                         } else {
-                            availableBalanceSubmit((Integer.parseInt(temp) + Integer.parseInt(transAmount)), view);
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(transAmount)))), view);
                         }
                     }
                 }
@@ -415,33 +411,36 @@ public class IndiaFragment extends Fragment {
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });
         }
     }
 
-    private void availableBalanceSubmit(int sourceAmount, View view) {
+    private void availableBalanceSubmit(String sourceAmount, View view) {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(String.valueOf(sourceAmount));
+        String avlAmount = decimalFormat.format(Double.parseDouble(sourceAmount));
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(view)).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> submitBalance(avlAmount, view)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(view.getContext(), "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void submitBalance(View view) {
+    private void submitBalance(String avlAmount, View view) {
 
         String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(amount);
-        data.setTransAmount(transAmount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setTransAmount(decimalFormat.format(Double.parseDouble(transAmount)));
+        data.setAvailableAmount(avlAmount);
         data.setCategory(category);
         if (balSwitch.isChecked()) {
             data.setType("Expense");

@@ -2,6 +2,7 @@ package com.gokul.personal.ViewBalance;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -339,10 +340,18 @@ public class ViewOmanBalanceRecyclerActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            startActivity(new Intent(ViewOmanBalanceRecyclerActivity.this, ViewBalanceDetailsActivity.class));
             this.finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(ViewOmanBalanceRecyclerActivity.this, ViewBalanceDetailsActivity.class));
+        finish();
     }
 
     @Override

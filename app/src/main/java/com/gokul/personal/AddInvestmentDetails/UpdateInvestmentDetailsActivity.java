@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -21,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.gokul.personal.ViewInvestmentDetails.ViewInvestmentDetailsActivity;
 import com.google.android.material.textfield.TextInputEditText;
@@ -33,6 +35,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,13 +48,14 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
-    private TextInputLayout updateInvestNameLayout, updateInvestAmountLayout, updateInvestFolioLayout, updateInvestTermLayout, updateInvestSourceLayout, updateInvestTranDateLayout, updateInvestRemarksLayout;
-    private TextInputEditText updateInvestName, updateInvestAmount, updateInvestFolio, updateInvestTerm, updateInvestRemarks;
+    private TextInputLayout updateInvestNameLayout, updateInvestAmountLayout, updateInvestRemAmountLayout, updateInvestFolioLayout, updateInvestTermLayout, updateInvestSourceLayout, updateInvestTranDateLayout, updateInvestRemarksLayout;
+    private TextInputEditText updateInvestName, updateInvestAmount, updateInvestRemAmount, updateInvestFolio, updateInvestTerm, updateInvestRemarks;
     private AutoCompleteTextView updateInvestSource, updateInvestTranDate;
     private Vibrator vibrator;
-    private String name, amount, folioNumber, term, source, date, remarks, oldName, oldAmount, oldFolioNumber, oldTerm, oldDate, oldRemarks, updateFinder, freqDropDown;
+    private String name, amount, remAmount, folioNumber, term, source, date, remarks, oldName, oldAmount, oldRemAmount, oldFolioNumber, oldTerm, oldDate, oldRemarks, updateFinder, freqDropDown;
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
         updateInvestNameLayout = findViewById(R.id.updateInvestNameLayout);
         updateInvestAmountLayout = findViewById(R.id.updateInvestAmountLayout);
+        updateInvestRemAmountLayout = findViewById(R.id.updateInvestRemAmountLayout);
         updateInvestFolioLayout = findViewById(R.id.updateInvestFolioLayout);
         updateInvestTermLayout = findViewById(R.id.updateInvestTermLayout);
         updateInvestSourceLayout = findViewById(R.id.updateInvestSourceLayout);
@@ -74,6 +80,9 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         updateInvestRemarksLayout = findViewById(R.id.updateInvestRemarksLayout);
         updateInvestName = findViewById(R.id.updateInvestName);
         updateInvestAmount = findViewById(R.id.updateInvestAmount);
+        updateInvestAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        updateInvestRemAmount = findViewById(R.id.updateInvestRemAmount);
+        updateInvestRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         updateInvestTerm = findViewById(R.id.updateInvestTerm);
         updateInvestRemarks = findViewById(R.id.updateInvestRemarks);
         updateInvestFolio = findViewById(R.id.updateInvestFolio);
@@ -97,6 +106,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
         oldName = getIntent().getStringExtra("name");
         oldAmount = getIntent().getStringExtra("amount");
+        oldRemAmount = getIntent().getStringExtra("remAmount");
         oldFolioNumber = getIntent().getStringExtra("folio");
         oldTerm = getIntent().getStringExtra("term");
         oldDate = getIntent().getStringExtra("date");
@@ -105,11 +115,17 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
         updateInvestName.setText(oldName);
         updateInvestAmount.setText(oldAmount);
+        updateInvestRemAmount.setText(oldRemAmount);
         updateInvestFolio.setText(oldFolioNumber);
         updateInvestTerm.setText(oldTerm);
         updateInvestSource.setText(getIntent().getStringExtra("source"));
         updateInvestTranDate.setText(oldDate);
         updateInvestRemarks.setText(oldRemarks);
+
+        updateInvestRemAmount.setInputType(InputType.TYPE_NULL);
+        updateInvestRemAmount.setClickable(false);
+        updateInvestRemAmountLayout.setClickable(false);
+        updateInvestRemAmount.setFocusable(false);
 
         updateInvestSource.setInputType(InputType.TYPE_NULL);
         updateInvestSource.setClickable(false);
@@ -121,6 +137,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         updateInvestTranDate.setFocusable(false);
         updateInvestTranDate.setOnClickListener(v -> {
             UIUtil.hideKeyboard(UpdateInvestmentDetailsActivity.this);
+            remAmountCall();
             UpdateInvestmentDetailsActivity.this.dayPicker();
         });
 
@@ -128,6 +145,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 dialog.setCancelable(false);
                 dialog.show();
+                remAmountCall();
                 updateInvestSubmitCall();
                 return true;
             }
@@ -137,9 +155,27 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         updateInvestSubmit.setOnClickListener(view -> {
             dialog.setCancelable(false);
             dialog.show();
+            remAmountCall();
             updateInvestSubmitCall();
         });
 
+    }
+
+    private void remAmountCall() {
+
+        if (((Objects.requireNonNull(updateInvestAmount.getText()).toString()).isEmpty()) || ((updateInvestAmount.getText().toString()).equalsIgnoreCase("0"))) {
+            updateInvestAmountLayout.setErrorEnabled(true);
+            updateInvestAmountLayout.setError("Amount is required");
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else if (Double.parseDouble(oldAmount) > (Double.parseDouble(Objects.requireNonNull(updateInvestAmount.getText()).toString()))) {
+            updateInvestAmountLayout.setError(null);
+            updateInvestAmountLayout.setErrorEnabled(false);
+            updateInvestRemAmount.setText(String.valueOf(BigDecimal.valueOf(Double.parseDouble(oldRemAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(updateInvestAmount.getText().toString()))))));
+        } else {
+            updateInvestAmountLayout.setError(null);
+            updateInvestAmountLayout.setErrorEnabled(false);
+            updateInvestRemAmount.setText(String.valueOf(BigDecimal.valueOf(Double.parseDouble(oldRemAmount)).add(BigDecimal.valueOf(Double.parseDouble(updateInvestAmount.getText().toString())).subtract(BigDecimal.valueOf(Double.parseDouble(oldAmount))))));
+        }
     }
 
     private void dayPicker() {
@@ -177,6 +213,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
             updateInvestNameLayout.setErrorEnabled(false);
             updateInvestAmountLayout.setError(null);
             updateInvestAmountLayout.setErrorEnabled(false);
+            updateInvestRemAmountLayout.setError(null);
+            updateInvestRemAmountLayout.setErrorEnabled(false);
             updateInvestFolioLayout.setError(null);
             updateInvestFolio.setError(null);
             updateInvestTermLayout.setError(null);
@@ -198,6 +236,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
             name = Objects.requireNonNull(updateInvestName.getText()).toString();
             amount = Objects.requireNonNull(updateInvestAmount.getText()).toString();
+            remAmount = Objects.requireNonNull(updateInvestRemAmount.getText()).toString();
             folioNumber = Objects.requireNonNull(updateInvestFolio.getText()).toString().trim();
             term = Objects.requireNonNull(updateInvestTerm.getText()).toString().trim();
             source = updateInvestSource.getText().toString().trim();
@@ -232,11 +271,22 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestAmountLayout.setError("New Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (remAmount.isEmpty()) {
+                updateInvestNameLayout.setError(null);
+                updateInvestNameLayout.setErrorEnabled(false);
+                updateInvestAmountLayout.setError(null);
+                updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setErrorEnabled(true);
+                updateInvestRemAmountLayout.setError("Amount is Required");
+                dialog.dismiss();
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (folioNumber.isEmpty()) {
                 updateInvestNameLayout.setError(null);
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setErrorEnabled(true);
                 updateInvestFolioLayout.setError("Frequency is Required");
                 dialog.dismiss();
@@ -246,6 +296,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setError(null);
                 updateInvestFolioLayout.setErrorEnabled(false);
                 updateInvestTermLayout.setErrorEnabled(true);
@@ -257,6 +309,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setError(null);
                 updateInvestFolioLayout.setErrorEnabled(false);
                 updateInvestTermLayout.setError(null);
@@ -270,6 +324,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setError(null);
                 updateInvestFolioLayout.setErrorEnabled(false);
                 updateInvestTermLayout.setError(null);
@@ -285,6 +341,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setError(null);
                 updateInvestFolioLayout.setErrorEnabled(false);
                 updateInvestTermLayout.setError(null);
@@ -302,6 +360,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setError(null);
                 updateInvestFolioLayout.setErrorEnabled(false);
                 updateInvestTermLayout.setError(null);
@@ -320,6 +380,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                     updateInvestNameLayout.setErrorEnabled(false);
                     updateInvestAmountLayout.setError(null);
                     updateInvestAmountLayout.setErrorEnabled(false);
+                    updateInvestRemAmountLayout.setError(null);
+                    updateInvestRemAmountLayout.setErrorEnabled(false);
                     updateInvestFolioLayout.setError(null);
                     updateInvestFolioLayout.setErrorEnabled(false);
                     updateInvestTermLayout.setError(null);
@@ -341,6 +403,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                     updateInvestNameLayout.setErrorEnabled(false);
                     updateInvestAmountLayout.setError(null);
                     updateInvestAmountLayout.setErrorEnabled(false);
+                    updateInvestRemAmountLayout.setError(null);
+                    updateInvestRemAmountLayout.setErrorEnabled(false);
                     updateInvestFolioLayout.setError(null);
                     updateInvestFolioLayout.setErrorEnabled(false);
                     updateInvestTermLayout.setError(null);
@@ -362,6 +426,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 updateInvestNameLayout.setErrorEnabled(false);
                 updateInvestAmountLayout.setError(null);
                 updateInvestAmountLayout.setErrorEnabled(false);
+                updateInvestRemAmountLayout.setError(null);
+                updateInvestRemAmountLayout.setErrorEnabled(false);
                 updateInvestFolioLayout.setError(null);
                 updateInvestFolioLayout.setErrorEnabled(false);
                 updateInvestTermLayout.setError(null);
@@ -387,6 +453,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         updateInvestNameLayout.setErrorEnabled(false);
         updateInvestAmountLayout.setError(null);
         updateInvestAmountLayout.setErrorEnabled(false);
+        updateInvestRemAmountLayout.setError(null);
+        updateInvestRemAmountLayout.setErrorEnabled(false);
         updateInvestFolioLayout.setError(null);
         updateInvestFolio.setError(null);
         updateInvestTermLayout.setError(null);
@@ -406,10 +474,10 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
-                    final boolean validate = Integer.parseInt(amount) < Integer.parseInt(oldAmount);
+                    final boolean validate = Double.parseDouble(amount) < Double.parseDouble(oldAmount);
                     if (temp == null) {
                         if (validate) {
-                            availableBalanceSubmit(String.valueOf(Integer.parseInt(oldAmount) - Integer.parseInt(amount)));
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount)))));
                         } else {
                             dialog.dismiss();
                             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -417,10 +485,10 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                         }
                     } else {
                         if (validate) {
-                            availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) + (Integer.parseInt(oldAmount) - Integer.parseInt(amount))));
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount))))));
                         } else {
-                            if (Integer.parseInt(temp) > (Integer.parseInt(amount) - Integer.parseInt(oldAmount))) {
-                                availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) + (Integer.parseInt(oldAmount) - Integer.parseInt(amount))));
+                            if (Double.parseDouble(temp) > Double.parseDouble(String.valueOf((BigDecimal.valueOf(Double.parseDouble(amount)).subtract(BigDecimal.valueOf(Double.parseDouble(oldAmount))))))) {
+                                availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(oldAmount)).subtract(BigDecimal.valueOf(Double.parseDouble(amount))))));
                             } else {
                                 dialog.dismiss();
                                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -444,20 +512,22 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(updateAmount);
+        String avlAmount = decimalFormat.format(Double.parseDouble(updateAmount));
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> updateInvestDetails()).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details India").child(source).setValue(data).addOnCompleteListener(task -> updateInvestDetails(avlAmount)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void updateInvestDetails() {
+    private void updateInvestDetails(String avlAmount) {
 
         InvestmentData data = new InvestmentData();
         data.setName(name);
-        data.setAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setRemAmount(decimalFormat.format(Double.parseDouble(remAmount)));
         data.setFolioNumber(folioNumber);
         data.setTerm(term);
         data.setSource(source);
@@ -466,19 +536,20 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         data.setUpdateFinder(updateFinder);
 
         databaseReference.child("Investment Details").child(updateFinder).setValue(data).
-                addOnCompleteListener(task -> balanceDetailsUpdate()).addOnFailureListener(e -> {
+                addOnCompleteListener(task -> balanceDetailsUpdate(avlAmount)).addOnFailureListener(e -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(UpdateInvestmentDetailsActivity.this, "Investment Amount Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void balanceDetailsUpdate() {
+    private void balanceDetailsUpdate(String avlAmount) {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
-        data.setAmount(amount);
-        data.setTransAmount(amount);
+        data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setTransAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setAvailableAmount(avlAmount);
         data.setCategory("Investment");
         data.setType("Expense");
         data.setDate(date);
@@ -503,6 +574,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(UpdateInvestmentDetailsActivity.this, ViewInvestmentDetailsActivity.class));
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);

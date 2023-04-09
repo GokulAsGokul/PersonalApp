@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class BalanceDetailsData {
 
-    private String Source, Amount, TransAmount, Category, Date, Remarks, Type, Filter, UpdateFinder;
+    private String Source, Amount, TransAmount, Category, Date, Remarks, Type, Filter, UpdateFinder, AvailableAmount;
 
     public String getSource() {
         return Source;
@@ -83,11 +83,21 @@ public class BalanceDetailsData {
         UpdateFinder = updateFinder;
     }
 
+    public String getAvailableAmount() {
+        return AvailableAmount;
+    }
+
+    public void setAvailableAmount(String availableAmount) {
+        AvailableAmount = availableAmount;
+    }
+
     public static Comparator<String> balComparatorFilter = (f1, f2) -> {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("MM_yyyy");
         try {
-            return String.valueOf(Objects.requireNonNull(dateFormat.parse(f2)).getTime()).compareToIgnoreCase(
-                    String.valueOf(Objects.requireNonNull(dateFormat.parse(f1)).getTime()));
+            if (!f2.equalsIgnoreCase("All")) {
+                return String.valueOf(Objects.requireNonNull(dateFormat.parse(f2)).getTime()).compareToIgnoreCase(
+                        String.valueOf(Objects.requireNonNull(dateFormat.parse(f1)).getTime()));
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -123,7 +133,5 @@ public class BalanceDetailsData {
     public static Comparator<BalanceDetailsData> balComparatorLowest = (l1, l2) -> Double.compare(Double.parseDouble(l1.getAmount()), Double.parseDouble(l2.getAmount()));
 
     public static Comparator<BalanceDetailsData> balComparatorHighest = (l1, l2) -> Double.compare(Double.parseDouble(l2.getAmount()), Double.parseDouble(l1.getAmount()));
-
-    public static Comparator<BalanceDetailsData> balComparatorSource = (l1, l2) -> l1.getSource().compareToIgnoreCase(l2.getSource());
 
 }

@@ -29,7 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.AddLent.AddLentReturnDetailsActivity;
-import com.gokul.personal.AddLent.LentData;
+import com.gokul.personal.AddLent.LentDetailsData;
 import com.gokul.personal.AddLent.UpdateLentDetailsActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
@@ -58,7 +58,7 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLentDetailsRecyclerAdapter.MyViewHolder> {
     private final Context context;
-    private ArrayList<LentData> list;
+    private ArrayList<LentDetailsData> list;
     private final Activity activity;
     private final LottieAnimationView animationView;
     private final Vibrator vibrator;
@@ -69,9 +69,9 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
     private TextInputLayout lentReturnSourceLayout;
     private AutoCompleteTextView lentReturnSource;
     private final ArrayList<String> sourceList = new ArrayList<>();
-    private String sourceDropDown;
+    private String sourceDropDown, name;
 
-    public ViewLentDetailsRecyclerAdapter(Context context, ArrayList<LentData> list, Activity activity, LottieAnimationView animationView, Vibrator vibrator, String country) {
+    public ViewLentDetailsRecyclerAdapter(Context context, ArrayList<LentDetailsData> list, Activity activity, LottieAnimationView animationView, Vibrator vibrator, String country) {
         this.context = context;
         this.list = list;
         this.activity = activity;
@@ -90,17 +90,14 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
     @Override
     public void onBindViewHolder(@NonNull ViewLentDetailsRecyclerAdapter.MyViewHolder holder, int position) {
 
-        LentData data = list.get(position);
+        LentDetailsData data = list.get(position);
         holder.lentDetName.setText(data.getName());
         if (country.equalsIgnoreCase("India")) {
             holder.lentDetAmount.setText(String.format("Rs %s", data.getAmount()));
-        } else {
-            holder.lentDetAmount.setText(String.format("Ro %s", data.getAmount()));
-        }
-        if (country.equalsIgnoreCase("India")) {
             holder.lentDetRemAmount.setText(String.format("Rs %s", data.getRemAmount()));
         } else {
-            holder.lentDetRemAmount.setText(String.format("Ro %s", data.getRemAmount()));
+            holder.lentDetAmount.setText(String.format("OMR %s", data.getAmount()));
+            holder.lentDetRemAmount.setText(String.format("OMR %s", data.getRemAmount()));
         }
         holder.lentDetFrom.setText(data.getFrom());
         holder.lentDetTo.setText(data.getTo());
@@ -220,7 +217,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                                     addOnSuccessListener(unused -> {
                                         list.remove(holder.getAdapterPosition());
                                         notifyItemRemoved(holder.getAdapterPosition());
-                                        addBalanceDetails(source, data.getRemAmount(), loadingDialog);
+                                        availableBalanceUpdateCall(source, data.getRemAmount(), loadingDialog, "Delete");
                                     }).
                                     addOnFailureListener(e -> {
                                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -274,6 +271,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 ConnectionCheck.connectionDialogShow(context, activity);
             } else {
                 Intent intent = new Intent(context, AddLentReturnDetailsActivity.class);
+                intent.putExtra("name", data.getName());
                 intent.putExtra("country", country);
                 intent.putExtra("amount", data.getRemAmount());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
@@ -284,64 +282,31 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
     }
 
-    private void deleteBalanceDetails(String source, String amount, String updateFinder, Dialog dialogCall) {
+    private void deleteBalanceDetails(String source, String amount, String updateFinder, Dialog loadingDialog) {
         databaseReference.child("Balance Details " + country).child(source).child(updateFinder).removeValue().
-                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, dialogCall)).addOnFailureListener(e -> {
-            dialogCall.dismiss();
+                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, loadingDialog, "Delete All")).addOnFailureListener(e -> {
+            loadingDialog.dismiss();
             StyleableToast.makeText(activity, "Balance Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void addBalanceDetails(String source, String amount, Dialog dialogCall) {
-
-        String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
-
-        BalanceDetailsData data = new BalanceDetailsData();
-        data.setSource(source);
-        data.setAmount(amount);
-        data.setTransAmount(amount);
-        data.setCategory("Lent Return");
-        data.setType("Income");
-        data.setDate(new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()));
-        data.setRemarks("Rem Amount Returned");
-        data.setUpdateFinder(date1);
-        data.setFilter(new SimpleDateFormat("MM_yyyy", Locale.getDefault()).format(new Date()));
-
-        databaseReference.child("Balance Details " + country).child(source).child(date1).setValue(data).
-                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, dialogCall)).addOnFailureListener(e -> {
-            dialogCall.dismiss();
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            StyleableToast.makeText(context, "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-        });
-    }
-
-    private void availableBalanceUpdateCall(String source, String amount, Dialog dialogCall) {
+    private void availableBalanceUpdateCall(String source, String amount, Dialog loadingDialog, String action) {
 
         databaseReference.child("Available Balance Details " + country).child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
 
-                if (country.equalsIgnoreCase("India")) {
-
-                    if (temp == null) {
-                        availableBalanceSubmit(source, String.valueOf(Integer.parseInt(amount)), dialogCall);
-                    } else {
-                        availableBalanceSubmit(source, String.valueOf(Integer.parseInt(temp) + Integer.parseInt(amount)), dialogCall);
-                    }
-                } else if (country.equalsIgnoreCase("Oman")) {
-
-                    if (temp == null) {
-                        availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount))), dialogCall);
-                    } else {
-                        availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), dialogCall);
-                    }
+                if (temp == null) {
+                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount))), loadingDialog, action, amount);
+                } else {
+                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), loadingDialog, action, amount);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                dialogCall.dismiss();
+                loadingDialog.dismiss();
                 if (list.isEmpty()) {
                     animationView.setVisibility(View.VISIBLE);
                     animationView.playAnimation();
@@ -353,29 +318,70 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
     }
 
-    private void availableBalanceSubmit(String source, String sourceAmount, Dialog dialogCall) {
+    private void availableBalanceSubmit(String source, String sourceAmount, Dialog loadingDialog, String action, String txnAmount) {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
+        String avlAmount;
         if (country.equalsIgnoreCase("India")) {
-            data.setAmount(sourceAmount);
+            avlAmount = new DecimalFormat("0.00").format(Double.parseDouble(sourceAmount));
         } else {
-            DecimalFormat decimalFormat = new DecimalFormat("#.000");
-            data.setAmount(decimalFormat.format(Double.parseDouble(sourceAmount)));
+            avlAmount = new DecimalFormat("0.000").format(Double.parseDouble(sourceAmount));
         }
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details " + country).child(source).setValue(data).addOnCompleteListener(task -> {
+        databaseReference.child("Available Balance Details " + country).child(source).setValue(data).addOnSuccessListener(task -> {
+            if (action.equalsIgnoreCase("Delete")) {
+                addBalanceDetails(source, txnAmount, loadingDialog, avlAmount);
+            } else {
+                loadingDialog.dismiss();
+                StyleableToast.makeText(context, "Lent Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+                if (list.isEmpty()) {
+                    animationView.setVisibility(View.VISIBLE);
+                    animationView.playAnimation();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                }
+            }
+        }).addOnFailureListener(e1 -> {
+            loadingDialog.dismiss();
             if (list.isEmpty()) {
                 animationView.setVisibility(View.VISIBLE);
                 animationView.playAnimation();
-                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             }
-            dialogCall.dismiss();
-            StyleableToast.makeText(context, "Lent Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
-        }).addOnFailureListener(e1 -> {
-            dialogCall.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(context, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+        });
+    }
+
+    private void addBalanceDetails(String source, String amount, Dialog loadingDialog, String avlAmount) {
+
+        String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
+
+        BalanceDetailsData data = new BalanceDetailsData();
+        data.setSource(source);
+        data.setAmount(amount);
+        data.setTransAmount(amount);
+        data.setAvailableAmount(avlAmount);
+        data.setCategory("Lent Return");
+        data.setType("Income");
+        data.setDate(new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()));
+        data.setRemarks("Rem Amount Returned");
+        data.setUpdateFinder(date1);
+        data.setFilter(new SimpleDateFormat("MM_yyyy", Locale.getDefault()).format(new Date()));
+
+        databaseReference.child("Balance Details " + country).child(source).child(date1).setValue(data).
+                addOnCompleteListener(task -> {
+                    loadingDialog.dismiss();
+                    StyleableToast.makeText(context, "Lent Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
+                    if (list.isEmpty()) {
+                        animationView.setVisibility(View.VISIBLE);
+                        animationView.playAnimation();
+                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    }
+                }).addOnFailureListener(e -> {
+            loadingDialog.dismiss();
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            StyleableToast.makeText(context, "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
@@ -406,7 +412,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
         }
     }
 
-    public void updateList(ArrayList<LentData> listData) {
+    public void updateList(ArrayList<LentDetailsData> listData) {
         list = listData;
         notifyDataSetChanged();
     }

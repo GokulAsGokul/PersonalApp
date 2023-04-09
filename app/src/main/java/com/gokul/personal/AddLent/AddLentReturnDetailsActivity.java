@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
+import com.gokul.personal.Miscellaneous.DecimalDigitsInputFilter;
 import com.gokul.personal.R;
 import com.gokul.personal.ViewLentDetails.ViewLentDetailsActivity;
 import com.google.android.material.textfield.TextInputEditText;
@@ -53,7 +55,7 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
     private TextInputEditText lentRetAmount, lentRetRemAmount, lentRetRemarks;
     private AutoCompleteTextView lentRetFrom, lentRetTo, lentRetTranDate;
     private Vibrator vibrator;
-    private String amount, remAmount, to, remarks, country, updateFinder, fromDropDown, toDropDown;
+    private String name, amount, remAmount, to, remarks, country, updateFinder, fromDropDown, toDropDown;
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> fromList = new ArrayList<>();
@@ -72,6 +74,10 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        name = getIntent().getStringExtra("name");
+        country = getIntent().getStringExtra("country");
+        updateFinder = getIntent().getStringExtra("updateFinder");
+
         lentRetAmountLayout = findViewById(R.id.lentRetAmountLayout);
         lentRetRemAmountLayout = findViewById(R.id.lentRetRemAmountLayout);
         lentRetFromLayout = findViewById(R.id.lentRetFromLayout);
@@ -80,6 +86,13 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         lentRetRemarksLayout = findViewById(R.id.lentRetRemarksLayout);
         lentRetAmount = findViewById(R.id.lentRetAmount);
         lentRetRemAmount = findViewById(R.id.lentRetRemAmount);
+        if (country.equalsIgnoreCase("India")) {
+            lentRetAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+            lentRetRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        } else {
+            lentRetAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+            lentRetRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+        }
         lentRetRemarks = findViewById(R.id.lentRetRemarks);
         lentRetFrom = findViewById(R.id.lentRetFrom);
         lentRetTo = findViewById(R.id.lentRetTo);
@@ -102,9 +115,6 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
         }
 
         vibrator = (Vibrator) getSystemService((VIBRATOR_SERVICE));
-
-        country = getIntent().getStringExtra("country");
-        updateFinder = getIntent().getStringExtra("updateFinder");
 
         lentRetRemAmount.setInputType(InputType.TYPE_NULL);
         lentRetRemAmount.setClickable(false);
@@ -262,30 +272,20 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
 
     private void remAmountCall() {
 
-        if ((Objects.requireNonNull(lentRetAmount.getText()).toString()).isEmpty()) {
+        if ((Objects.requireNonNull(lentRetAmount.getText()).toString()).isEmpty() ||
+                (lentRetAmount.getText().toString()).equalsIgnoreCase("0") ||
+                (lentRetAmount.getText().toString()).startsWith(".")) {
             lentRetAmountLayout.setErrorEnabled(true);
             lentRetAmountLayout.setError("Amount is required");
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else if ((lentRetAmount.getText().toString()).equalsIgnoreCase("0")) {
-            lentRetAmountLayout.setErrorEnabled(true);
-            lentRetAmountLayout.setError("Amount is required");
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else if ((getIntent().getStringExtra("country").equalsIgnoreCase("India")) && (Integer.parseInt(getIntent().getStringExtra("amount")) < (Integer.parseInt(Objects.requireNonNull(lentRetAmount.getText()).toString())))) {
-            lentRetAmountLayout.setErrorEnabled(true);
-            lentRetAmountLayout.setError("Entered amount is high");
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else if ((getIntent().getStringExtra("country").equalsIgnoreCase("Oman")) && (Double.parseDouble(getIntent().getStringExtra("amount")) < (Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString())))) {
+        } else if (Double.parseDouble(getIntent().getStringExtra("amount")) < (Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString()))) {
             lentRetAmountLayout.setErrorEnabled(true);
             lentRetAmountLayout.setError("Entered amount is high");
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             lentRetAmountLayout.setError(null);
             lentRetAmountLayout.setErrorEnabled(false);
-            if (getIntent().getStringExtra("country").equalsIgnoreCase("India")) {
-                lentRetRemAmount.setText(String.valueOf(Integer.parseInt(getIntent().getStringExtra("amount")) - Integer.parseInt(lentRetAmount.getText().toString())));
-            } else {
-                lentRetRemAmount.setText(String.valueOf(BigDecimal.valueOf(Double.parseDouble(getIntent().getStringExtra("amount"))).subtract(BigDecimal.valueOf(Double.parseDouble(lentRetAmount.getText().toString())))));
-            }
+            lentRetRemAmount.setText(String.valueOf(BigDecimal.valueOf(Double.parseDouble(getIntent().getStringExtra("amount"))).subtract(BigDecimal.valueOf(Double.parseDouble(lentRetAmount.getText().toString())))));
         }
     }
 
@@ -350,14 +350,14 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
                     lentRetRemarks.setText(R.string.nill);
                 }
 
+                DecimalFormat decimalFormat;
                 if (country.equalsIgnoreCase("Oman")) {
-                    DecimalFormat decimalFormat = new DecimalFormat("0.000");
-                    amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString().trim()));
-                    remAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetRemAmount.getText()).toString().trim()));
+                    decimalFormat = new DecimalFormat("0.000");
                 } else {
-                    amount = Objects.requireNonNull(lentRetAmount.getText()).toString().trim();
-                    remAmount = Objects.requireNonNull(lentRetRemAmount.getText()).toString().trim();
+                    decimalFormat = new DecimalFormat("0.00");
                 }
+                amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetAmount.getText()).toString().trim()));
+                remAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(lentRetRemAmount.getText()).toString().trim()));
                 String from = lentRetFrom.getText().toString().trim();
                 to = lentRetTo.getText().toString().trim();
                 String date = lentRetTranDate.getText().toString().trim();
@@ -365,17 +365,12 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
 
                 String remarksPattern = "^[a-zA-Z0-9\\s]{4,20}$";
 
-                if (amount.isEmpty()) {
+                if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
                     lentRetAmountLayout.setErrorEnabled(true);
                     lentRetAmountLayout.setError("Amount is Required");
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else if (amount.equals("0")) {
-                    lentRetAmountLayout.setErrorEnabled(true);
-                    lentRetAmountLayout.setError("Amount is Required");
-                    dialog.dismiss();
-                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else if (remAmount.isEmpty()) {
+                } else if (remAmount.startsWith(".") || remAmount.isEmpty() || remAmount.equals("0")) {
                     lentRetAmountLayout.setError(null);
                     lentRetAmountLayout.setErrorEnabled(false);
                     lentRetRemAmountLayout.setErrorEnabled(true);
@@ -537,9 +532,9 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
                     if (country.equalsIgnoreCase("India")) {
 
                         if (temp == null) {
-                            availableBalanceSubmit(String.valueOf(Integer.parseInt(amount)), updateFinder);
+                            availableBalanceSubmit(String.valueOf(Double.parseDouble(amount)), updateFinder);
                         } else {
-                            availableBalanceSubmit(String.valueOf(Integer.parseInt(temp) + Integer.parseInt(amount)), updateFinder);
+                            availableBalanceSubmit(String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), updateFinder);
                         }
 
                     } else if (country.equalsIgnoreCase("Oman")) {
@@ -566,57 +561,85 @@ public class AddLentReturnDetailsActivity extends AppCompatActivity {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(to);
+        String avlAmount;
         if (country.equalsIgnoreCase("India")) {
-            data.setAmount(updateAmount);
+            avlAmount = new DecimalFormat("0.00").format(Double.parseDouble(updateAmount));
         } else {
-            DecimalFormat decimalFormat = new DecimalFormat("#.000");
-            data.setAmount(decimalFormat.format(Double.parseDouble(updateAmount)));
+            avlAmount = new DecimalFormat("0.000").format(Double.parseDouble(updateAmount));
         }
+        data.setAmount(avlAmount);
 
-        databaseReference.child("Available Balance Details " + country).child(to).setValue(data).addOnCompleteListener(task -> updateLentDetails(updateFinder)).addOnFailureListener(e1 -> {
+        databaseReference.child("Available Balance Details " + country).child(to).setValue(data).addOnCompleteListener(task -> updateLentDetails(avlAmount, updateFinder)).addOnFailureListener(e1 -> {
             dialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Available Balance Submit Error: " + e1.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
     }
 
-    private void updateLentDetails(String updateFinder) {
+    private void updateLentDetails(String avlAmount, String updateFinder) {
 
-        String finalAmount;
         if (country.equalsIgnoreCase("India")) {
-            finalAmount = remAmount;
-        } else {
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            finalAmount = decimalFormat.format(Double.parseDouble(remAmount));
-        }
 
-        databaseReference.child("Lent Details " + country).child(updateFinder).child("remAmount").setValue(finalAmount).
-                addOnCompleteListener(task -> addBalanceDetails()).addOnFailureListener(e -> {
-            dialog.dismiss();
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Lent Details Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-        });
+            String finalAmount = new DecimalFormat("0.00").format(Double.parseDouble(remAmount));
+
+            if (finalAmount.equals("0.00")) {
+                databaseReference.child("Lent Details India").child(updateFinder).removeValue().addOnCompleteListener(task -> addBalanceDetails(avlAmount)).addOnFailureListener(e -> {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Lent Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                });
+            } else {
+                databaseReference.child("Lent Details India").child(updateFinder).child("remAmount").setValue(remAmount).
+                        addOnCompleteListener(task -> addBalanceDetails(avlAmount)).addOnFailureListener(e -> {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Lent Details Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                });
+            }
+        } else {
+            String finalAmount = new DecimalFormat("0.000").format(Double.parseDouble(remAmount));
+
+            if (finalAmount.equals("0.000")) {
+                databaseReference.child("Lent Details Oman").child(updateFinder).removeValue().addOnCompleteListener(task -> addBalanceDetails(avlAmount)).addOnFailureListener(e -> {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Lent Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                });
+            } else {
+                databaseReference.child("Lent Details Oman").child(updateFinder).child("remAmount").setValue(remAmount).
+                        addOnCompleteListener(task -> addBalanceDetails(avlAmount)).addOnFailureListener(e -> {
+                    dialog.dismiss();
+                    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                    StyleableToast.makeText(AddLentReturnDetailsActivity.this, "Lent Details Update Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                });
+            }
+
+        }
     }
 
-    private void addBalanceDetails() {
+    private void addBalanceDetails(String avlAmount) {
 
         String date = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(to);
+        String newAmount;
         if (country.equalsIgnoreCase("India")) {
-            data.setAmount(amount);
-            data.setTransAmount(amount);
+            newAmount = new DecimalFormat("0.00").format(Double.parseDouble(amount));
         } else {
-            DecimalFormat decimalFormat = new DecimalFormat("0.000");
-            String finalAmount = decimalFormat.format(Double.parseDouble(amount));
-            data.setAmount(finalAmount);
-            data.setTransAmount(finalAmount);
+            newAmount = new DecimalFormat("0.000").format(Double.parseDouble(amount));
         }
+        data.setAmount(newAmount);
+        data.setTransAmount(newAmount);
+        data.setAvailableAmount(avlAmount);
         data.setCategory("Lent Return");
         data.setType("Income");
         data.setDate(new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()));
-        data.setRemarks(remarks);
+        if ((remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+            data.setRemarks(name + "'s Lent Return Amount");
+        } else {
+            data.setRemarks(remarks);
+        }
         data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
         data.setUpdateFinder(date);
 
