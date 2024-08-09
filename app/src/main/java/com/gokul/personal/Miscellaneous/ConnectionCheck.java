@@ -10,8 +10,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.annotation.IntRange;
-
 import com.gokul.personal.R;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.DialogPlusBuilder;
@@ -19,7 +17,6 @@ import com.orhanobut.dialogplus.ViewHolder;
 
 public class ConnectionCheck {
 
-    @IntRange(from = 0, to = 3)
     public static int getConnectionType(Context context) {
         int result = 0; // Returns connection type. 0: none; 1: mobile data; 2: wifi; 3: vpn
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

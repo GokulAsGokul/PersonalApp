@@ -16,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -33,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -51,6 +52,10 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public class IndiaFragment extends Fragment {
 
+    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private final ArrayList<String> sourceList = new ArrayList<>();
+    private final ArrayList<String> categoryList = new ArrayList<>();
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private TextInputLayout balSourceNameLayout, balAmountLayout, balTransAmountLayout, balCategoryLayout, balTranDateLayout, balDecRemarksLayout;
     private TextInputEditText balAmount, balTransAmount, balDecRemarks;
     private AutoCompleteTextView balSourceName, balCategory, balTranDate;
@@ -58,10 +63,6 @@ public class IndiaFragment extends Fragment {
     private String source, amount, transAmount, category, date, remarks, sourceDropDown, categoryDropDown;
     private SwitchCompat balSwitch;
     private Vibrator vibrator;
-    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private final ArrayList<String> sourceList = new ArrayList<>();
-    private final ArrayList<String> categoryList = new ArrayList<>();
-    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,9 +76,9 @@ public class IndiaFragment extends Fragment {
         balTranDateLayout = view.findViewById(R.id.balTranDateLayout);
         balSourceName = view.findViewById(R.id.balSourceName);
         balAmount = view.findViewById(R.id.balAmount);
-        balAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        balAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         balTransAmount = view.findViewById(R.id.balTransAmount);
-        balTransAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        balTransAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         balCategory = view.findViewById(R.id.balCategory);
         balTranDate = view.findViewById(R.id.balTranDate);
         balDecRemarksLayout = view.findViewById(R.id.balDecRemarksLayout);
@@ -108,7 +109,7 @@ public class IndiaFragment extends Fragment {
         balSourceNameLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -125,7 +126,7 @@ public class IndiaFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "Sources Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -137,7 +138,7 @@ public class IndiaFragment extends Fragment {
         balCategoryLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("IndiaBalanceCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -154,7 +155,7 @@ public class IndiaFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "Category Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -243,14 +244,16 @@ public class IndiaFragment extends Fragment {
                 balSourceNameLayout.setError("Source Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if ((amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) && !category.equalsIgnoreCase("Zenovic Trust")) {
+            } else if ((amount.startsWith(".") || amount.isEmpty() || amount.equals("0") || amount.equals("0.0") || amount.equals("0.00")
+            ) && !category.equalsIgnoreCase("Zenovic Trust")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (transAmount.startsWith(".") || transAmount.isEmpty() || transAmount.equals("0")) {
+            } else if (transAmount.startsWith(".") || transAmount.isEmpty() || transAmount.equals("0") || transAmount.equals("0.0")
+                    || transAmount.equals("0.00")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setError(null);
@@ -384,7 +387,7 @@ public class IndiaFragment extends Fragment {
 
             databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
                     if (balSwitch.isChecked()) {
                         if (temp == null) {
@@ -409,7 +412,7 @@ public class IndiaFragment extends Fragment {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

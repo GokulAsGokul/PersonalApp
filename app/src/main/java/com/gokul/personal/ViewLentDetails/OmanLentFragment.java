@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -31,6 +30,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -89,7 +90,7 @@ public class OmanLentFragment extends Fragment {
         dialog.show();
         FirebaseDatabase.getInstance().getReference().child("Lent Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String name = Objects.requireNonNull(childDataSnapshot.child("name").getValue(String.class));
                     String remAmount = Objects.requireNonNull(childDataSnapshot.child("remAmount").getValue(String.class));
@@ -129,7 +130,7 @@ public class OmanLentFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Oman Chart Data Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

@@ -10,10 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.gokul.personal.R;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -25,9 +24,8 @@ public class OmanLentListViewAdapter extends ArrayAdapter<LentListViewData> {
     }
 
     @SuppressLint("InflateParams")
-    @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 
         LentListViewData lentListData = getItem(position);
 

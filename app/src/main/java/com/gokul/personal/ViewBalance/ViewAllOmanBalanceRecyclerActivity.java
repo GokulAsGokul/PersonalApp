@@ -14,10 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -39,7 +37,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
-import java.lang.reflect.Field;
+import org.jetbrains.annotations.NotNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -118,7 +117,7 @@ public class ViewAllOmanBalanceRecyclerActivity extends AppCompatActivity {
 
         databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     omanBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
                 }
@@ -135,7 +134,7 @@ public class ViewAllOmanBalanceRecyclerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(ViewAllOmanBalanceRecyclerActivity.this, "Oman Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -149,7 +148,7 @@ public class ViewAllOmanBalanceRecyclerActivity extends AppCompatActivity {
         for (int i = 0; i < omanBalanceNameList.size(); i++) {
             databaseReference.child("Balance Details Oman").child(omanBalanceNameList.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         BalanceDetailsData data1 = dataSnapshot.getValue(BalanceDetailsData.class);
                         list.add(data1);
@@ -173,7 +172,7 @@ public class ViewAllOmanBalanceRecyclerActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(ViewAllOmanBalanceRecyclerActivity.this, "oman Balance Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -359,19 +358,12 @@ public class ViewAllOmanBalanceRecyclerActivity extends AppCompatActivity {
                 return false;
             }
         });
-        try {
-            @SuppressLint("SoonBlockedPrivateApi") Field mCursorDrawableRes = TextView.class.getDeclaredField("mDrawableForCursor");
-            mCursorDrawableRes.setAccessible(true);
-            mCursorDrawableRes.set(searchView, R.drawable.filter_color_cursor);
-        } catch (Exception ignored) {
-        }
-
         return super.onCreateOptionsMenu(menu);
     }
 
     @SuppressLint("NonConstantResourceId")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(ViewAllOmanBalanceRecyclerActivity.this, ViewBalanceDetailsActivity.class));
             this.finish();

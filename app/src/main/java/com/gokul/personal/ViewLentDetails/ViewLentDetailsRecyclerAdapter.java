@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,6 +43,8 @@ import com.orhanobut.dialogplus.ViewHolder;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -58,18 +59,18 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLentDetailsRecyclerAdapter.MyViewHolder> {
     private final Context context;
-    private ArrayList<LentDetailsData> list;
     private final Activity activity;
     private final LottieAnimationView animationView;
     private final Vibrator vibrator;
     private final String country;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private Dialog loadingDialog;
+    private final ArrayList<String> sourceList = new ArrayList<>();
+    private ArrayList<LentDetailsData> list;
+    private Dialog loadingDialog1, loadingDialog2;
     private DialogPlus dialogPlus;
     private TextInputLayout lentReturnSourceLayout;
     private AutoCompleteTextView lentReturnSource;
-    private final ArrayList<String> sourceList = new ArrayList<>();
-    private String sourceDropDown, name;
+    private String sourceDropDown;
 
     public ViewLentDetailsRecyclerAdapter(Context context, ArrayList<LentDetailsData> list, Activity activity, LottieAnimationView animationView, Vibrator vibrator, String country) {
         this.context = context;
@@ -80,15 +81,15 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
         this.country = country;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public ViewLentDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewLentDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_lent_details_view, parent, false);
         return new ViewLentDetailsRecyclerAdapter.MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewLentDetailsRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(ViewLentDetailsRecyclerAdapter.MyViewHolder holder, int position) {
 
         LentDetailsData data = list.get(position);
         holder.lentDetName.setText(data.getName());
@@ -109,14 +110,24 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
             Toast.makeText(context, "No of Days Calculation Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
-        loadingDialog = new Dialog(holder.itemView.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
-        loadingDialog.setContentView(R.layout.loading_dialog);
-        loadingDialog.setCancelable(true);
-        loadingDialog.setCanceledOnTouchOutside(false);
-        if (loadingDialog.getWindow() != null) {
-            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            loadingDialog.getWindow().setStatusBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
-            loadingDialog.getWindow().setNavigationBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
+        loadingDialog1 = new Dialog(holder.itemView.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        loadingDialog1.setContentView(R.layout.loading_dialog);
+        loadingDialog1.setCancelable(true);
+        loadingDialog1.setCanceledOnTouchOutside(false);
+        if (loadingDialog1.getWindow() != null) {
+            loadingDialog1.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            loadingDialog1.getWindow().setStatusBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
+            loadingDialog1.getWindow().setNavigationBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
+        }
+
+        loadingDialog2 = new Dialog(holder.itemView.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar);
+        loadingDialog2.setContentView(R.layout.loading_dialog);
+        loadingDialog2.setCancelable(true);
+        loadingDialog2.setCanceledOnTouchOutside(false);
+        if (loadingDialog2.getWindow() != null) {
+            loadingDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            loadingDialog2.getWindow().setStatusBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
+            loadingDialog2.getWindow().setNavigationBarColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.background));
         }
 
         holder.lentDetDeleteBtn.setOnClickListener(view -> {
@@ -148,16 +159,16 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                         sourceList.clear();
                         databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            public void onDataChange(@NotNull DataSnapshot snapshot) {
                                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                                    loadingDialog.show();
+                                    loadingDialog1.show();
                                     sourceList.add(temp);
                                 }
                                 ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(context, R.layout.dropdown_list, sourceList);
                                 sourceAdapter.sort(Comparator.naturalOrder());
                                 lentReturnSource.setAdapter(sourceAdapter);
-                                loadingDialog.dismiss();
+                                loadingDialog1.dismiss();
                                 lentReturnSource.setOnItemClickListener((parent, view, position, id) -> {
                                     UIUtil.hideKeyboard(activity);
                                     sourceDropDown = parent.getItemAtPosition(position).toString();
@@ -165,8 +176,8 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                             }
 
                             @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                loadingDialog.dismiss();
+                            public void onCancelled(@NotNull DatabaseError error) {
+                                loadingDialog1.dismiss();
                                 StyleableToast.makeText(context, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                             }
                         });
@@ -174,16 +185,16 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                         sourceList.clear();
                         databaseReference.child("DropDown Values").child("OmanSource").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            public void onDataChange(@NotNull DataSnapshot snapshot) {
                                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                                    loadingDialog.show();
+                                    loadingDialog1.show();
                                     sourceList.add(temp);
                                 }
                                 ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(context, R.layout.dropdown_list, sourceList);
                                 sourceAdapter.sort(Comparator.naturalOrder());
                                 lentReturnSource.setAdapter(sourceAdapter);
-                                loadingDialog.dismiss();
+                                loadingDialog1.dismiss();
                                 lentReturnSource.setOnItemClickListener((parent, view, position, id) -> {
                                     UIUtil.hideKeyboard(activity);
                                     sourceDropDown = parent.getItemAtPosition(position).toString();
@@ -191,8 +202,8 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                             }
 
                             @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                loadingDialog.dismiss();
+                            public void onCancelled(@NotNull DatabaseError error) {
+                                loadingDialog1.dismiss();
                                 StyleableToast.makeText(context, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                             }
                         });
@@ -201,12 +212,9 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                     lentReturnUpdateBtn.setOnClickListener(view2 -> {
                         String source = lentReturnSource.getText().toString();
 
-                        loadingDialog.show();
-
                         if (source.isEmpty()) {
                             lentReturnSourceLayout.setErrorEnabled(true);
                             lentReturnSourceLayout.setError("Source is required");
-                            loadingDialog.dismiss();
                             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         } else {
                             lentReturnSourceLayout.setError(null);
@@ -217,7 +225,8 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                                     addOnSuccessListener(unused -> {
                                         list.remove(holder.getAdapterPosition());
                                         notifyItemRemoved(holder.getAdapterPosition());
-                                        availableBalanceUpdateCall(source, data.getRemAmount(), loadingDialog, "Delete");
+                                        loadingDialog1.show();
+                                        availableBalanceUpdateCall(source, data.getRemAmount(), "Delete");
                                     }).
                                     addOnFailureListener(e -> {
                                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -226,19 +235,17 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                         }
                     });
                 });
-                builder.setNeutralButton("Delete All", (dialog, which) -> {
-                    loadingDialog.show();
-                    databaseReference.child("Lent Details " + country).child(data.getUpdateFinder()).removeValue().
-                            addOnSuccessListener(unused -> {
-                                list.remove(holder.getAdapterPosition());
-                                notifyItemRemoved(holder.getAdapterPosition());
-                                deleteBalanceDetails(data.getFrom(), data.getAmount(), data.getUpdateFinder(), loadingDialog);
-                            }).
-                            addOnFailureListener(e -> {
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                                StyleableToast.makeText(activity, "Lent Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-                            });
-                });
+                builder.setNeutralButton("Delete All", (dialog, which) -> databaseReference.child("Lent Details " + country).child(data.getUpdateFinder()).removeValue().
+                        addOnSuccessListener(unused -> {
+                            list.remove(holder.getAdapterPosition());
+                            notifyItemRemoved(holder.getAdapterPosition());
+                            loadingDialog2.show();
+                            deleteBalanceDetails(data.getFrom(), data.getAmount(), data.getUpdateFinder());
+                        }).
+                        addOnFailureListener(e -> {
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            StyleableToast.makeText(activity, "Lent Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                        }));
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
                 alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundColor(Color.rgb(0, 74, 153));
@@ -282,31 +289,26 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
     }
 
-    private void deleteBalanceDetails(String source, String amount, String updateFinder, Dialog loadingDialog) {
+    private void deleteBalanceDetails(String source, String amount, String updateFinder) {
         databaseReference.child("Balance Details " + country).child(source).child(updateFinder).removeValue().
-                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, loadingDialog, "Delete All")).addOnFailureListener(e -> {
-            loadingDialog.dismiss();
-            StyleableToast.makeText(activity, "Balance Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-        });
+                addOnCompleteListener(task -> availableBalanceUpdateCall(source, amount, "Delete All")).addOnFailureListener(e -> StyleableToast.makeText(activity, "Balance Details Delete Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show());
     }
 
-    private void availableBalanceUpdateCall(String source, String amount, Dialog loadingDialog, String action) {
+    private void availableBalanceUpdateCall(String source, String amount, String action) {
 
         databaseReference.child("Available Balance Details " + country).child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
-
                 if (temp == null) {
-                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount))), loadingDialog, action, amount);
+                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount))), action, amount);
                 } else {
-                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), loadingDialog, action, amount);
+                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), action, amount);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
+            public void onCancelled(@NotNull DatabaseError error) {
                 if (list.isEmpty()) {
                     animationView.setVisibility(View.VISIBLE);
                     animationView.playAnimation();
@@ -318,7 +320,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
     }
 
-    private void availableBalanceSubmit(String source, String sourceAmount, Dialog loadingDialog, String action, String txnAmount) {
+    private void availableBalanceSubmit(String source, String sourceAmount, String action, String txnAmount) {
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
@@ -332,9 +334,9 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
         databaseReference.child("Available Balance Details " + country).child(source).setValue(data).addOnSuccessListener(task -> {
             if (action.equalsIgnoreCase("Delete")) {
-                addBalanceDetails(source, txnAmount, loadingDialog, avlAmount);
+                addBalanceDetails(source, txnAmount, avlAmount);
             } else {
-                loadingDialog.dismiss();
+                loadingDialog2.dismiss();
                 StyleableToast.makeText(context, "Lent Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                 if (list.isEmpty()) {
                     animationView.setVisibility(View.VISIBLE);
@@ -343,7 +345,6 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                 }
             }
         }).addOnFailureListener(e1 -> {
-            loadingDialog.dismiss();
             if (list.isEmpty()) {
                 animationView.setVisibility(View.VISIBLE);
                 animationView.playAnimation();
@@ -353,7 +354,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
         });
     }
 
-    private void addBalanceDetails(String source, String amount, Dialog loadingDialog, String avlAmount) {
+    private void addBalanceDetails(String source, String amount, String avlAmount) {
 
         String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
@@ -371,7 +372,7 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
 
         databaseReference.child("Balance Details " + country).child(source).child(date1).setValue(data).
                 addOnCompleteListener(task -> {
-                    loadingDialog.dismiss();
+                    loadingDialog1.dismiss();
                     StyleableToast.makeText(context, "Lent Details Deleted Successfully", Toast.LENGTH_LONG, R.style.CustomToast).show();
                     if (list.isEmpty()) {
                         animationView.setVisibility(View.VISIBLE);
@@ -379,7 +380,6 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     }
                 }).addOnFailureListener(e -> {
-            loadingDialog.dismiss();
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             StyleableToast.makeText(context, "Balance Details Submit Error: " + e.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
         });
@@ -388,6 +388,24 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public void updateList(ArrayList<LentDetailsData> listData) {
+        list = listData;
+        notifyDataSetChanged();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void calculateDays(String dueDate, MyViewHolder holder) throws ParseException {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dates = new SimpleDateFormat("dd-MM-yyyy");
+        Date date1 = dates.parse(dueDate);
+        Date date2 = dates.parse(dates.format(Calendar.getInstance().getTime()));
+        assert date1 != null;
+        assert date2 != null;
+        long difference = Math.abs(date1.getTime() - date2.getTime());
+        long differenceDates = difference / (24 * 60 * 60 * 1000);
+        holder.lentDetDays.setText(differenceDates + " Days Completed");
+
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -410,24 +428,6 @@ public class ViewLentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewLen
             lentDetReturnBtn = itemView.findViewById(R.id.lentDetReturnBtn);
 
         }
-    }
-
-    public void updateList(ArrayList<LentDetailsData> listData) {
-        list = listData;
-        notifyDataSetChanged();
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void calculateDays(String dueDate, MyViewHolder holder) throws ParseException {
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat dates = new SimpleDateFormat("dd-MM-yyyy");
-        Date date1 = dates.parse(dueDate);
-        Date date2 = dates.parse(dates.format(Calendar.getInstance().getTime()));
-        assert date1 != null;
-        assert date2 != null;
-        long difference = Math.abs(date1.getTime() - date2.getTime());
-        long differenceDates = difference / (24 * 60 * 60 * 1000);
-        holder.lentDetDays.setText(differenceDates + " Days Completed");
-
     }
 
 }

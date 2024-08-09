@@ -13,10 +13,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -37,7 +35,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
-import java.lang.reflect.Field;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -108,7 +107,7 @@ public class ViewDocumentsActivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().getReference("Documents Data").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     GeneralData data1 = dataSnapshot.getValue(GeneralData.class);
                     dataList.add(data1);
@@ -131,7 +130,7 @@ public class ViewDocumentsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(ViewDocumentsActivity.this, "Document Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -243,12 +242,6 @@ public class ViewDocumentsActivity extends AppCompatActivity {
                 return false;
             }
         });
-        try {
-            @SuppressLint("SoonBlockedPrivateApi") Field mCursorDrawableRes = TextView.class.getDeclaredField("mDrawableForCursor");
-            mCursorDrawableRes.setAccessible(true);
-            mCursorDrawableRes.set(searchView, R.drawable.filter_color_cursor);
-        } catch (Exception ignored) {
-        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -311,7 +304,7 @@ public class ViewDocumentsActivity extends AppCompatActivity {
 
     @SuppressLint("NonConstantResourceId")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             this.finish();
             return true;

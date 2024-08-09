@@ -19,6 +19,7 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
@@ -26,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         app:lottie_enableMergePathsForKitKatAndAbove="true">
-        <activity android:name=".ViewLentDetails.ViewLentDetailsRecyclerActivity"></activity>
+        <activity android:name=".ViewLentDetails.ViewLentDetailsRecyclerActivity" />
         <activity android:name=".AddInvestmentDetails.MatureInvestmentDetailsActivity" />
         <activity android:name=".AddLent.AddLentReturnDetailsActivity" />
         <activity android:name=".AddLent.UpdateLentDetailsActivity" />

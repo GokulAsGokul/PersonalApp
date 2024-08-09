@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.gokul.personal"
         minSdkVersion 26
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 1
-        versionName "1.2"
+        versionName "1.3"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -25,7 +25,7 @@ android {
         }
     }
 
-    packagingOptions{
+    packagingOptions {
         exclude 'com/itextpdf/io/font/cmap_info.txt'
         exclude 'com/itextpdf/io/font/cmap/*'
     }
@@ -39,24 +39,43 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.2.0-alpha02'                          //Don't Change
+    //Don't Change
+    implementation 'androidx.activity:activity:1.4.0'
+    //Don't Change
+    implementation 'androidx.fragment:fragment:1.4.0'
+    //Don't Change
+    implementation 'com.google.android.material:material:1.2.0-alpha02'
+    //Don't Change
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.firebase:firebase-database:20.1.0'
-    implementation 'com.google.firebase:firebase-storage:20.1.0'
+    implementation 'com.google.firebase:firebase-database:21.0.0'
+    //Firebase Database
+    implementation 'com.google.firebase:firebase-storage:21.0.0'
+    //Firebase Storage
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    implementation 'com.orhanobut:dialogplus:1.11@aar'                                          //Dialogplus
-    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'    //UTIL Library
-    implementation 'io.github.muddz:styleabletoast:2.4.0'                                       //Custom Toast
-    implementation 'com.airbnb.android:lottie:5.0.3'                                            //Lottie Animation
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'                                   //Pie Chart
-    implementation "ru.tinkoff.scrollingpagerindicator:scrollingpagerindicator:1.2.1"           //RecyclerView PageIndicator
-    implementation 'com.itextpdf:itext7-core:7.1.3'                                             //Pdf Generator
-    implementation 'org.apache.poi:poi:3.17'                                                    //Excel Generation
-    implementation 'androidx.biometric:biometric:1.1.0'                                         //Finger Print Authentication
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.56'                                       //PDF Password Encryption
-
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'com.orhanobut:dialogplus:1.11@aar'
+    //Dialog Plus
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
+    //UTIL Library
+    implementation 'io.github.muddz:styleabletoast:2.4.0'
+    //Custom Toast
+    implementation 'com.airbnb.android:lottie:5.0.3'
+    //Lottie Animation
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    //Pie Chart
+    implementation 'ru.tinkoff.scrollingpagerindicator:scrollingpagerindicator:1.2.1'
+    //RecyclerView PageIndicator
+    implementation 'com.itextpdf:itext7-core:7.1.3'
+    //Pdf Generator
+    implementation 'org.apache.poi:poi:3.17'
+    //Excel Generation
+    implementation 'androidx.biometric:biometric:1.1.0'
+    //Finger Print Authentication
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.56'
+    //PDF Password Encryption
+    implementation 'com.android.support:support-annotations:28.0.0'
+    //@Nonnull Support
 }

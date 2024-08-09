@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -32,6 +31,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class IndiaBalanceFragment extends Fragment {
         dialog.show();
         databaseReference.child("Available Balance Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String source = childDataSnapshot.child("source").getValue(String.class);
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
@@ -115,7 +116,7 @@ public class IndiaBalanceFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "India Chart Data Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

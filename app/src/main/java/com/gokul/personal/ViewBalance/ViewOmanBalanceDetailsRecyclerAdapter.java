@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -37,12 +38,12 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder> {
     private final Context context;
-    private ArrayList<BalanceDetailsData> list;
     private final Activity activity;
     private final LottieAnimationView animationView;
     private final Vibrator vibrator;
     private final String balName;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private ArrayList<BalanceDetailsData> list;
     private Dialog loadingDialog;
 
     public ViewOmanBalanceDetailsRecyclerAdapter(Context context, ArrayList<BalanceDetailsData> list, Activity activity, LottieAnimationView animationView, Vibrator vibrator, String balName) {
@@ -54,15 +55,15 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
         this.balName = balName;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_balance_details_view, parent, false);
         return new ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(ViewOmanBalanceDetailsRecyclerAdapter.MyViewHolder holder, int position) {
         BalanceDetailsData data = list.get(position);
         holder.balViewCategory.setText(data.getCategory());
         holder.balViewAmount.setText(String.format("OMR %s", data.getAmount()));
@@ -136,7 +137,7 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
 
         databaseReference.child("Available Balance Details Oman").child(balName).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
 
                 final String s = String.valueOf(BigDecimal.valueOf(Double.parseDouble(amount)));
@@ -166,7 +167,7 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 if (list.isEmpty()) {
                     animationView.setVisibility(View.VISIBLE);
                     animationView.playAnimation();
@@ -234,6 +235,11 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
         return list.size();
     }
 
+    public void updateList(ArrayList<BalanceDetailsData> listData) {
+        list = listData;
+        notifyDataSetChanged();
+    }
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView balViewCategory, balViewAmount, balViewTransAmount, balViewAvlAmount, balViewMode, balViewDate, balViewRemarks;
@@ -251,11 +257,6 @@ public class ViewOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapter<
             balViewDeleteBtn = itemView.findViewById(R.id.balViewDeleteBtn);
 
         }
-    }
-
-    public void updateList(ArrayList<BalanceDetailsData> listData) {
-        list = listData;
-        notifyDataSetChanged();
     }
 
 }

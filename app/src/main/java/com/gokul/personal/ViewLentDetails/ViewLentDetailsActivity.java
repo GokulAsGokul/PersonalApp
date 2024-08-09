@@ -1,5 +1,6 @@
 package com.gokul.personal.ViewLentDetails;
 
+import android.annotation.TargetApi;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -9,9 +10,6 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -23,6 +21,9 @@ import androidx.viewpager.widget.ViewPager;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.tabs.TabLayout;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -75,7 +76,7 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
             super(supportFragmentManager);
         }
 
-        @NonNull
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             return fragmentArrayList.get(position);
@@ -86,7 +87,7 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
             return fragmentArrayList.size();
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.Q)
+        @TargetApi(Build.VERSION_CODES.Q)
         @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
@@ -106,7 +107,7 @@ public class ViewLentDetailsActivity extends AppCompatActivity {
         ConnectionCheck.connectionDialogShow(getApplicationContext(), this);
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             this.finish();
             return true;

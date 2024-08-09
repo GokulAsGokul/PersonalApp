@@ -9,10 +9,8 @@ import android.os.Vibrator;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -29,7 +27,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Field;
+import org.jetbrains.annotations.NotNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().getReference("Investment Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     InvestmentData data1 = dataSnapshot.getValue(InvestmentData.class);
                     list.add(data1);
@@ -117,7 +116,7 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(ViewInvestmentDetailsActivity.this, "Investment Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -148,12 +147,6 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
                 return false;
             }
         });
-        try {
-            @SuppressLint("SoonBlockedPrivateApi") Field mCursorDrawableRes = TextView.class.getDeclaredField("mDrawableForCursor");
-            mCursorDrawableRes.setAccessible(true);
-            mCursorDrawableRes.set(searchView, R.drawable.color_cursor);
-        } catch (Exception ignored) {
-        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -170,7 +163,7 @@ public class ViewInvestmentDetailsActivity extends AppCompatActivity {
 
     @SuppressLint("NonConstantResourceId")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();

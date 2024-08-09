@@ -10,10 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.gokul.personal.R;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -25,9 +24,8 @@ public class IndiaListViewAdapter extends ArrayAdapter<BalanceListViewData> {
     }
 
     @SuppressLint("InflateParams")
-    @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 
         BalanceListViewData balanceData = getItem(position);
 
@@ -45,13 +43,12 @@ public class IndiaListViewAdapter extends ArrayAdapter<BalanceListViewData> {
 
             if (balanceData.name.equalsIgnoreCase("All")) {
                 view.getContext().startActivity(new Intent(view.getContext(), ViewAllIndiaBalanceRecyclerActivity.class));
-                ((Activity) view.getContext()).finish();
             } else {
                 Intent intent = new Intent(view.getContext(), ViewIndiaBalanceRecyclerActivity.class);
                 intent.putExtra("category", balanceData.name);
                 view.getContext().startActivity(intent);
-                ((Activity) view.getContext()).finish();
             }
+            ((Activity) view.getContext()).finish();
 
         });
 

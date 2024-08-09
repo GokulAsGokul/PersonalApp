@@ -14,7 +14,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -29,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,7 +82,7 @@ public class PersonalDetailsFragment extends Fragment {
         personalType.setFocusable(false);
         databaseReference.child("DropDown Values").child("PersonalTypes").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -98,7 +99,7 @@ public class PersonalDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Type Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -166,7 +167,7 @@ public class PersonalDetailsFragment extends Fragment {
 
                 databaseReference.child("Personal Details").orderByChild("personalName").equalTo(namePersonal).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(@NotNull DataSnapshot snapshot) {
 
                         if (snapshot.exists()) {
 
@@ -193,7 +194,7 @@ public class PersonalDetailsFragment extends Fragment {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(@NotNull DatabaseError error) {
                         dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "Personal details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

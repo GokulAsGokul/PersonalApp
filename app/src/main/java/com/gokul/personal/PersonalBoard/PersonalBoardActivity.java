@@ -1,10 +1,8 @@
 package com.gokul.personal.PersonalBoard;
 
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -14,7 +12,6 @@ import java.util.Objects;
 
 public class PersonalBoardActivity extends AppCompatActivity {
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 public class LentListViewData {
 
+    public static Comparator<LentListViewData> listSorter = (l1, l2) -> l1.getName().compareToIgnoreCase(l2.getName());
     String name, remAmount;
 
     public LentListViewData(String name, String remAmount) {
@@ -26,7 +27,5 @@ public class LentListViewData {
     public void setRemAmount(String remAmount) {
         this.remAmount = remAmount;
     }
-
-    public static Comparator<LentListViewData> listSorter = (l1, l2) -> l1.getName().compareToIgnoreCase(l2.getName());
 
 }

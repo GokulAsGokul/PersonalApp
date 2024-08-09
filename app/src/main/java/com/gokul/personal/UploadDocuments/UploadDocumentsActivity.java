@@ -3,7 +3,6 @@ package com.gokul.personal.UploadDocuments;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,12 +21,10 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.gokul.personal.Dashboard.DashboardActivity;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.Miscellaneous.GeneralData;
 import com.gokul.personal.R;
@@ -41,6 +38,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -123,7 +122,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         docUpCategoryLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("DocumentCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog2.show();
@@ -140,7 +139,7 @@ public class UploadDocumentsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog2.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(UploadDocumentsActivity.this, "DocumentCategory Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -281,16 +280,8 @@ public class UploadDocumentsActivity extends AppCompatActivity {
         return typeMap.getExtensionFromMimeType(resolver.getType(fileUri));
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            startActivity(new Intent(UploadDocumentsActivity.this, DashboardActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             this.finish();
             return true;

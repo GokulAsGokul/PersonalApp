@@ -15,7 +15,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -34,6 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -80,9 +81,9 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         updateInvestRemarksLayout = findViewById(R.id.updateInvestRemarksLayout);
         updateInvestName = findViewById(R.id.updateInvestName);
         updateInvestAmount = findViewById(R.id.updateInvestAmount);
-        updateInvestAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        updateInvestAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         updateInvestRemAmount = findViewById(R.id.updateInvestRemAmount);
-        updateInvestRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        updateInvestRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         updateInvestTerm = findViewById(R.id.updateInvestTerm);
         updateInvestRemarks = findViewById(R.id.updateInvestRemarks);
         updateInvestFolio = findViewById(R.id.updateInvestFolio);
@@ -163,7 +164,8 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
     private void remAmountCall() {
 
-        if (((Objects.requireNonNull(updateInvestAmount.getText()).toString()).isEmpty()) || ((updateInvestAmount.getText().toString()).equalsIgnoreCase("0"))) {
+        if (((Objects.requireNonNull(updateInvestAmount.getText()).toString()).isEmpty()) || ((updateInvestAmount.getText().toString()).equalsIgnoreCase("0"))
+                || ((updateInvestAmount.getText().toString()).equalsIgnoreCase("0.0")) || ((updateInvestAmount.getText().toString()).equalsIgnoreCase("0.00"))) {
             updateInvestAmountLayout.setErrorEnabled(true);
             updateInvestAmountLayout.setError("Amount is required");
             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -375,7 +377,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (source.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     updateInvestNameLayout.setError(null);
                     updateInvestNameLayout.setErrorEnabled(false);
                     updateInvestAmountLayout.setError(null);
@@ -398,7 +400,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                     availableBalanceUpdateCall();
                 }
             } else if (source.equals("Bank")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     updateInvestNameLayout.setError(null);
                     updateInvestNameLayout.setErrorEnabled(false);
                     updateInvestAmountLayout.setError(null);
@@ -472,7 +474,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
         } else {
             databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
                     final boolean validate = Double.parseDouble(amount) < Double.parseDouble(oldAmount);
                     if (temp == null) {
@@ -499,7 +501,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(UpdateInvestmentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -571,7 +573,7 @@ public class UpdateInvestmentDetailsActivity extends AppCompatActivity {
 
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(UpdateInvestmentDetailsActivity.this, ViewInvestmentDetailsActivity.class));
             finish();

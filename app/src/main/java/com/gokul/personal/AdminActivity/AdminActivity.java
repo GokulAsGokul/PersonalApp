@@ -1,13 +1,9 @@
 package com.gokul.personal.AdminActivity;
 
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -20,12 +16,13 @@ import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
 import com.google.android.material.tabs.TabLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class AdminActivity extends AppCompatActivity {
 
-    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,13 +77,12 @@ public class AdminActivity extends AppCompatActivity {
             super(supportFragmentManager1);
         }
 
-        @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
             return fragmentTitleList1.get(position);
         }
 
-        @NonNull
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             return fragmentArrayList1.get(position);
@@ -98,7 +94,7 @@ public class AdminActivity extends AppCompatActivity {
         }
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;

@@ -10,12 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gokul.personal.AdminActivity.AdminData;
 import com.gokul.personal.Miscellaneous.ConnectionCheck;
 import com.gokul.personal.R;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -30,16 +31,16 @@ public class DashboardRecyclerAdapter extends RecyclerView.Adapter<DashboardRecy
         this.activity = activity;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public DashboardRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public DashboardRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_dash_details_view, parent, false);
         return new DashboardRecyclerAdapter.MyViewHolder(v);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull DashboardRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(DashboardRecyclerAdapter.MyViewHolder holder, int position) {
         AdminData data = list.get(position);
         holder.bankName.setText(data.getBankName());
         holder.cifNo.setText(data.getBankCIF());
@@ -53,12 +54,10 @@ public class DashboardRecyclerAdapter extends RecyclerView.Adapter<DashboardRecy
                 ConnectionCheck.connectionDialogShow(context, activity);
             } else {
                 String shareTextBody = "***** *Bank Details* *****" + "\n" + "\n" +
-                        "_Name_               : " + "*Gokul P*" + "\n" +
+                        "_Name_               : " + "*Gokul Palanisamy*" + "\n" +
                         "_Bank Name_     : " + "*" + list.get(position).getBankName() + "*" + "\n" +
                         "_Account No_     : " + "*" + list.get(position).getBankAccount() + "*" + "\n" +
-                        "_IFSC Code_       : " + "*" + list.get(position).getBankIFSC() + "*" + "\n" +
-                        "_MICR Code_      : " + "*" + list.get(position).getBankMICR() + "*" + "\n" +
-                        "_Branch_              : " + "*" + list.get(position).getBankBranch() + "*" + "\n" + "\n" +
+                        "_IFSC Code_       : " + "*" + list.get(position).getBankIFSC() + "*" + "\n" + "\n" +
                         "*********************************";
                 shareContDet(position, shareTextBody);
             }

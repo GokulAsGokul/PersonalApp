@@ -16,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -33,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -75,9 +76,9 @@ public class OmanFragment extends Fragment {
         balTranDateLayout = view.findViewById(R.id.balTranDateLayout1);
         balSourceName = view.findViewById(R.id.balSourceName1);
         balAmount = view.findViewById(R.id.balAmount1);
-        balAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+        balAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3)});
         balTransAmount = view.findViewById(R.id.balTransAmount1);
-        balTransAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+        balTransAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3)});
         balCategory = view.findViewById(R.id.balCategory1);
         balTranDate = view.findViewById(R.id.balTranDate1);
         balDecRemarksLayout = view.findViewById(R.id.balDecRemarksLayout1);
@@ -107,7 +108,7 @@ public class OmanFragment extends Fragment {
         balSourceNameLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("OmanSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -124,7 +125,7 @@ public class OmanFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Sources Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -137,7 +138,7 @@ public class OmanFragment extends Fragment {
         balCategoryLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("OmanBalanceCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -154,7 +155,7 @@ public class OmanFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "Category Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -243,14 +244,15 @@ public class OmanFragment extends Fragment {
                 balSourceNameLayout.setError("Source Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0") || amount.equals("0.0") || amount.equals("0.00") || amount.equals("0.000")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
                 balAmountLayout.setErrorEnabled(true);
                 balAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if ((transAmount.startsWith(".") || transAmount.isEmpty() || transAmount.equals("0")) &&
+            } else if ((transAmount.startsWith(".") || transAmount.isEmpty() || transAmount.equals("0") ||
+                    transAmount.equals("0.0") || transAmount.equals("0.00") || transAmount.equals("0.000")) &&
                     !source.equalsIgnoreCase("SplitWise")) {
                 balSourceNameLayout.setError(null);
                 balSourceNameLayout.setErrorEnabled(false);
@@ -315,7 +317,7 @@ public class OmanFragment extends Fragment {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (source.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     balSourceNameLayout.setError(null);
                     balSourceNameLayout.setErrorEnabled(false);
                     balAmountLayout.setError(null);
@@ -334,7 +336,7 @@ public class OmanFragment extends Fragment {
                     availableBalanceSubmitCall(view);
                 }
             } else if (category.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     balSourceNameLayout.setError(null);
                     balSourceNameLayout.setErrorEnabled(false);
                     balAmountLayout.setError(null);
@@ -362,7 +364,11 @@ public class OmanFragment extends Fragment {
     private void availableBalanceSubmitCall(View view) {
 
         amount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balAmount.getText()).toString().trim()));
-        transAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balTransAmount.getText()).toString().trim()));
+        if (source.equalsIgnoreCase("SplitWise")) {
+            transAmount = "0.000";
+        } else {
+            transAmount = decimalFormat.format(Double.parseDouble(Objects.requireNonNull(balTransAmount.getText()).toString().trim()));
+        }
 
         balSourceNameLayout.setError(null);
         balSourceNameLayout.setErrorEnabled(false);
@@ -387,7 +393,7 @@ public class OmanFragment extends Fragment {
             } else {
                 databaseReference.child("Available Balance Details Oman").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(@NotNull DataSnapshot snapshot) {
                         String temp = snapshot.getValue(String.class);
                         if (balSwitch.isChecked()) {
                             if (temp == null) {
@@ -412,7 +418,7 @@ public class OmanFragment extends Fragment {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(@NotNull DatabaseError error) {
                         dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

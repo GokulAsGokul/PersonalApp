@@ -18,7 +18,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -35,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -78,7 +79,7 @@ public class AddLentOmanFragment extends Fragment {
         lendDecRemarksLayout = view.findViewById(R.id.lendDecRemarksLayoutOM);
         lendDecName = view.findViewById(R.id.lendDecNameOM);
         lendDecAmount = view.findViewById(R.id.lendDecAmountOM);
-        lendDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+        lendDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3)});
         lendDecRemarks = view.findViewById(R.id.lendDecRemarksOM);
         lendDecFrom = view.findViewById(R.id.lendDecFromOM);
         lendDecTo = view.findViewById(R.id.lendDecToOM);
@@ -108,7 +109,7 @@ public class AddLentOmanFragment extends Fragment {
         lendDecFromLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("OmanSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -125,7 +126,7 @@ public class AddLentOmanFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -137,7 +138,7 @@ public class AddLentOmanFragment extends Fragment {
         lendDecToLayout.setClickable(true);
         databaseReference.child("DropDown Values").child("OmanLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -154,7 +155,7 @@ public class AddLentOmanFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(view.getContext(), "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -260,7 +261,7 @@ public class AddLentOmanFragment extends Fragment {
                 lendDecAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.equals("0.000")) {
+            } else if (amount.equals("0") || amount.equals("0.0") || amount.equals("0.00") || amount.equals("0.000")) {
                 lendDecNameLayout.setError(null);
                 lendDecNameLayout.setErrorEnabled(false);
                 lendDecAmountLayout.setErrorEnabled(true);
@@ -331,7 +332,7 @@ public class AddLentOmanFragment extends Fragment {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (from.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     lendDecNameLayout.setError(null);
                     lendDecNameLayout.setErrorEnabled(false);
                     lendDecAmountLayout.setError(null);
@@ -350,7 +351,7 @@ public class AddLentOmanFragment extends Fragment {
                     availableBalanceSubmitCall(view);
                 }
             } else if (to.equals("Bank")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     lendDecNameLayout.setError(null);
                     lendDecNameLayout.setErrorEnabled(false);
                     lendDecAmountLayout.setError(null);
@@ -369,7 +370,7 @@ public class AddLentOmanFragment extends Fragment {
                     availableBalanceSubmitCall(view);
                 }
             } else if (to.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     lendDecNameLayout.setError(null);
                     lendDecNameLayout.setErrorEnabled(false);
                     lendDecAmountLayout.setError(null);
@@ -414,7 +415,7 @@ public class AddLentOmanFragment extends Fragment {
         } else {
             databaseReference.child("Available Balance Details Oman").child(from).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
                     if (temp == null) {
                         dialog.dismiss();
@@ -433,7 +434,7 @@ public class AddLentOmanFragment extends Fragment {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     StyleableToast.makeText(view.getContext(), "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });
@@ -442,8 +443,6 @@ public class AddLentOmanFragment extends Fragment {
     }
 
     private void availableBalanceSubmit(String sourceAmount, View view) {
-
-        @SuppressLint("DefaultLocale") String amount = String.format("%.3f", Float.parseFloat(sourceAmount));
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(from);

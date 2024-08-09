@@ -16,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -35,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -55,7 +56,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
     private TextInputEditText investMatAmount, investMatRemAmt, investMatRemarks;
     private AutoCompleteTextView investMatSource, investMatTranDate;
     private Vibrator vibrator;
-    private String amount, remAmount, source, sourceDropDown;
+    private String amount, remAmount, source, date, sourceDropDown;
     private Dialog dialog;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private final ArrayList<String> sourceList = new ArrayList<>();
@@ -80,9 +81,9 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
         investMatTranDateLayout = findViewById(R.id.investMatTranDateLayout);
         investMatRemarksLayout = findViewById(R.id.investMatRemarksLayout);
         investMatAmount = findViewById(R.id.investMatAmount);
-        investMatAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        investMatAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         investMatRemAmt = findViewById(R.id.investMatRemAmt);
-        investMatRemAmt.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        investMatRemAmt.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         investMatSource = findViewById(R.id.investMatSource);
         investMatTranDate = findViewById(R.id.investMatTranDate);
         investMatRemarks = findViewById(R.id.investMatRemarks);
@@ -117,9 +118,9 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
         investMatSource.setFocusable(false);
         investMatSourceLayout.setClickable(true);
 
-        databaseReference.child("DropDown Values").child("IndiaLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -137,7 +138,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(MatureInvestmentDetailsActivity.this, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -187,7 +188,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
             investMatAmountLayout.setErrorEnabled(false);
             investMatRemAmtLayout.setError(null);
             investMatRemAmtLayout.setErrorEnabled(false);
-            investMatRemAmt.setText(String.valueOf(BigDecimal.valueOf(Double.parseDouble(getIntent().getStringExtra("amount"))).subtract(BigDecimal.valueOf(Double.parseDouble(investMatAmount.getText().toString())))));
+            investMatRemAmt.setText(String.valueOf(decimalFormat.format(BigDecimal.valueOf(Double.parseDouble(getIntent().getStringExtra("amount"))).subtract(BigDecimal.valueOf(Double.parseDouble(investMatAmount.getText().toString()))))));
         }
     }
 
@@ -251,12 +252,12 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
                 amount = Objects.requireNonNull(investMatAmount.getText()).toString().trim();
                 remAmount = Objects.requireNonNull(investMatRemAmt.getText()).toString().trim();
                 source = investMatSource.getText().toString().trim();
-                String date = investMatTranDate.getText().toString().trim();
+                date = investMatTranDate.getText().toString().trim();
                 String remarks = investMatRemarks.getText().toString().trim();
 
                 String remarksPattern = "^[a-zA-Z0-9\\s]{4,20}$";
 
-                if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
+                if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0") || amount.equals("0.0") || amount.equals("0.00")) {
                     investMatAmountLayout.setErrorEnabled(true);
                     investMatAmountLayout.setError("Amount is Required");
                     dialog.dismiss();
@@ -316,7 +317,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
                     if (source.equals("Others")) {
-                        if (remarks.equalsIgnoreCase("Mention If Any") || remarks.equalsIgnoreCase("Nill")) {
+                        if (remarks.equalsIgnoreCase("Mention If Any") || remarks.equalsIgnoreCase("Nil")) {
                             investMatAmountLayout.setError(null);
                             investMatAmountLayout.setErrorEnabled(false);
                             investMatRemAmtLayout.setError(null);
@@ -358,7 +359,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
         } else {
             databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
                     String updateFinder = getIntent().getStringExtra("updateFinder");
                     if (temp == null) {
@@ -369,7 +370,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(MatureInvestmentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -394,7 +395,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
 
     private void updateInvestmentDetails(String avlAmount, String updateFinder) {
 
-        if (remAmount.equalsIgnoreCase("0")) {
+        if (remAmount.equalsIgnoreCase("0.00")) {
             databaseReference.child("Investment Details").child(updateFinder).removeValue().addOnSuccessListener(unused -> addBalanceDetails(avlAmount)).addOnFailureListener(e -> {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -412,7 +413,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
 
     private void addBalanceDetails(String avlAmount) {
 
-        String date = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
+        String date1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.getDefault()).format(new Date());
 
         BalanceDetailsData data = new BalanceDetailsData();
         data.setSource(source);
@@ -423,10 +424,10 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
         data.setType("Income");
         data.setDate(date);
         data.setFilter(date.substring(3, 10).replaceAll("-", "_"));
-        data.setUpdateFinder(date);
+        data.setUpdateFinder(date1);
         data.setRemarks("From " + getIntent().getStringExtra("folio"));
 
-        databaseReference.child("Balance Details India").child(source).child(date).setValue(data).
+        databaseReference.child("Balance Details India").child(source).child(date1).setValue(data).
                 addOnSuccessListener(unused -> {
                     startActivity(new Intent(MatureInvestmentDetailsActivity.this, ViewInvestmentDetailsActivity.class));
                     finish();
@@ -440,7 +441,7 @@ public class MatureInvestmentDetailsActivity extends AppCompatActivity {
 
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(MatureInvestmentDetailsActivity.this, ViewInvestmentDetailsActivity.class));
             finish();

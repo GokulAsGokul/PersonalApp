@@ -16,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -35,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -93,11 +94,11 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         lendUpdateAmount = findViewById(R.id.lendUpdateAmount);
         lendUpdateRemAmount = findViewById(R.id.lendUpdateRemAmount);
         if (country.equalsIgnoreCase("India")) {
-            lendUpdateAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
-            lendUpdateRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+            lendUpdateAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
+            lendUpdateRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         } else {
-            lendUpdateAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
-            lendUpdateRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 3)});
+            lendUpdateAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3)});
+            lendUpdateRemAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3)});
         }
         lendUpdateRemarks = findViewById(R.id.lendUpdateRemarks);
         lendUpdateFrom = findViewById(R.id.lendUpdateFrom);
@@ -139,30 +140,58 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         lendUpdateTo.setClickable(true);
         lendUpdateTo.setFocusable(false);
         lendUpdateToLayout.setClickable(true);
-        databaseReference.child("DropDown Values").child("IndiaLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
-                    String temp = childDataSnapshot.child("listValue").getValue(String.class);
-                    dialog.show();
-                    toList.add(temp);
-                }
-                ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(UpdateLentDetailsActivity.this, R.layout.dropdown_list, toList);
-                sourceAdapter.sort(Comparator.naturalOrder());
-                lendUpdateTo.setAdapter(sourceAdapter);
-                dialog.dismiss();
-                lendUpdateTo.setOnItemClickListener((parent, view, position, id) -> {
-                    UIUtil.hideKeyboard(UpdateLentDetailsActivity.this);
-                    toDropDown = parent.getItemAtPosition(position).toString();
-                });
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                dialog.dismiss();
-                StyleableToast.makeText(UpdateLentDetailsActivity.this, "From Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
-        });
+        if (country.equalsIgnoreCase("India")) {
+            databaseReference.child("DropDown Values").child("IndiaLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
+                    for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                        String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                        dialog.show();
+                        toList.add(temp);
+                    }
+                    ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(UpdateLentDetailsActivity.this, R.layout.dropdown_list, toList);
+                    sourceAdapter.sort(Comparator.naturalOrder());
+                    lendUpdateTo.setAdapter(sourceAdapter);
+                    dialog.dismiss();
+                    lendUpdateTo.setOnItemClickListener((parent, view, position, id) -> {
+                        UIUtil.hideKeyboard(UpdateLentDetailsActivity.this);
+                        toDropDown = parent.getItemAtPosition(position).toString();
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NotNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(UpdateLentDetailsActivity.this, "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        } else {
+            databaseReference.child("DropDown Values").child("OmanLentTo").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
+                    for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
+                        String temp = childDataSnapshot.child("listValue").getValue(String.class);
+                        dialog.show();
+                        toList.add(temp);
+                    }
+                    ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(UpdateLentDetailsActivity.this, R.layout.dropdown_list, toList);
+                    sourceAdapter.sort(Comparator.naturalOrder());
+                    lendUpdateTo.setAdapter(sourceAdapter);
+                    dialog.dismiss();
+                    lendUpdateTo.setOnItemClickListener((parent, view, position, id) -> {
+                        UIUtil.hideKeyboard(UpdateLentDetailsActivity.this);
+                        toDropDown = parent.getItemAtPosition(position).toString();
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NotNull DatabaseError error) {
+                    dialog.dismiss();
+                    StyleableToast.makeText(UpdateLentDetailsActivity.this, "To Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+            });
+        }
 
         lendUpdateTranDate.setInputType(InputType.TYPE_NULL);
         lendUpdateTranDate.setClickable(true);
@@ -259,14 +288,14 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 lendUpdateNameLayout.setError("Borrower Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0") || amount.equals("0.0") || amount.equals("0.00") || amount.equals("0.000")) {
                 lendUpdateNameLayout.setError(null);
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setErrorEnabled(true);
                 lendUpdateAmountLayout.setError("Amount is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (remAmount.startsWith(".") || remAmount.isEmpty() || remAmount.equals("0")) {
+            } else if (remAmount.startsWith(".") || remAmount.isEmpty() || remAmount.equals("0") || remAmount.equals("0.0") || remAmount.equals("0.00") || remAmount.equals("0.000")) {
                 lendUpdateNameLayout.setError(null);
                 lendUpdateNameLayout.setErrorEnabled(false);
                 lendUpdateAmountLayout.setError(null);
@@ -348,7 +377,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
             } else if (from.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     lendUpdateNameLayout.setError(null);
                     lendUpdateNameLayout.setErrorEnabled(false);
                     lendUpdateAmountLayout.setError(null);
@@ -369,7 +398,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     availableBalanceUpdateCall();
                 }
             } else if (to.equalsIgnoreCase("Bank Account")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     lendUpdateNameLayout.setError(null);
                     lendUpdateNameLayout.setErrorEnabled(false);
                     lendUpdateAmountLayout.setError(null);
@@ -390,7 +419,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                     availableBalanceUpdateCall();
                 }
             } else if (to.equals("Others")) {
-                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nill"))) {
+                if ((remarks.isEmpty()) || (remarks.equalsIgnoreCase("Mention If Any")) || (remarks.equalsIgnoreCase("Nil"))) {
                     lendUpdateNameLayout.setError(null);
                     lendUpdateNameLayout.setErrorEnabled(false);
                     lendUpdateAmountLayout.setError(null);
@@ -455,7 +484,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
         } else {
             databaseReference.child("Available Balance Details " + country).child(from).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
 
                     final boolean validate = Double.parseDouble(amount) < Double.parseDouble(oldAmount);
@@ -483,7 +512,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(UpdateLentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -571,7 +600,7 @@ public class UpdateLentDetailsActivity extends AppCompatActivity {
 
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(UpdateLentDetailsActivity.this, ViewLentDetailsActivity.class));
             finish();

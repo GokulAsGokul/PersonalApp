@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,17 +32,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import io.github.muddz.styleabletoast.StyleableToast;
 
 public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<ViewInvestmentDetailsRecyclerAdapter.MyViewHolder> {
     private final Context context;
-    private ArrayList<InvestmentData> list;
     private final Activity activity;
     private final LottieAnimationView animationView;
     private final Vibrator vibrator;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private ArrayList<InvestmentData> list;
     private Dialog loadingDialog;
 
     public ViewInvestmentDetailsRecyclerAdapter(Context context, ArrayList<InvestmentData> list, Activity activity, LottieAnimationView animationView, Vibrator vibrator) {
@@ -54,15 +56,15 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
         this.vibrator = vibrator;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public ViewInvestmentDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewInvestmentDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_investment_details_view, parent, false);
         return new ViewInvestmentDetailsRecyclerAdapter.MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewInvestmentDetailsRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(ViewInvestmentDetailsRecyclerAdapter.MyViewHolder holder, int position) {
         InvestmentData data = list.get(position);
         holder.invDetCompany.setText(data.getName());
         holder.invDetAmount.setText(data.getAmount());
@@ -135,7 +137,7 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             } else {
                 Intent intent = new Intent(context, MatureInvestmentDetailsActivity.class);
                 intent.putExtra("folio", data.getFolioNumber());
-                intent.putExtra("amount", data.getAmount());
+                intent.putExtra("amount", data.getRemAmount());
                 intent.putExtra("updateFinder", data.getUpdateFinder());
                 context.startActivity(intent);
                 ((Activity) context).finish();
@@ -156,17 +158,17 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
 
         databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
                 if (temp == null) {
                     availableBalanceSubmit(source, String.valueOf(Integer.parseInt(amount)), dialogCall);
                 } else {
-                    availableBalanceSubmit(source, String.valueOf(Integer.parseInt(temp) + Integer.parseInt(amount)), dialogCall);
+                    availableBalanceSubmit(source, String.valueOf(BigDecimal.valueOf(Double.parseDouble(temp)).add(BigDecimal.valueOf(Double.parseDouble(amount)))), dialogCall);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialogCall.dismiss();
                 if (list.isEmpty()) {
                     animationView.setVisibility(View.VISIBLE);
@@ -205,6 +207,11 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
         return list.size();
     }
 
+    public void updateList(ArrayList<InvestmentData> listData) {
+        list = listData;
+        notifyDataSetChanged();
+    }
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView invDetCompany, invDetAmount, invDetRemAmount, invDetFolio, invDetTerm, invDetSource, invDetDate, invDetRemarks;
@@ -225,11 +232,6 @@ public class ViewInvestmentDetailsRecyclerAdapter extends RecyclerView.Adapter<V
             investDetMatureBtn = itemView.findViewById(R.id.investDetMatureBtn);
 
         }
-    }
-
-    public void updateList(ArrayList<InvestmentData> listData) {
-        list = listData;
-        notifyDataSetChanged();
     }
 
 }

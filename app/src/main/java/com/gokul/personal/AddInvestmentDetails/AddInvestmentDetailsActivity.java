@@ -16,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -34,6 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -82,7 +83,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         investDecRemarksLayout = findViewById(R.id.investDecRemarksLayout);
         investDecName = findViewById(R.id.investDecName);
         investDecAmount = findViewById(R.id.investDecAmount);
-        investDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
+        investDecAmount.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2)});
         investDecTerm = findViewById(R.id.investDecTerm);
         investDecRemarks = findViewById(R.id.investDecRemarks);
         investDecFolio = findViewById(R.id.investDecFolio);
@@ -113,7 +114,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         investDecSource.setFocusable(false);
         databaseReference.child("DropDown Values").child("IndiaSource").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String temp = childDataSnapshot.child("listValue").getValue(String.class);
                     dialog.show();
@@ -130,7 +131,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Source Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
             }
@@ -231,7 +232,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 investDecNameLayout.setError("Company Name is Required");
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0")) {
+            } else if (amount.startsWith(".") || amount.isEmpty() || amount.equals("0") || amount.equals("0.0") || amount.equals("0.00")) {
                 investDecNameLayout.setError(null);
                 investDecNameLayout.setErrorEnabled(false);
                 investDecAmountLayout.setErrorEnabled(true);
@@ -392,7 +393,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         } else {
             databaseReference.child("Available Balance Details India").child(source).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     String temp = snapshot.getValue(String.class);
                     if (temp == null) {
                         dialog.dismiss();
@@ -411,7 +412,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     StyleableToast.makeText(AddInvestmentDetailsActivity.this, "Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
                 }
             });
@@ -441,6 +442,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
         InvestmentData data = new InvestmentData();
         data.setName(name);
         data.setAmount(decimalFormat.format(Double.parseDouble(amount)));
+        data.setRemAmount(decimalFormat.format(Double.parseDouble(amount)));
         data.setFolioNumber(folioNumber);
         data.setTerm(term);
         data.setSource(source);
@@ -488,7 +490,7 @@ public class AddInvestmentDetailsActivity extends AppCompatActivity {
 
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;

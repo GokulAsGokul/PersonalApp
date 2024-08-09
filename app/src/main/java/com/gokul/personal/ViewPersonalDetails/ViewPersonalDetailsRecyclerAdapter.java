@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,6 +35,8 @@ import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -61,15 +62,15 @@ public class ViewPersonalDetailsRecyclerAdapter extends RecyclerView.Adapter<Vie
         this.vibrator = vibrator;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public ViewPersonalDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewPersonalDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_personal_details_view, parent, false);
         return new ViewPersonalDetailsRecyclerAdapter.MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewPersonalDetailsRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(ViewPersonalDetailsRecyclerAdapter.MyViewHolder holder, int position) {
         AdminData data = list.get(position);
         holder.viewPersonalType.setText(data.getPersonalType());
         holder.viewPerDetText1.setText(data.getPersonalName());

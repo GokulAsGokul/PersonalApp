@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -37,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,10 +49,10 @@ import io.github.muddz.styleabletoast.StyleableToast;
 
 public class ViewLentDetailsRecyclerActivity extends AppCompatActivity {
 
-    private ArrayList<LentDetailsData> list;
     private final ArrayList<String> filterData = new ArrayList<>();
     private final ArrayList<LentDetailsData> searchList = new ArrayList<>();
     private final ArrayList<LentDetailsData> filterList = new ArrayList<>();
+    private ArrayList<LentDetailsData> list;
     private Dialog dialog;
     private ViewLentDetailsRecyclerAdapter adapter;
     private Vibrator vibrator;
@@ -112,7 +113,7 @@ public class ViewLentDetailsRecyclerActivity extends AppCompatActivity {
         if (getIntent().getExtras().getString("name").equalsIgnoreCase("All")) {
             FirebaseDatabase.getInstance().getReference("Lent Details " + (getIntent().getExtras().getString("country"))).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         LentDetailsData data1 = dataSnapshot.getValue(LentDetailsData.class);
                         list.add(data1);
@@ -143,7 +144,7 @@ public class ViewLentDetailsRecyclerActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(ViewLentDetailsRecyclerActivity.this, "India Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -153,7 +154,7 @@ public class ViewLentDetailsRecyclerActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference("Lent Details " + (getIntent().getExtras().getString("country"))).
                     orderByChild("name").equalTo(getIntent().getExtras().getString("name")).addValueEventListener(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         LentDetailsData data1 = dataSnapshot.getValue(LentDetailsData.class);
                         list.add(data1);
@@ -184,7 +185,7 @@ public class ViewLentDetailsRecyclerActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(ViewLentDetailsRecyclerActivity.this, "India Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -377,7 +378,7 @@ public class ViewLentDetailsRecyclerActivity extends AppCompatActivity {
 
     @SuppressLint("NonConstantResourceId")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(ViewLentDetailsRecyclerActivity.this, ViewLentDetailsActivity.class));
             this.finish();

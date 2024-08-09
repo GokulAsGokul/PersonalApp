@@ -12,7 +12,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -27,6 +26,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -198,7 +199,7 @@ public class BankDetailsFragment extends Fragment {
 
         databaseReference.child("Bank Details").orderByChild("bankName").equalTo(bankName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
 
                 if (snapshot.exists()) {
 
@@ -226,7 +227,7 @@ public class BankDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view1.getContext(), "Bank details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

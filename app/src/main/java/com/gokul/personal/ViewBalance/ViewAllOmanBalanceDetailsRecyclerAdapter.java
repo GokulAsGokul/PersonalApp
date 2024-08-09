@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -52,15 +53,15 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
         this.vibrator = vibrator;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public ViewAllOmanBalanceDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewAllOmanBalanceDetailsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_all_balance_details, parent, false);
         return new ViewAllOmanBalanceDetailsRecyclerAdapter.MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewAllOmanBalanceDetailsRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(ViewAllOmanBalanceDetailsRecyclerAdapter.MyViewHolder holder, int position) {
         BalanceDetailsData data = list.get(position);
         holder.allBalViewSource.setText(data.getSource());
         holder.allBalViewCategory.setText(data.getCategory());
@@ -119,7 +120,7 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
 
         databaseReference.child("Available Balance Details Oman").child(balName).child("amount").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 String temp = snapshot.getValue(String.class);
 
                 if (balType.equalsIgnoreCase("Income")) {
@@ -149,7 +150,7 @@ public class ViewAllOmanBalanceDetailsRecyclerAdapter extends RecyclerView.Adapt
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 if (list.isEmpty()) {
                     animationView.setVisibility(View.VISIBLE);
                     animationView.playAnimation();

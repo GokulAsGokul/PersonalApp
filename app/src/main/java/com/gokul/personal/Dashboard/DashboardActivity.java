@@ -29,10 +29,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.biometric.BiometricPrompt;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -67,9 +67,12 @@ import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.DialogPlusBuilder;
 import com.orhanobut.dialogplus.ViewHolder;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 import io.github.muddz.styleabletoast.StyleableToast;
 import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator;
@@ -130,67 +133,63 @@ public class DashboardActivity extends AppCompatActivity {
         View headerView = navigationView.getHeaderView(0);
         headerView.findViewById(R.id.navDraProfile).setOnClickListener(view -> {
 
-//            Executor executor = ContextCompat.getMainExecutor(this);
-//
-//            BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
-//                @Override
-//                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-//                    super.onAuthenticationError(errorCode, errString);
-//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
-//                }
-//
-//                @Override
-//                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-//                    super.onAuthenticationSucceeded(result);
-//                    startActivity(new Intent(DashboardActivity.this, AdminActivity.class));
-//                }
-//
-//                @Override
-//                public void onAuthenticationFailed() {
-//                    super.onAuthenticationFailed();
-//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
-//                }
-//            });
-//
-//            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Admin Activity Authentication")
-//                    .setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
-//
-//            prompt.authenticate(promptInfo);
+            Executor executor = ContextCompat.getMainExecutor(this);
 
-            startActivity(new Intent(DashboardActivity.this, AdminActivity.class));
+            BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationError(int errorCode, @NotNull CharSequence errString) {
+                    super.onAuthenticationError(errorCode, errString);
+                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+                }
+
+                @Override
+                public void onAuthenticationSucceeded(@NotNull BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+                    startActivity(new Intent(DashboardActivity.this, AdminActivity.class));
+                }
+
+                @Override
+                public void onAuthenticationFailed() {
+                    super.onAuthenticationFailed();
+                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+                }
+            });
+
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Admin Activity Authentication")
+                    .setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
+
+            prompt.authenticate(promptInfo);
 
         });
 
         headerView.findViewById(R.id.headerLayout2).setOnClickListener(view -> {
 
-//            Executor executor = ContextCompat.getMainExecutor(this);
-//
-//            BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
-//                @Override
-//                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-//                    super.onAuthenticationError(errorCode, errString);
-//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
-//                }
-//
-//                @Override
-//                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-//                    super.onAuthenticationSucceeded(result);
-//                    startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class));
-//                }
-//
-//                @Override
-//                public void onAuthenticationFailed() {
-//                    super.onAuthenticationFailed();
-//                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
-//                }
-//            });
-//
-//            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Personal Data View Authentication")
-//                    .setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
-//
-//            prompt.authenticate(promptInfo);
+            Executor executor = ContextCompat.getMainExecutor(this);
 
-            startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class));
+            BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationError(int errorCode, @NotNull CharSequence errString) {
+                    super.onAuthenticationError(errorCode, errString);
+                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+                }
+
+                @Override
+                public void onAuthenticationSucceeded(@NotNull BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+                    startActivity(new Intent(DashboardActivity.this, ViewPersonalDetailsActivity.class));
+                }
+
+                @Override
+                public void onAuthenticationFailed() {
+                    super.onAuthenticationFailed();
+                    StyleableToast.makeText(DashboardActivity.this, "Please place registered finger on sensor", R.style.CustomErrorToast);
+                }
+            });
+
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Personal Data View Authentication")
+                    .setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
+
+            prompt.authenticate(promptInfo);
 
         });
 
@@ -334,7 +333,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         databaseReference.child("Bank Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     AdminData data1 = dataSnapshot.getValue(AdminData.class);
                     list.add(data1);
@@ -352,7 +351,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Bank detail read error: " + error.getMessage(), R.style.CustomErrorToast, Toast.LENGTH_LONG);
@@ -365,7 +364,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -381,7 +380,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             databaseReference.orderByChild("appExtension").equalTo("apk").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     if (!snapshot.exists()) {
                         dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -389,7 +388,7 @@ public class DashboardActivity extends AppCompatActivity {
                     } else {
                         databaseReference.child("Latest AppData").addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            public void onDataChange(@NotNull DataSnapshot snapshot) {
 
                                 appName = Objects.requireNonNull(snapshot.child("appName").getValue()).toString();
                                 appURL = Objects.requireNonNull(snapshot.child("appUrl").getValue()).toString();
@@ -422,7 +421,7 @@ public class DashboardActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+                            public void onCancelled(@NotNull DatabaseError error) {
                                 dialog.dismiss();
                                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                                 StyleableToast.makeText(DashboardActivity.this, "App Version Read Error: ", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -432,7 +431,7 @@ public class DashboardActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(DashboardActivity.this, "App details read error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -524,7 +523,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         databaseReference.child("Available Balance Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
                     assert amount != null;
@@ -536,7 +535,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "India Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -549,7 +548,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         databaseReference.child("Lent Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("remAmount").getValue(String.class);
                     assert amount != null;
@@ -561,7 +560,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "India Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -574,7 +573,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         databaseReference.child("Investment Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
                     assert amount != null;
@@ -588,7 +587,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -601,7 +600,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
                     assert amount != null;
@@ -613,7 +612,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Oman Available Balance Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -626,7 +625,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         databaseReference.child("Lent Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     String amount = childDataSnapshot.child("amount").getValue(String.class);
                     assert amount != null;
@@ -639,7 +638,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(DashboardActivity.this, "Oman Lent Details Read Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();

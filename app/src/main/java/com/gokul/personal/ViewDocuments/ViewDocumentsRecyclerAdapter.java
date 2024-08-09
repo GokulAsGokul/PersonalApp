@@ -21,7 +21,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,6 +30,8 @@ import com.gokul.personal.Miscellaneous.GeneralData;
 import com.gokul.personal.R;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -53,16 +54,16 @@ public class ViewDocumentsRecyclerAdapter extends RecyclerView.Adapter<ViewDocum
         this.vibrator = vibrator;
     }
 
-    @NonNull
+    @NotNull
     @Override
-    public ViewDocumentsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewDocumentsRecyclerAdapter.MyViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.view_documents_view, parent, false);
         return new ViewDocumentsRecyclerAdapter.MyViewHolder(v);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewDocumentsRecyclerAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(ViewDocumentsRecyclerAdapter.MyViewHolder holder, int position) {
         GeneralData data = list.get(position);
         holder.viewDocsCategory.setText(data.getFileCategory().toUpperCase());
         holder.viewDocsType.setText(data.getFileExtension().toUpperCase());

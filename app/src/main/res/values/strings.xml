@@ -132,7 +132,7 @@
     <string name="enter_available_amount">Enter Available Amount</string>
     <string name="enter_invested_amount">Enter Invested Amount</string>
     <string name="investment_mature_details">Add Maturity Details</string>
-    <string name="enter_maturity_amount">Ente Maturity Amount</string>
+    <string name="enter_maturity_amount">Enter Maturity Amount</string>
     <string name="remaining_amount">Remaining Amount</string>
     <string name="investmentDetailsMatureBtn">Investment Details Mature Btn</string>
     <string name="download_amp_upload_data"><![CDATA[Download & Upload Data]]></string>

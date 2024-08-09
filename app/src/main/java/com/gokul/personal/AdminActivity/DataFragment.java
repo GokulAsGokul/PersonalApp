@@ -1,10 +1,10 @@
 package com.gokul.personal.AdminActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -21,12 +21,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.Fragment;
 
 import com.gokul.personal.AddBalances.BalanceDetailsData;
@@ -63,6 +64,8 @@ import com.itextpdf.layout.property.VerticalAlignment;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.ParseException;
@@ -79,9 +82,8 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public class DataFragment extends Fragment {
 
-    private TextInputLayout dataTableLayout, dataUploadNameLayout, dataUploadFileLayout;
-    private AutoCompleteTextView dataTable, dataUploadName, dataUploadFile;
-    private Button dataUploadButton;
+    private TextInputLayout dataTableLayout;
+    private AutoCompleteTextView dataTable;
     private View view;
     private Vibrator vibrator;
     private Dialog dialog;
@@ -90,8 +92,6 @@ public class DataFragment extends Fragment {
     private String tableDropDown1, tableDropDown2, tableDropDown3;
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private Document document;
-    private ProgressBar downloadDialogBar;
-    private long downloadID;
     private final Color colorBackground = new DeviceRgb(0, 74, 153);
     private final ArrayList<String> indiaBalanceNameList = new ArrayList<>();
     private final ArrayList<String> omanBalanceNameList = new ArrayList<>();
@@ -149,13 +149,13 @@ public class DataFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_data, container, false);
 
         dataTableLayout = view.findViewById(R.id.dataTableLayout);
-        dataUploadNameLayout = view.findViewById(R.id.dataUploadNameLayout);
-        dataUploadFileLayout = view.findViewById(R.id.dataUploadFileLayout);
+        TextInputLayout dataUploadNameLayout = view.findViewById(R.id.dataUploadNameLayout);
+        TextInputLayout dataUploadFileLayout = view.findViewById(R.id.dataUploadFileLayout);
         dataTable = view.findViewById(R.id.dataTable);
-        dataUploadName = view.findViewById(R.id.dataUploadName);
-        dataUploadFile = view.findViewById(R.id.dataUploadFile);
+        AutoCompleteTextView dataUploadName = view.findViewById(R.id.dataUploadName);
+        AutoCompleteTextView dataUploadFile = view.findViewById(R.id.dataUploadFile);
         Button dataDownloadButton = view.findViewById(R.id.dataDownloadButton);
-        dataUploadButton = view.findViewById(R.id.dataUploadButton);
+        Button dataUploadButton = view.findViewById(R.id.dataUploadButton);
 
         vibrator = (Vibrator) requireActivity().getSystemService((VIBRATOR_SERVICE));
 
@@ -208,8 +208,12 @@ public class DataFragment extends Fragment {
                 } else {
                     dataTableLayout.setErrorEnabled(false);
                     dataTableLayout.setError(null);
-                    dialog.show();
-                    pdfDataCall(tableDropDown1);
+                    if (ContextCompat.checkSelfPermission(view.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
+                        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    } else {
+                        dialog.show();
+                        pdfDataCall(tableDropDown1);
+                    }
                 }
             }
         });
@@ -221,14 +225,14 @@ public class DataFragment extends Fragment {
 
         databaseReference.child("Available Balance Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                     indiaBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
                 }
 
                 databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
+                    public void onDataChange(@NotNull DataSnapshot snapshot) {
                         for (DataSnapshot childDataSnapshot : snapshot.getChildren()) {
                             omanBalanceNameList.add(childDataSnapshot.child("source").getValue(String.class));
                         }
@@ -238,7 +242,7 @@ public class DataFragment extends Fragment {
                     }
 
                     @Override
-                    public void onCancelled(@androidx.annotation.NonNull DatabaseError error) {
+                    public void onCancelled(@NotNull DatabaseError error) {
                         dialog.dismiss();
                         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         StyleableToast.makeText(view.getContext(), "Oman Balance Names Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -248,7 +252,7 @@ public class DataFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@androidx.annotation.NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "India Balance Names Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -296,7 +300,7 @@ public class DataFragment extends Fragment {
 
             databaseReference.child("Available Balance Details India").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     if (snapshot.getChildrenCount() == 0) {
                         table27.setHorizontalAlignment(HorizontalAlignment.CENTER);
                         table27.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -332,7 +336,7 @@ public class DataFragment extends Fragment {
 
                     databaseReference.child("Available Balance Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        public void onDataChange(@NotNull DataSnapshot snapshot) {
                             if (snapshot.getChildrenCount() == 0) {
                                 table31.setHorizontalAlignment(HorizontalAlignment.CENTER);
                                 table31.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -370,7 +374,7 @@ public class DataFragment extends Fragment {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
+                        public void onCancelled(@NotNull DatabaseError error) {
                             dialog.dismiss();
                             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                             StyleableToast.makeText(view.getContext(), "Available Balance Oman Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -380,7 +384,7 @@ public class DataFragment extends Fragment {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Available Balance India Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -399,21 +403,6 @@ public class DataFragment extends Fragment {
     private void pdfSpace(int count) {
         for (int i = 0; i < count; i++) {
             document.add(new Paragraph(""));
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        int STORAGE_PERMISSION_CODE = 1;
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                StyleableToast.makeText(view.getContext(), "Storage Permission Granted", Toast.LENGTH_LONG, R.style.CustomToast).show();
-            } else {
-                StyleableToast.makeText(view.getContext(), "Storage Permission Denied", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
-            }
         }
     }
 
@@ -436,7 +425,7 @@ public class DataFragment extends Fragment {
 
         databaseReference.child("Bank Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
                     table3.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     table3.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -467,7 +456,7 @@ public class DataFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Bank Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -492,7 +481,7 @@ public class DataFragment extends Fragment {
 
         databaseReference.child("Investment Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
                     table7.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     table7.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -536,7 +525,7 @@ public class DataFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Investment Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -561,7 +550,7 @@ public class DataFragment extends Fragment {
 
         databaseReference.child("Personal Details").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
                     table35.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     table35.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -598,7 +587,7 @@ public class DataFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Personal Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -626,7 +615,7 @@ public class DataFragment extends Fragment {
 
         databaseReference.child("Lent Details India").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
                     table11.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     table11.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -671,7 +660,7 @@ public class DataFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "India Lent Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -698,7 +687,7 @@ public class DataFragment extends Fragment {
 
         databaseReference.child("Lent Details Oman").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
                     table15.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     table15.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -747,7 +736,7 @@ public class DataFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 dialog.dismiss();
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                 StyleableToast.makeText(view.getContext(), "Oman Lent Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -780,7 +769,7 @@ public class DataFragment extends Fragment {
             int finalI = i;
             databaseReference.child("Balance Details India").child(indiaBalanceNameList.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     List<BalanceDetailsData> balList = new ArrayList<>();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         if (dataSnapshot.getChildrenCount() != 0) {
@@ -835,7 +824,7 @@ public class DataFragment extends Fragment {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "India Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -869,7 +858,7 @@ public class DataFragment extends Fragment {
             int finalI = i;
             databaseReference.child("Balance Details Oman").child(omanBalanceNameList.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onDataChange(@NotNull DataSnapshot snapshot) {
                     List<BalanceDetailsData> balList = new ArrayList<>();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         if (dataSnapshot.getChildrenCount() != 0) {
@@ -920,7 +909,7 @@ public class DataFragment extends Fragment {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onCancelled(@NotNull DatabaseError error) {
                     dialog.dismiss();
                     vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                     StyleableToast.makeText(view.getContext(), "Oman Balance Details Fetch Error: " + error.getMessage(), Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
@@ -962,5 +951,17 @@ public class DataFragment extends Fragment {
 
         }
     }
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result) {
+                    dialog.show();
+                    pdfDataCall(tableDropDown1);
+                } else {
+                    StyleableToast.makeText(view.getContext(), "Storage Permission Denied", Toast.LENGTH_LONG, R.style.CustomErrorToast).show();
+                }
+
+            });
 
 }
